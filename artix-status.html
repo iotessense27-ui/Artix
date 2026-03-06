@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTIX 2026 – Check Status</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--red:#D90429;--red-dark:#a80220;--black:#090909;--black2:#111;--white:#fff;--soft:#ececec;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.07);--green:#22c55e;--orange:#f97316}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 40% at 50% -5%,rgba(217,4,41,.17) 0%,transparent 70%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:58px 58px}
+.wrap{position:relative;z-index:1;max-width:540px;margin:0 auto;padding:0 18px 80px}
+header{text-align:center;padding:44px 0 28px}
+.backlink{display:inline-flex;align-items:center;gap:6px;color:var(--gray);font-size:13px;text-decoration:none;margin-bottom:18px}
+.backlink:hover{color:var(--red)}
+.ptitle{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,11vw,68px);letter-spacing:4px;line-height:1}
+.ptitle span{color:var(--red)}
+.psub{color:var(--gray);font-size:14px;margin-top:7px}
+.card{background:var(--black2);border:1px solid var(--border);border-radius:8px;padding:30px;box-shadow:0 22px 65px rgba(0,0,0,.55)}
+.slabel{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:13px;font-weight:700}
+.srow{display:flex;gap:9px}
+.srow input{flex:1;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:12px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .2s;text-transform:uppercase}
+.srow input:focus{border-color:var(--red)}
+.srow input::placeholder{color:rgba(255,255,255,.18);text-transform:none}
+.sbtn{background:var(--red);border:none;border-radius:5px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:0 20px;cursor:pointer;transition:background .2s;white-space:nowrap}
+.sbtn:hover{background:var(--red-dark)}.sbtn:disabled{opacity:.45;cursor:not-allowed}
+.res{margin-top:22px;display:none}.res.show{display:block}
+.stbadge{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px}
+.st-pending{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.28);color:var(--orange)}
+.st-approved{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.22);color:var(--green)}
+.st-rejected{background:rgba(217,4,41,.09);border:1px solid rgba(217,4,41,.22);color:var(--red)}
+.stdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.stdot.anim{animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.dgrid .full{grid-column:1/-1}
+.di{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;padding:11px 13px}
+.dk{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:3px}
+.dv{font-size:14px;color:var(--soft);font-weight:500}
+.qrsec{text-align:center;padding:22px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.14);border-radius:8px;margin-bottom:14px}
+.qrtitle{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--green);margin-bottom:5px}
+.qrsub{font-size:12px;color:var(--gray);margin-bottom:18px}
+.qrbox{display:inline-block;background:#fff;padding:13px;border-radius:6px;margin-bottom:14px}
+.qrdetails{font-size:12px;color:var(--gray);line-height:1.9;margin-bottom:14px}
+.qrdetails strong{color:var(--soft)}
+.dlbtn{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#0a0a0a;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;padding:9px 20px;border-radius:5px;border:none;cursor:pointer}
+.notfound{text-align:center;padding:22px;color:var(--gray)}
+.notfound .big{font-size:38px;margin-bottom:9px}
+.notfound a{color:var(--red)}
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--red);border-radius:50%;animation:sp .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+footer{text-align:center;padding:36px 0 0;color:var(--gray);font-size:12px;line-height:1.9}
+footer strong{color:var(--soft)}
+@media(max-width:480px){.srow{flex-direction:column}.sbtn{padding:12px}.dgrid{grid-template-columns:1fr}.dgrid .full{grid-column:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="artix-register.html" class="backlink">← Back to Registration</a>
+    <div class="ptitle">Check <span>Status</span></div>
+    <div class="psub">Enter your Roll No to see your registration status</div>
+  </header>
+  <div class="card">
+    <div class="slabel">— Enter Your Roll No</div>
+    <div class="srow">
+      <input type="text" id="rollInput" placeholder="e.g. 22B91A6701" onkeydown="if(event.key==='Enter')doCheck()">
+      <button class="sbtn" id="chkBtn" onclick="doCheck()">Check</button>
+    </div>
+    <div class="res" id="resArea"></div>
+  </div>
+  <footer><strong>ARTIX 2026</strong> &nbsp;·&nbsp; Department of CSE – IoT<br>Malla Reddy Deemed to be University</footer>
+</div>
+<script>
+const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
+const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
+
+function sb(path,opts={}){
+  return fetch(SB+path,{...opts,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:opts.prefer||'',...(opts.headers||{})}});
+}
+
+async function doCheck(){
+  const roll=document.getElementById('rollInput').value.trim().toUpperCase();
+  if(!roll){alert('Please enter your Roll No');return;}
+  const btn=document.getElementById('chkBtn'),res=document.getElementById('resArea');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  res.classList.remove('show'); res.innerHTML='';
+  try {
+    const r=await sb('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(roll)+'&select=*');
+    const data=await r.json();
+    if(data && data.length>0){ renderRes(data[0]); }
+    else { res.innerHTML=`<div class="notfound"><div class="big">🔍</div><p>No registration found for <strong>${roll}</strong>.<br>Check your roll number or <a href="artix-register.html">register here</a>.</p></div>`; }
+  } catch(e){
+    res.innerHTML=`<div class="notfound"><div class="big">⚠️</div><p>Could not connect. Try again in a moment.</p></div>`;
+  }
+  res.classList.add('show');
+  btn.disabled=false; btn.textContent='Check';
+}
+
+function renderRes(r){
+  const st=r.status||'Pending';
+  const cls=st==='Approved'?'st-approved':st==='Rejected'?'st-rejected':'st-pending';
+  const dot=st==='Pending'?'stdot anim':'stdot';
+  let html=`<div class="stbadge ${cls}"><span class="${dot}"></span>${st}</div>
+    <div class="dgrid">
+      <div class="di full"><div class="dk">Full Name</div><div class="dv">${r.name||'—'}</div></div>
+      <div class="di"><div class="dk">Roll No</div><div class="dv">${r.rollno||'—'}</div></div>
+      <div class="di"><div class="dk">Event</div><div class="dv">${r.event||'—'}</div></div>
+      <div class="di"><div class="dk">Phone</div><div class="dv">${r.phone||'—'}</div></div>
+      <div class="di"><div class="dk">Email</div><div class="dv">${r.email||'—'}</div></div>
+    </div>`;
+  if(st==='Approved'){
+    html+=`<div class="qrsec">
+      <div class="qrtitle">✓ You're Approved!</div>
+      <div class="qrsub">Show this QR at the event entry gate</div>
+      <div class="qrbox" id="confQR"></div>
+      <div class="qrdetails"><strong>${r.name}</strong> &nbsp;|&nbsp; ${r.rollno}<br>${r.event} &nbsp;|&nbsp; ARTIX 2026<br>16–17 March 2026</div>
+      <button class="dlbtn" onclick="dlQR('${r.name}','${r.rollno}','${r.event}')">⬇ Download QR Card</button>
+    </div>`;
+    setTimeout(()=>{
+      const el=document.getElementById('confQR'); if(!el) return;
+      new QRCode(el,{text:JSON.stringify({name:r.name,roll:r.rollno,event:r.event,college:'MRDU',artix:'2026',status:'APPROVED'}),width:180,height:180,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+    },120);
+  } else if(st==='Pending'){
+    html+=`<div style="text-align:center;padding:14px;color:var(--gray);font-size:13px;line-height:1.8">⏳ Your screenshot is being reviewed.<br>Usually takes a few hours — check back soon.</div>`;
+  } else {
+    html+=`<div style="text-align:center;padding:14px;color:var(--gray);font-size:13px;line-height:1.8">❌ Registration not approved.<br>Please contact the organizers or <a href="artix-register.html" style="color:var(--red)">re-register</a>.</div>`;
+  }
+  document.getElementById('resArea').innerHTML=html;
+}
+
+function dlQR(name,roll,event){
+  setTimeout(()=>{
+    const src=document.querySelector('#confQR canvas'); if(!src){alert('QR not ready.');return;}
+    const c=document.createElement('canvas'); c.width=400;c.height=520;
+    const x=c.getContext('2d');
+    x.fillStyle='#090909';x.fillRect(0,0,400,520);
+    x.fillStyle='#D90429';x.fillRect(0,0,400,7);
+    x.fillStyle='#fff';x.font='bold 50px Georgia';x.textAlign='center';x.fillText('ARTIX 2026',200,68);
+    x.fillStyle='#D90429';x.font='13px sans-serif';x.fillText('DEPARTMENT OF CSE – IoT · MRDU',200,92);
+    x.drawImage(src,110,108,180,180);
+    x.fillStyle='#fff';x.font='bold 20px sans-serif';x.fillText(name,200,320);
+    x.fillStyle='#888';x.font='14px sans-serif';x.fillText(roll,200,343);
+    x.fillStyle='#22c55e';x.font='bold 13px sans-serif';x.fillText('✓ APPROVED · '+event.toUpperCase(),200,368);
+    x.fillStyle='#555';x.font='12px sans-serif';x.fillText('16–17 March 2026 · Sports Complex Auditorium',200,393);
+    x.fillStyle='#D90429';x.fillRect(0,513,400,7);
+    const a=document.createElement('a');a.download=`ARTIX2026_${roll}.png`;a.href=c.toDataURL();a.click();
+  },200);
+}
+</script>
+</body>
+</html>

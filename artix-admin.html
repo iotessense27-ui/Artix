@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTIX 2026 – Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--red:#D90429;--red-dark:#a80220;--black:#090909;--black2:#111;--black3:#181818;--white:#fff;--soft:#ececec;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.07);--green:#22c55e;--orange:#f97316;--blue:#3b82f6}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse 65% 55% at 50% 0%,rgba(217,4,41,.2) 0%,transparent 70%)}
+.lcard{background:var(--black2);border:1px solid var(--border);border-radius:10px;padding:42px 38px;width:100%;max-width:390px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.65)}
+.ltitle{font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:4px;margin-bottom:3px}
+.ltitle span{color:var(--red)}
+.lsub{color:var(--gray);font-size:13px;margin-bottom:30px}
+.lf{display:flex;flex-direction:column;gap:6px;margin-bottom:13px;text-align:left}
+.lf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:600}
+.lf input{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:12px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .2s}
+.lf input:focus{border-color:var(--red)}
+.lerr{color:var(--red);font-size:13px;margin-bottom:9px;min-height:17px}
+.lbtn{width:100%;background:var(--red);border:none;border-radius:5px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:14px;cursor:pointer;margin-top:6px}
+.lbtn:hover{background:var(--red-dark)}
+#panel{display:none}
+.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px}
+.brand span{color:var(--red)}
+.tright{display:flex;align-items:center;gap:14px}
+.tuser{font-size:13px;color:var(--gray)}
+.logoutbtn{background:rgba(217,4,41,.1);border:1px solid rgba(217,4,41,.2);color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 13px;border-radius:4px;cursor:pointer}
+.main{max-width:1180px;margin:0 auto;padding:26px 20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:24px}
+.sc{background:var(--black2);border:1px solid var(--border);border-radius:7px;padding:17px 19px}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;line-height:1}
+.sk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
+.sc.total .sn{color:var(--white)}.sc.pend .sn{color:var(--orange)}.sc.appr .sn{color:var(--green)}.sc.expo .sn{color:var(--blue)}
+.filters{display:flex;align-items:center;gap:9px;margin-bottom:18px;flex-wrap:wrap}
+.fb{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;padding:6px 14px;border-radius:4px;cursor:pointer;transition:all .2s}
+.fb:hover{border-color:rgba(255,255,255,.18);color:var(--white)}
+.fb.on{background:rgba(217,4,41,.1);border-color:var(--red);color:var(--white)}
+.fsearch{flex:1;min-width:160px;max-width:260px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:7px 11px;color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;outline:none}
+.fsearch:focus{border-color:var(--red)}
+.fsearch::placeholder{color:rgba(255,255,255,.18)}
+.rfbtn{background:transparent;border:1px solid var(--border);color:var(--gray);font-size:16px;width:33px;height:33px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.rfbtn:hover{border-color:var(--red);color:var(--red)}
+.twrap{background:var(--black2);border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead{background:rgba(255,255,255,.03)}
+th{padding:11px 13px;text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;border-bottom:1px solid var(--border)}
+td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.035);font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.018)}
+.ss-thumb{width:44px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer;display:block;transition:transform .15s}
+.ss-thumb:hover{transform:scale(1.12);border-color:var(--red)}
+.ss-none{color:var(--gray);font-size:12px}
+.bdg{display:inline-block;padding:3px 9px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.b-pend{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.22)}
+.b-appr{background:rgba(34,197,94,.09);color:var(--green);border:1px solid rgba(34,197,94,.18)}
+.b-rej{background:rgba(217,4,41,.09);color:var(--red);border:1px solid rgba(217,4,41,.18)}
+.b-reg{background:rgba(255,255,255,.05);color:var(--lgray)}
+.b-expo{background:rgba(59,130,246,.09);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
+.acts{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.bappr{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.22);color:var(--green);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.bappr:hover{background:rgba(34,197,94,.18)}
+.brej{background:rgba(217,4,41,.07);border:1px solid rgba(217,4,41,.18);color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.brej:hover{background:rgba(217,4,41,.15)}
+.bview{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.bview:hover{border-color:rgba(255,255,255,.2);color:#fff}
+.bqr{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.14);color:var(--green);font-size:14px;width:29px;height:29px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bqr:hover{background:rgba(34,197,94,.16)}
+.empty{text-align:center;padding:44px;color:var(--gray)}
+.empty .ico{font-size:38px;margin-bottom:10px}
+.mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px)}
+.mback.on{display:flex}
+.modal{background:var(--black2);border:1px solid var(--border);border-radius:10px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--black2);z-index:1}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:3px}
+.mclose{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--gray);width:30px;height:30px;border-radius:4px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.mclose:hover{color:#fff}
+.mbody{padding:22px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px}
+.mgrid .full{grid-column:1/-1}
+.mf{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;padding:10px 12px}
+.mk{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:2px}
+.mv{font-size:14px;color:var(--soft)}
+.macts{display:flex;gap:9px;margin-top:6px}
+.macts .bappr,.macts .brej{flex:1;padding:11px;font-size:13px;letter-spacing:1.5px}
+.ss-section{margin-bottom:18px}
+.ss-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:8px}
+.ss-img{width:100%;max-height:320px;object-fit:contain;border-radius:6px;border:1px solid var(--border);display:block;cursor:zoom-in}
+.ss-img:hover{border-color:var(--red)}
+.ss-actions{display:flex;gap:12px;margin-top:8px;font-size:12px}
+.ss-dl{color:var(--red);text-decoration:none}.ss-dl:hover{color:var(--soft)}
+.ss-hint{color:var(--gray)}
+.ss-missing{padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;color:var(--gray);font-size:13px}
+#qrModal .modal{max-width:360px}
+.qrmb{text-align:center;padding:26px}
+#adminQRbox{display:inline-block;background:#fff;padding:13px;border-radius:6px;margin-bottom:14px}
+.qrpname{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:2px;margin-bottom:3px}
+.qrproll{font-size:13px;color:var(--gray);margin-bottom:14px}
+.dlqr{background:var(--green);color:#0a0a0a;border:none;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;padding:10px 22px;cursor:pointer}
+#ssOverlay{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+#ssOverlay.on{display:flex}
+#ssOverlay img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+#ssOverlay .ss-close{position:absolute;top:18px;right:22px;color:#fff;font-size:26px;cursor:pointer;background:rgba(255,255,255,.1);border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.loader{text-align:center;padding:44px;color:var(--gray)}
+.spin{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--red);border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--black3);border:1px solid var(--border);border-radius:6px;padding:11px 18px;font-size:14px;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.on{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:rgba(34,197,94,.3);color:var(--green)}
+.toast.err{border-color:rgba(217,4,41,.3);color:var(--red)}
+@media(max-width:680px){.stats{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 14px}.main{padding:18px 13px}.mgrid{grid-template-columns:1fr}.mgrid .full{grid-column:1}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lcard">
+    <div class="ltitle">ARTIX <span>Admin</span></div>
+    <div class="lsub">ARTIX 2026 · Department of CSE–IoT</div>
+    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lerr" id="lerr"></div>
+    <button class="lbtn" onclick="doLogin()">Login →</button>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div id="panel">
+  <div class="topbar">
+    <div class="brand">ARTIX <span>2026</span> Admin</div>
+    <div class="tright">
+      <span class="tuser">iot@123</span>
+      <button class="logoutbtn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="stats">
+      <div class="sc total"><div class="sn" id="stTotal">—</div><div class="sk">Total</div></div>
+      <div class="sc pend"><div class="sn" id="stPend">—</div><div class="sk">Pending</div></div>
+      <div class="sc appr"><div class="sn" id="stAppr">—</div><div class="sk">Approved</div></div>
+      <div class="sc expo"><div class="sn" id="stExpo">—</div><div class="sk">Project Expo</div></div>
+    </div>
+    <div class="filters">
+      <button class="fb on" data-f="All" onclick="setF(this)">All</button>
+      <button class="fb" data-f="Pending" onclick="setF(this)">Pending</button>
+      <button class="fb" data-f="Approved" onclick="setF(this)">Approved</button>
+      <button class="fb" data-f="Rejected" onclick="setF(this)">Rejected</button>
+      <button class="fb" data-f="expo" onclick="setF(this)">Project Expo</button>
+      <input class="fsearch" type="text" placeholder="Search name / roll…" oninput="renderTable()" id="fq">
+      <button class="rfbtn" onclick="loadData()" title="Refresh">↻</button>
+    </div>
+    <div class="twrap" id="tw"><div class="loader"><div class="spin"></div></div></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="mback" id="detModal">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle">Registration Details</div><button class="mclose" onclick="closeM('detModal')">✕</button></div>
+    <div class="mbody" id="detBody"></div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="mback" id="qrModal">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle">Confirmation QR</div><button class="mclose" onclick="closeM('qrModal')">✕</button></div>
+    <div class="qrmb">
+      <div id="adminQRbox"></div>
+      <div class="qrpname" id="qrName"></div>
+      <div class="qrproll" id="qrRoll"></div>
+      <button class="dlqr" id="dlQRbtn">⬇ Download QR Card</button>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN SCREENSHOT -->
+<div id="ssOverlay" onclick="closeSS()">
+  <button class="ss-close" onclick="closeSS()">✕</button>
+  <img id="ssOverlayImg" src="" alt="Screenshot">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_USER = 'iot@123';
+const ADMIN_PASS = '12345';
+const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
+const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
+
+let recs = [], curF = 'All';
+
+function sb(path, opts={}) {
+  return fetch(SB + path, {
+    ...opts,
+    headers: { apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer:opts.prefer||'', ...(opts.headers||{}) }
+  });
+}
+
+// ── LOGIN ─────────────────────────────────────────────
+function doLogin(){
+  const u=document.getElementById('luser').value.trim();
+  const p=document.getElementById('lpass').value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    document.getElementById('login').style.display='none';
+    document.getElementById('panel').style.display='block';
+    loadData();
+  } else {
+    document.getElementById('lerr').textContent='Invalid credentials.';
+    setTimeout(()=>document.getElementById('lerr').textContent='',3000);
+  }
+}
+function logout(){
+  document.getElementById('panel').style.display='none';
+  document.getElementById('login').style.display='flex';
+  document.getElementById('luser').value='';
+  document.getElementById('lpass').value='';
+  recs=[];
+}
+
+// ── LOAD DATA — direct Supabase REST, zero CORS issues ──
+async function loadData(){
+  document.getElementById('tw').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  try {
+    const res = await sb('/rest/v1/registrations?select=*&order=created_at.desc');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    recs = await res.json();
+    updateStats();
+    renderTable();
+  } catch(err) {
+    document.getElementById('tw').innerHTML=
+      `<div class="empty"><div class="ico">⚠️</div>Could not load data: ${err.message}</div>`;
+  }
+}
+
+function updateStats(){
+  document.getElementById('stTotal').textContent=recs.length;
+  document.getElementById('stPend').textContent=recs.filter(r=>!r.status||r.status==='Pending').length;
+  document.getElementById('stAppr').textContent=recs.filter(r=>r.status==='Approved').length;
+  document.getElementById('stExpo').textContent=recs.filter(r=>(r.event||'').includes('Expo')).length;
+}
+
+function setF(btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); curF=btn.dataset.f; renderTable();
+}
+
+// ── TABLE ─────────────────────────────────────────────
+function renderTable(){
+  const q=(document.getElementById('fq').value||'').toLowerCase();
+  const rows=recs.filter(r=>{
+    const fok=curF==='All'||(curF==='expo'?(r.event||'').includes('Expo'):r.status===curF);
+    const qok=!q||(r.name||'').toLowerCase().includes(q)||(r.rollno||'').toLowerCase().includes(q);
+    return fok&&qok;
+  });
+  if(!rows.length){
+    document.getElementById('tw').innerHTML='<div class="empty"><div class="ico">📋</div>No registrations found.</div>';
+    return;
+  }
+  const tbody=rows.map((r,i)=>{
+    const st=r.status||'Pending';
+    const sc=st==='Approved'?'b-appr':st==='Rejected'?'b-rej':'b-pend';
+    const ec=(r.event||'').includes('Expo')?'b-expo':'b-reg';
+    const ssThumb=r.screenshot&&r.screenshot.length>100
+      ? `<img class="ss-thumb" src="${r.screenshot}" onclick="openSS('${r.id}')" title="Click to enlarge">`
+      : `<span class="ss-none">—</span>`;
+    return `<tr>
+      <td style="color:var(--gray);font-size:12px">${i+1}</td>
+      <td style="font-weight:500;color:var(--soft)">${r.name||'—'}</td>
+      <td style="font-family:'Barlow Condensed',sans-serif;color:var(--lgray)">${r.rollno||'—'}</td>
+      <td><span class="bdg ${ec}">${r.event||'Reg'}</span></td>
+      <td>${ssThumb}</td>
+      <td><span class="bdg ${sc}">${st}</span></td>
+      <td><div class="acts">
+        <button class="bview" onclick="viewRec('${r.id}')">View</button>
+        ${st!=='Approved'?`<button class="bappr" onclick="updStatus('${r.id}','Approved')">✓</button>`:''}
+        ${st!=='Rejected'?`<button class="brej"  onclick="updStatus('${r.id}','Rejected')">✕</button>`:''}
+        ${st==='Approved'?`<button class="bqr"   onclick="showQR('${r.id}')" title="QR">⊞</button>`:''}
+      </div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('tw').innerHTML=`<table>
+    <thead><tr><th>#</th><th>Name</th><th>Roll No</th><th>Event</th><th>Screenshot</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${tbody}</tbody>
+  </table>`;
+}
+
+// ── SCREENSHOT FULLSCREEN ─────────────────────────────
+function openSS(id){
+  const r=recs.find(x=>x.id===id); if(!r||!r.screenshot) return;
+  document.getElementById('ssOverlayImg').src=r.screenshot;
+  document.getElementById('ssOverlay').classList.add('on');
+}
+function closeSS(){
+  document.getElementById('ssOverlay').classList.remove('on');
+  document.getElementById('ssOverlayImg').src='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSS();});
+
+// ── VIEW RECORD ───────────────────────────────────────
+function viewRec(id){
+  const r=recs.find(x=>x.id===id); if(!r) return;
+  const st=r.status||'Pending';
+  const sc=st==='Approved'?'b-appr':st==='Rejected'?'b-rej':'b-pend';
+  let ssHtml='';
+  if(r.screenshot&&r.screenshot.length>100){
+    ssHtml+=`<div class="ss-section">
+      <div class="ss-label">Payment Screenshot</div>
+      <img class="ss-img" src="${r.screenshot}" alt="Screenshot" onclick="openSS('${r.id}')">
+      <div class="ss-actions">
+        <span class="ss-hint">Click to fullscreen</span>
+        <a class="ss-dl" href="${r.screenshot}" download="ss_${r.rollno}.jpg">⬇ Download</a>
+      </div>
+    </div>`;
+  } else {
+    ssHtml+=`<div class="ss-section"><div class="ss-label">Payment Screenshot</div><div class="ss-missing">No screenshot uploaded.</div></div>`;
+  }
+  document.getElementById('detBody').innerHTML=`
+    <div class="mgrid">
+      <div class="mf full"><div class="mk">Full Name</div><div class="mv">${r.name||'—'}</div></div>
+      <div class="mf"><div class="mk">Roll No</div><div class="mv">${r.rollno||'—'}</div></div>
+      <div class="mf"><div class="mk">Event</div><div class="mv">${r.event||'—'}</div></div>
+      <div class="mf"><div class="mk">Phone</div><div class="mv">${r.phone||'—'}</div></div>
+      <div class="mf"><div class="mk">Email</div><div class="mv">${r.email||'—'}</div></div>
+      <div class="mf"><div class="mk">Amount Paid</div><div class="mv">₹${r.amount||70}</div></div>
+      ${r.m2name?`<div class="mf"><div class="mk">Member 2</div><div class="mv">${r.m2name} · ${r.m2roll||''}</div></div>`:''}
+      ${r.m3name?`<div class="mf"><div class="mk">Member 3</div><div class="mv">${r.m3name} · ${r.m3roll||''}</div></div>`:''}
+      <div class="mf"><div class="mk">Status</div><div class="mv"><span class="bdg ${sc}">${st}</span></div></div>
+      <div class="mf"><div class="mk">Submitted</div><div class="mv">${r.created_at?new Date(r.created_at).toLocaleString('en-IN'):'—'}</div></div>
+    </div>
+    ${ssHtml}
+    <div class="macts">
+      ${st!=='Approved'?`<button class="bappr" onclick="updStatus('${r.id}','Approved');closeM('detModal')">✓ Approve</button>`:''}
+      ${st!=='Rejected'?`<button class="brej"  onclick="updStatus('${r.id}','Rejected');closeM('detModal')">✕ Reject</button>`:''}
+      ${st==='Approved'?`<button class="bview" onclick="closeM('detModal');showQR('${r.id}')">View QR →</button>`:''}
+    </div>`;
+  openM('detModal');
+}
+
+// ── UPDATE STATUS ─────────────────────────────────────
+async function updStatus(id, status){
+  try {
+    await sb('/rest/v1/registrations?id=eq.'+id, {method:'PATCH', prefer:'return=minimal', body:JSON.stringify({status})});
+    const r=recs.find(x=>x.id===id); if(r) r.status=status;
+    updateStats(); renderTable();
+    toast((r?r.rollno:id)+' → '+status, status==='Approved'?'ok':'err');
+    if(status==='Approved') setTimeout(()=>showQR(id),400);
+  } catch(e){ toast('Update failed','err'); }
+}
+
+// ── QR ────────────────────────────────────────────────
+function showQR(id){
+  const r=recs.find(x=>x.id===id); if(!r) return;
+  document.getElementById('adminQRbox').innerHTML='';
+  document.getElementById('qrName').textContent=r.name;
+  document.getElementById('qrRoll').textContent=r.rollno+' · '+r.event;
+  new QRCode(document.getElementById('adminQRbox'),{
+    text:JSON.stringify({name:r.name,roll:r.rollno,event:r.event,college:'MRDU',artix:'2026',status:'APPROVED'}),
+    width:180,height:180,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
+  });
+  document.getElementById('dlQRbtn').onclick=()=>dlQRCard(r);
+  openM('qrModal');
+}
+
+function dlQRCard(r){
+  setTimeout(()=>{
+    const src=document.querySelector('#adminQRbox canvas'); if(!src){alert('QR not ready');return;}
+    const c=document.createElement('canvas'); c.width=400;c.height=520;
+    const x=c.getContext('2d');
+    x.fillStyle='#090909';x.fillRect(0,0,400,520);
+    x.fillStyle='#D90429';x.fillRect(0,0,400,7);
+    x.fillStyle='#fff';x.font='bold 50px Georgia';x.textAlign='center';x.fillText('ARTIX 2026',200,68);
+    x.fillStyle='#D90429';x.font='13px sans-serif';x.fillText('DEPARTMENT OF CSE – IoT · MRDU',200,92);
+    x.drawImage(src,110,108,180,180);
+    x.fillStyle='#fff';x.font='bold 20px sans-serif';x.fillText(r.name,200,320);
+    x.fillStyle='#888';x.font='14px sans-serif';x.fillText(r.rollno,200,343);
+    x.fillStyle='#22c55e';x.font='bold 13px sans-serif';x.fillText('✓ APPROVED · '+(r.event||'').toUpperCase(),200,368);
+    x.fillStyle='#555';x.font='12px sans-serif';x.fillText('16–17 March 2026 · Sports Complex Auditorium',200,393);
+    x.fillStyle='#D90429';x.fillRect(0,513,400,7);
+    const a=document.createElement('a');a.download=`ARTIX2026_QR_${r.rollno}.png`;a.href=c.toDataURL();a.click();
+  },200);
+}
+
+function openM(id){document.getElementById(id).classList.add('on');}
+function closeM(id){document.getElementById(id).classList.remove('on');}
+document.querySelectorAll('.mback').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');}));
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} on`;setTimeout(()=>t.classList.remove('on'),2800);}
+</script>
+</body>
+</html>

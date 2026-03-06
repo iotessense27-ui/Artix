@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTIX 2026 – Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--red:#D90429;--red-dark:#a80220;--black:#090909;--black2:#111;--white:#fff;--soft:#ececec;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.07);--green:#22c55e;--orange:#f97316}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 90% 55% at 50% -8%,rgba(217,4,41,.22) 0%,transparent 68%),radial-gradient(ellipse 35% 35% at 95% 85%,rgba(217,4,41,.08) 0%,transparent 60%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:58px 58px}
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
+header{text-align:center;padding:52px 0 32px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:4px;padding:5px 15px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--lgray);margin-bottom:22px}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.title{font-family:'Bebas Neue',sans-serif;font-size:clamp(88px,21vw,155px);line-height:.85;letter-spacing:4px;display:inline-block;position:relative}
+.title-line{position:absolute;bottom:-4px;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.year{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(17px,4vw,30px);letter-spacing:12px;color:var(--red);margin-top:5px}
+.meta{display:flex;justify-content:center;flex-wrap:wrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:13px 0;margin-top:26px}
+.mi{display:flex;flex-direction:column;align-items:center;padding:0 22px;gap:2px;position:relative}
+.mi:not(:last-child)::after{content:'';position:absolute;right:0;top:8%;height:84%;width:1px;background:var(--border)}
+.mk{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700}
+.mv{font-size:13px;color:var(--soft);font-weight:500;text-align:center}
+.steps{display:flex;align-items:center;margin:28px 0 6px}
+.st{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+.sn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--gray);transition:all .3s}
+.st.active .sn{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 18px rgba(217,4,41,.45)}
+.st.done .sn{background:rgba(217,4,41,.18);border-color:var(--red);color:var(--red)}
+.sl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);text-align:center}
+.st.active .sl{color:var(--soft)}
+.sline{flex:1;height:1px;background:rgba(255,255,255,.07);margin-bottom:17px}
+.sline.done{background:var(--red)}
+.card{background:var(--black2);border:1px solid var(--border);border-radius:8px;padding:34px;margin-top:6px;box-shadow:0 22px 65px rgba(0,0,0,.55)}
+.slabel{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px;font-weight:700}
+.eopts{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px}
+.eopt{position:relative;cursor:pointer;user-select:none}
+.eopt input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.oc{display:flex;flex-direction:column;gap:5px;padding:17px 19px 17px 50px;border:1.5px solid rgba(255,255,255,.09);border-radius:6px;background:rgba(255,255,255,.02);transition:all .25s;cursor:pointer;position:relative}
+.oc:hover{border-color:rgba(217,4,41,.4);background:rgba(217,4,41,.04)}
+.eopt input:checked+.oc{border-color:var(--red);background:rgba(217,4,41,.09)}
+.oc::before{content:'';position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;border:1.5px solid rgba(255,255,255,.2);border-radius:4px;background:rgba(255,255,255,.04);transition:all .2s}
+.eopt input:checked+.oc::before{background:var(--red);border-color:var(--red)}
+.oc::after{content:'';position:absolute;left:22px;top:50%;transform:translateY(-60%) rotate(45deg);width:6px;height:10px;border-right:2px solid #fff;border-bottom:2px solid #fff;opacity:0;transition:opacity .15s}
+.eopt input:checked+.oc::after{opacity:1}
+.on{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--white)}
+.op{font-family:'Bebas Neue',sans-serif;font-size:27px;color:var(--red);line-height:1}
+.od{font-size:11px;color:var(--gray)}
+.sel-summary{background:rgba(217,4,41,.06);border:1px solid rgba(217,4,41,.18);border-radius:5px;padding:11px 15px;font-size:13px;margin-bottom:16px;display:none}
+.sel-summary.show{display:block}
+.sel-summary .total{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);float:right}
+.notice{background:rgba(217,4,41,.07);border:1px solid rgba(217,4,41,.22);border-radius:5px;padding:11px 15px;font-size:13px;color:var(--lgray);line-height:1.65;margin-bottom:22px}
+.notice strong{color:var(--red)}
+.div{height:1px;background:var(--border);margin:22px 0}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.fg .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600}
+input[type=text],input[type=email],input[type=tel]{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:11px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;width:100%;outline:none;transition:border-color .2s}
+input::placeholder{color:rgba(255,255,255,.16)}
+input:focus{border-color:var(--red);background:rgba(217,4,41,.04)}
+input.inv{border-color:var(--red)!important}
+.team{overflow:hidden;max-height:0;opacity:0;transition:max-height .45s,opacity .35s}
+.team.open{max-height:380px;opacity:1}
+.thdiv{display:flex;align-items:center;gap:10px;margin:18px 0 13px}
+.thline{flex:1;height:1px;background:var(--border)}
+.thlabel{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--gray);white-space:nowrap;text-transform:uppercase}
+.phase{display:none}.phase.active{display:block}
+.upibox{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;padding:26px 22px;text-align:center;margin-bottom:18px}
+.upi-amt{display:inline-block;background:var(--red);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;padding:5px 20px;border-radius:4px;margin-bottom:18px}
+.qrwrap{display:flex;flex-direction:column;align-items:center;gap:11px;margin:4px 0 18px}
+.qrbox{background:#fff;padding:13px;border-radius:7px;display:inline-block}
+.qr-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray)}
+.upi-or{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2)}
+.openbtn{display:inline-flex;align-items:center;gap:7px;background:var(--red);color:#fff;border:none;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;padding:9px 22px;cursor:pointer;text-decoration:none}
+.upiid{font-family:'Barlow Condensed',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin:4px 0}
+.copybtn{background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;padding:5px 13px;border-radius:4px;cursor:pointer;margin-left:8px}
+.usteps{text-align:left;font-size:13px;color:var(--gray);line-height:2.1;border-top:1px solid var(--border);padding-top:13px;margin-top:6px}
+.usteps span{color:var(--soft)}
+.uparea{border:2px dashed rgba(255,255,255,.1);border-radius:6px;padding:30px 18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:18px}
+.uparea:hover,.uparea.drag{border-color:var(--red);background:rgba(217,4,41,.04)}
+.uparea input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upicon{font-size:30px;margin-bottom:7px;opacity:.45}
+.uptxt{font-size:14px;color:var(--gray)}
+.uptxt strong{color:var(--soft)}
+.upprev{display:none;margin-top:11px}
+.upprev img{max-width:100%;max-height:190px;border-radius:5px;border:1px solid var(--border)}
+.upname{font-size:12px;color:var(--red);margin-top:5px}
+.compressing{font-size:12px;color:var(--orange);margin-top:6px;display:none}
+.amtbar{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:rgba(217,4,41,.06);border:1px solid rgba(217,4,41,.18);border-radius:5px;margin-bottom:14px}
+.amtlbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray)}
+.amtval{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);letter-spacing:2px}
+.amtval em{color:var(--red);font-style:normal}
+.btn{width:100%;padding:15px;border:none;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;transition:all .2s}
+.btnp{background:var(--red);color:#fff}.btnp:hover{background:var(--red-dark)}.btnp:disabled{opacity:.42;cursor:not-allowed}
+.btno{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,.13);margin-top:9px;font-size:14px;letter-spacing:1px;padding:11px}
+.progress-wrap{display:none;margin-bottom:14px}.progress-wrap.show{display:block}
+.progress-bar-bg{background:rgba(255,255,255,.07);border-radius:4px;height:6px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--red);border-radius:4px;width:0%;transition:width .3s}
+.progress-label{font-size:11px;color:var(--gray);margin-top:5px;text-align:center}
+.done-wrap{text-align:center;padding:18px 0}
+.done-icon{font-size:52px;margin-bottom:14px}
+.done-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:4px;margin-bottom:7px}
+.done-sub{color:var(--gray);font-size:14px;line-height:1.8;margin-bottom:22px}
+.roll-box{background:rgba(217,4,41,.07);border:1px solid rgba(217,4,41,.18);border-radius:6px;padding:14px;margin-bottom:22px;display:inline-block;min-width:200px}
+.roll-lbl{font-size:10px;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.roll-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px}
+.status-link{text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.status-link a{color:var(--gray);font-size:13px;text-decoration:none}
+.status-link a span{color:var(--red)}
+footer{text-align:center;padding:36px 0 0;color:var(--gray);font-size:12px;line-height:1.9}
+footer strong{color:var(--soft)}
+@media(max-width:560px){.card{padding:20px 15px}.fg{grid-template-columns:1fr}.fg .full{grid-column:1}.eopts{grid-template-columns:1fr}.meta{flex-direction:column;gap:8px}.mi::after{display:none}.mi{padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">Malla Reddy Deemed to be University</div>
+    <div class="title">ARTIX<span class="year">2026</span><div class="title-line"></div></div>
+    <div class="meta">
+      <div class="mi"><span class="mk">Dept</span><span class="mv">CSE – IoT</span></div>
+      <div class="mi"><span class="mk">Date</span><span class="mv">16–17 Mar 2026</span></div>
+      <div class="mi"><span class="mk">Venue</span><span class="mv">Sports Complex Auditorium</span></div>
+    </div>
+  </header>
+  <div class="steps">
+    <div class="st active" id="s1"><div class="sn">1</div><div class="sl">Details</div></div>
+    <div class="sline" id="l1"></div>
+    <div class="st" id="s2"><div class="sn">2</div><div class="sl">Pay</div></div>
+    <div class="sline" id="l2"></div>
+    <div class="st" id="s3"><div class="sn">3</div><div class="sl">Upload</div></div>
+    <div class="sline" id="l3"></div>
+    <div class="st" id="s4"><div class="sn">4</div><div class="sl">Done</div></div>
+  </div>
+  <div class="card">
+    <!-- PHASE 1 -->
+    <div class="phase active" id="ph1">
+      <div class="slabel">— Select Event(s)</div>
+      <div class="eopts">
+        <label class="eopt"><input type="checkbox" id="chkReg" onchange="onEvt()">
+          <div class="oc"><div class="on">Registration</div><div class="op">₹70</div><div class="od">Individual participation</div></div>
+        </label>
+        <label class="eopt"><input type="checkbox" id="chkExpo" onchange="onEvt()">
+          <div class="oc"><div class="on">Project Expo</div><div class="op">₹150</div><div class="od">Team of max 3 members</div></div>
+        </label>
+      </div>
+      <div class="sel-summary" id="selSum"><span id="selTxt"></span><span class="total" id="selTot"></span></div>
+      <div class="notice" id="expoNote" style="display:none"><strong>Project Expo selected:</strong> Register for Expo only (₹150), or both Registration + Expo (₹220).</div>
+      <div class="div"></div>
+      <div class="slabel">— Your Details</div>
+      <div class="fg">
+        <div class="field full"><label>Full Name</label><input type="text" id="fname" placeholder="e.g. Priya Sharma"></div>
+        <div class="field"><label>Roll No</label><input type="text" id="roll" placeholder="e.g. 22B91A6701"></div>
+        <div class="field"><label>Phone</label><input type="tel" id="phone" placeholder="10-digit number" maxlength="10"></div>
+        <div class="field full"><label>Email</label><input type="email" id="email" placeholder="you@example.com"></div>
+      </div>
+      <div class="team" id="teamSec">
+        <div class="thdiv"><div class="thline"></div><div class="thlabel">Team Members (Optional)</div><div class="thline"></div></div>
+        <div class="fg">
+          <div class="field"><label>Member 2 Name</label><input type="text" id="m2n" placeholder="Full name"></div>
+          <div class="field"><label>Member 2 Roll No</label><input type="text" id="m2r" placeholder="Roll number"></div>
+          <div class="field"><label>Member 3 Name</label><input type="text" id="m3n" placeholder="Full name"></div>
+          <div class="field"><label>Member 3 Roll No</label><input type="text" id="m3r" placeholder="Roll number"></div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="amtbar"><span class="amtlbl">Total Amount</span><span class="amtval"><em>₹</em><span id="amtDisp">0</span></span></div>
+      <button class="btn btnp" onclick="goPhase2()">Continue to Payment →</button>
+    </div>
+    <!-- PHASE 2 -->
+    <div class="phase" id="ph2">
+      <div class="slabel">— Pay Now</div>
+      <div class="upibox">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px">Send exactly</div>
+        <div class="upi-amt" id="payBadge">₹0</div>
+        <div class="qrwrap">
+          <div class="qr-lbl">Scan with PhonePe / GPay / Paytm</div>
+          <div class="qrbox" id="payQR"></div>
+          <div class="upi-or">— or —</div>
+          <a class="openbtn" id="upiBtn" href="#">📱 Open UPI App</a>
+        </div>
+        <div style="height:1px;background:var(--border);margin-bottom:13px"></div>
+        <div class="upiid">6305696184-2@ybl <button class="copybtn" onclick="copyUPI()">Copy</button></div>
+        <div class="usteps">1. Scan QR or tap "Open UPI App"<br>2. Amount pre-filled: <span id="stepAmt">₹0</span><br>3. Add your <span>Roll No</span> in remarks<br>4. Pay and take a <span>screenshot</span></div>
+      </div>
+      <button class="btn btnp" onclick="setPhase(3)">I've Paid — Upload Screenshot →</button>
+      <button class="btn btno" onclick="setPhase(1)">← Back</button>
+    </div>
+    <!-- PHASE 3 -->
+    <div class="phase" id="ph3">
+      <div class="slabel">— Upload Payment Screenshot</div>
+      <div class="notice">Upload a clear screenshot of payment. It will be <strong>compressed automatically</strong>.</div>
+      <div class="uparea" id="upArea">
+        <input type="file" id="ssFile" accept="image/*" onchange="onFile(event)">
+        <div class="upicon">📸</div>
+        <div class="uptxt"><strong>Tap to upload screenshot</strong><br>or drag &amp; drop here</div>
+        <div class="compressing" id="compMsg">⚙️ Compressing...</div>
+        <div class="upprev" id="upPrev"><img id="upImg" src="" alt=""><div class="upname" id="upName"></div></div>
+      </div>
+      <div class="progress-wrap" id="progWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progFill"></div></div>
+        <div class="progress-label" id="progLabel">Uploading...</div>
+      </div>
+      <button class="btn btnp" id="subBtn" onclick="submitReg()">Submit Registration</button>
+      <button class="btn btno" onclick="setPhase(2)">← Back</button>
+    </div>
+    <!-- PHASE 4 -->
+    <div class="phase" id="ph4">
+      <div class="done-wrap">
+        <div class="done-icon">🎉</div>
+        <div class="done-title">Registration Submitted!</div>
+        <div class="done-sub">Your screenshot is being reviewed.<br>Check status once approved.</div>
+        <div class="roll-box"><div class="roll-lbl">Your Roll No</div><div class="roll-val" id="doneRoll">—</div></div>
+        <a href="artix-status.html" style="color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;text-decoration:none">Check Status →</a>
+      </div>
+    </div>
+    <div class="status-link"><a href="artix-status.html">Already registered? <span>Check your status →</span></a></div>
+  </div>
+  <footer><strong>ARTIX 2026</strong> &nbsp;·&nbsp; Department of CSE – IoT<br>Malla Reddy Deemed to be University &nbsp;·&nbsp; 16–17 March 2026</footer>
+</div>
+<script>
+const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
+const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
+const UPI = '6305696184-2@ybl';
+
+function sb(path, opts={}) {
+  return fetch(SB + path, {
+    ...opts,
+    headers: { apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer: opts.prefer||'', ...(opts.headers||{}) }
+  });
+}
+
+let fd={}, ss64='';
+
+function g(id){ return document.getElementById(id).value.trim(); }
+function inv(id){ const el=document.getElementById(id); el.classList.add('inv'); el.addEventListener('input',()=>el.classList.remove('inv'),{once:true}); }
+
+function onEvt(){
+  const reg=document.getElementById('chkReg').checked, expo=document.getElementById('chkExpo').checked;
+  document.getElementById('teamSec').classList.toggle('open',expo);
+  document.getElementById('expoNote').style.display=expo?'block':'none';
+  let tot=0,parts=[];
+  if(reg){tot+=70;parts.push('Registration ₹70');}
+  if(expo){tot+=150;parts.push('Project Expo ₹150');}
+  document.getElementById('amtDisp').textContent=tot;
+  const s=document.getElementById('selSum');
+  if(tot>0){document.getElementById('selTxt').textContent=parts.join(' + ');document.getElementById('selTot').textContent='₹'+tot;s.classList.add('show');}
+  else s.classList.remove('show');
+}
+
+function validate(){
+  const reg=document.getElementById('chkReg').checked,expo=document.getElementById('chkExpo').checked;
+  if(!reg&&!expo){alert('Please select at least one event.');return false;}
+  let ok=true;
+  [{id:'fname',t:v=>v.length>=2},{id:'roll',t:v=>v.length>=4},{id:'phone',t:v=>/^[6-9]\d{9}$/.test(v)},{id:'email',t:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}]
+  .forEach(({id,t})=>{if(!t(g(id))){inv(id);ok=false;}});
+  return ok;
+}
+
+function setPhase(n){
+  document.querySelectorAll('.phase').forEach(p=>p.classList.remove('active'));
+  document.getElementById('ph'+n).classList.add('active');
+  for(let i=1;i<=4;i++) document.getElementById('s'+i).className='st'+(i<n?' done':i===n?' active':'');
+  for(let i=1;i<=3;i++) document.getElementById('l'+i).className='sline'+(i<n?' done':'');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goPhase2(){
+  if(!validate()) return;
+  const reg=document.getElementById('chkReg').checked,expo=document.getElementById('chkExpo').checked;
+  const amt=(reg?70:0)+(expo?150:0);
+  fd={name:g('fname'),rollno:g('roll').toUpperCase(),email:g('email'),phone:g('phone'),
+      event:reg&&expo?'Registration + Project Expo':reg?'Registration':'Project Expo',
+      amount:amt,m2name:g('m2n'),m2roll:g('m2r'),m3name:g('m3n'),m3roll:g('m3r')};
+  setPhase(2);
+  const link=`upi://pay?pa=${UPI}&pn=ARTIX&am=${amt}&cu=INR&tn=ARTIX_${fd.rollno}`;
+  document.getElementById('upiBtn').href=link;
+  document.getElementById('payBadge').textContent='₹'+amt;
+  document.getElementById('stepAmt').textContent='₹'+amt;
+  const box=document.getElementById('payQR'); box.innerHTML='';
+  new QRCode(box,{text:link,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+}
+
+function copyUPI(){ navigator.clipboard.writeText(UPI).then(()=>{const b=document.querySelector('.copybtn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);}); }
+
+function compress(file,maxW,q,cb){
+  const r=new FileReader(); r.onload=ev=>{
+    const img=new Image(); img.onload=()=>{
+      const ratio=Math.min(maxW/img.width,maxW/img.height,1);
+      const w=Math.round(img.width*ratio),h=Math.round(img.height*ratio);
+      const c=document.createElement('canvas'); c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',q));
+    }; img.src=ev.target.result;
+  }; r.readAsDataURL(file);
+}
+
+function onFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  document.querySelector('.uptxt').style.display='none';
+  document.querySelector('.upicon').style.display='none';
+  document.getElementById('compMsg').style.display='block';
+  compress(file,900,0.75,compressed=>{
+    ss64=compressed;
+    document.getElementById('upImg').src=ss64;
+    document.getElementById('upName').textContent=file.name+' ('+Math.round((ss64.length*3/4)/1024)+' KB)';
+    document.getElementById('upPrev').style.display='block';
+    document.getElementById('compMsg').style.display='none';
+  });
+}
+
+const ua=document.getElementById('upArea');
+ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('drag');});
+ua.addEventListener('dragleave',()=>ua.classList.remove('drag'));
+ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('ssFile').files=e.dataTransfer.files;onFile({target:{files:[f]}});}});
+
+async function submitReg(){
+  if(!ss64){alert('Please upload your payment screenshot first.');return;}
+  const btn=document.getElementById('subBtn'),fill=document.getElementById('progFill'),label=document.getElementById('progLabel');
+  btn.disabled=true; btn.textContent='Submitting...';
+  document.getElementById('progWrap').classList.add('show');
+  let p=0; const iv=setInterval(()=>{p=Math.min(p+Math.random()*12,88);fill.style.width=p+'%';label.textContent='Uploading... '+Math.round(p)+'%';},180);
+  try {
+    const res=await sb('/rest/v1/registrations',{
+      method:'POST', prefer:'return=minimal',
+      body:JSON.stringify({name:fd.name,rollno:fd.rollno,email:fd.email,phone:fd.phone,
+        event:fd.event,amount:fd.amount,m2name:fd.m2name||null,m2roll:fd.m2roll||null,
+        m3name:fd.m3name||null,m3roll:fd.m3roll||null,screenshot:ss64,status:'Pending'})
+    });
+    clearInterval(iv);
+    if(res.status===409){
+      document.getElementById('progWrap').classList.remove('show');
+      btn.disabled=false; btn.textContent='Submit Registration';
+      alert('This Roll No is already registered. Check status at artix-status.html'); return;
+    }
+    if(!res.ok){ const e=await res.json(); throw new Error(e.message||'Server error'); }
+    fill.style.width='100%'; label.textContent='Submitted ✓';
+    setTimeout(()=>{document.getElementById('doneRoll').textContent=fd.rollno;setPhase(4);},600);
+  } catch(err){
+    clearInterval(iv);
+    document.getElementById('progWrap').classList.remove('show');
+    btn.disabled=false; btn.textContent='Submit Registration';
+    alert('Error: '+err.message);
+  }
+}
+</script>
+</body>
+</html>
