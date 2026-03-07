@@ -377,8 +377,8 @@ async function updStatus(id, status){
 }
 
 // ── EMAIL SYSTEM (BREVO) ───────────────────────────────
-const BREVO_KEY  = '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';
-const BREVO_FROM = { name:'ARTIX 2026 · CSE-IoT MRDU', email:'iotessense27@gmail.com' };
+const RESEND_KEY  = 're_eaUATX2C_DCLgRNLSWVZSjoCcgmt2uSM5';
+const MAIL_FROM   = 'ARTIX 2026 <onboarding@resend.dev>';
 
 // Build QR card as base64 PNG using canvas
 function buildQRCard(r){
@@ -519,47 +519,32 @@ async function sendMail(btnEl, id, silent=false){
       : "You're Approved! ARTIX 2026 Entry Pass 🎉";
 
     const payload = {
-      sender: BREVO_FROM,
-      to: [{ email: r.email, name: r.name }],
+      from: MAIL_FROM,
+      to: [r.email],
       subject,
-      htmlContent: buildEmailHTML(r),
-      attachment: [{
-        name: 'ARTIX2026_QR_'+r.rollno+'.png',
+      html: buildEmailHTML(r),
+      attachments: [{
+        filename: 'ARTIX2026_QR_'+r.rollno+'.png',
         content: qrBase64
       }]
     };
 
-    // Use allorigins proxy to bypass CORS restriction on Brevo API
-    const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'api-key': BREVO_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Authorization': 'Bearer ' + RESEND_KEY,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
-    }).catch(async()=>{
-      // CORS blocked — fallback via proxy
-      const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.brevo.com/v3/smtp/email');
-      return fetch(proxyUrl, {
-        method: 'POST',
-        headers: {
-          'api-key': BREVO_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
     });
 
-    const resText = await brevoRes.text();
-    console.log('Brevo status:', brevoRes.status, 'body:', resText);
-    if(!brevoRes.ok){
-      let msg = 'Brevo error ' + brevoRes.status;
+    const resText = await res.text();
+    console.log('Resend status:', res.status, resText);
+    if(!res.ok){
+      let msg = 'Resend error ' + res.status;
       try{ msg = JSON.parse(resText).message || msg; }catch(_){}
       throw new Error(msg);
     }
-    const res = brevoRes;
 
     // Mark mail_sent in Supabase
     await sb('/rest/v1/registrations?id=eq.'+id, {
