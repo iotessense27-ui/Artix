@@ -195,10 +195,10 @@ footer strong{color:var(--soft)}
     <div class="phase" id="ph3">
       <div class="slabel">— Upload Payment Screenshot</div>
       <div class="notice">Upload a clear screenshot of payment. It will be <strong>compressed automatically</strong>.</div>
-      <div class="uparea" id="upArea">
-        <input type="file" id="ssFile" accept="image/*" onchange="onFile(event)">
+      <div class="uparea" id="upArea" onclick="document.getElementById('ssFile').click()">
+        <input type="file" id="ssFile" accept="image/*" onchange="onFile(event)" style="display:none">
         <div class="upicon">📸</div>
-        <div class="uptxt"><strong>Tap to upload screenshot</strong><br>or drag &amp; drop here</div>
+        <div class="uptxt"><strong>Tap anywhere here to upload</strong><br>or drag &amp; drop</div>
         <div class="compressing" id="compMsg">⚙️ Compressing...</div>
         <div class="upprev" id="upPrev"><img id="upImg" src="" alt=""><div class="upname" id="upName"></div></div>
       </div>
@@ -304,10 +304,11 @@ function onFile(e){
   document.querySelector('.uptxt').style.display='none';
   document.querySelector('.upicon').style.display='none';
   document.getElementById('compMsg').style.display='block';
-  compress(file,900,0.75,compressed=>{
+  // Max 700px wide, quality 0.65 — keeps screenshots ~80-120KB, uploads in 1-2s
+  compress(file,700,0.65,compressed=>{
     ss64=compressed;
     document.getElementById('upImg').src=ss64;
-    document.getElementById('upName').textContent=file.name+' ('+Math.round((ss64.length*3/4)/1024)+' KB)';
+    document.getElementById('upName').textContent=file.name+' ('+Math.round((ss64.length*3/4)/1024)+' KB compressed)';
     document.getElementById('upPrev').style.display='block';
     document.getElementById('compMsg').style.display='none';
   });
@@ -316,7 +317,11 @@ function onFile(e){
 const ua=document.getElementById('upArea');
 ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('drag');});
 ua.addEventListener('dragleave',()=>ua.classList.remove('drag'));
-ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('ssFile').files=e.dataTransfer.files;onFile({target:{files:[f]}});}});
+ua.addEventListener('drop',e=>{
+  e.preventDefault();ua.classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f){ onFile({target:{files:[f]}}); }
+});
 
 async function submitReg(){
   if(!ss64){alert('Please upload your payment screenshot first.');return;}
