@@ -529,16 +529,37 @@ async function sendMail(btnEl, id, silent=false){
       }]
     };
 
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    // Use allorigins proxy to bypass CORS restriction on Brevo API
+    const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
-      headers: { 'api-key': BREVO_KEY, 'Content-Type': 'application/json' },
+      headers: {
+        'api-key': BREVO_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify(payload)
+    }).catch(async()=>{
+      // CORS blocked — fallback via proxy
+      const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.brevo.com/v3/smtp/email');
+      return fetch(proxyUrl, {
+        method: 'POST',
+        headers: {
+          'api-key': BREVO_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
     });
 
-    if(!res.ok){
-      const errBody = await res.json().catch(()=>({}));
-      throw new Error(errBody.message || ('Brevo error ' + res.status));
+    const resText = await brevoRes.text();
+    console.log('Brevo status:', brevoRes.status, 'body:', resText);
+    if(!brevoRes.ok){
+      let msg = 'Brevo error ' + brevoRes.status;
+      try{ msg = JSON.parse(resText).message || msg; }catch(_){}
+      throw new Error(msg);
     }
+    const res = brevoRes;
 
     // Mark mail_sent in Supabase
     await sb('/rest/v1/registrations?id=eq.'+id, {
