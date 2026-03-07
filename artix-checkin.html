@@ -119,7 +119,7 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
   <div class="lcard">
     <div class="ltitle">ARTIX <span>2026</span></div>
     <div class="lsub">Entry Check-In Scanner</div>
-    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lerr" id="lerr"></div>
     <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
@@ -190,7 +190,7 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 <script>
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const ADMIN_USER = 'iot@123';
-const ADMIN_PASS = '12345';
+const ADMIN_HASH = '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
@@ -215,10 +215,12 @@ function sb(path, opts={}) {
 }
 
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
-function doLogin(){
+async function doLogin(){
   const u = document.getElementById('luser').value.trim();
   const p = document.getElementById('lpass').value;
-  if(u === ADMIN_USER && p === ADMIN_PASS){
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
+  const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(u === ADMIN_USER && hash === ADMIN_HASH){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     initScanner();
