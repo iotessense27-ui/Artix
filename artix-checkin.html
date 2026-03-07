@@ -5,15 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ARTIX 2026 – Check In</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
 :root{--red:#D90429;--black:#090909;--black2:#111;--white:#fff;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.08);--green:#22c55e;--orange:#f97316}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh;overflow:hidden}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;height:100vh;height:100dvh;overflow:hidden}
 
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;background:var(--black);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;
-  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
+#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
 .lcard{background:var(--black2);border:1px solid var(--border);border-radius:12px;padding:36px 28px;width:100%;max-width:340px;text-align:center}
 .ltitle{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:4px}
 .ltitle span{color:var(--red)}
@@ -24,95 +22,93 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .lf input:focus{border-color:var(--red)}
 .lerr{color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px}
 .lbtn{width:100%;background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:13px;cursor:pointer;margin-top:4px}
+.lbtn:active{background:#a80220}
 
-/* MAIN SCANNER UI */
-#app{display:none;flex-direction:column;height:100vh}
-
-/* TOP BAR */
+/* APP */
+#app{display:none;flex-direction:column;height:100vh;height:100dvh}
 .topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
 .brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
 .brand span{color:var(--red)}
-.tright{display:flex;align-items:center;gap:10px}
-.counter{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--lgray);letter-spacing:.5px}
-.counter strong{color:var(--green)}
+.counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
+.counter strong{color:var(--green);font-size:16px}
 
-/* CAMERA AREA */
-.cam-wrap{position:relative;flex:1;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center}
-#video{width:100%;height:100%;object-fit:cover;display:block}
+/* CAMERA */
+.cam-wrap{flex:1;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
+#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #canvas{display:none}
 
-/* SCAN FRAME OVERLAY */
-.scan-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:min(260px,72vw);height:min(260px,72vw);pointer-events:none}
-.scan-frame::before,.scan-frame::after{content:'';position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
-.scan-frame::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
-.scan-frame::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
-.scan-frame-tr{position:absolute;top:0;right:0;width:36px;height:36px;border-top:3px solid var(--red);border-right:3px solid var(--red);border-radius:0 4px 0 0}
-.scan-frame-bl{position:absolute;bottom:0;left:0;width:36px;height:36px;border-bottom:3px solid var(--red);border-left:3px solid var(--red);border-radius:0 0 0 4px}
+/* SCAN FRAME */
+.overlay{position:absolute;inset:0;pointer-events:none}
+.overlay svg{width:100%;height:100%}
+.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:min(250px,68vw);height:min(250px,68vw)}
+.corner{position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
+.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
+.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
+.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
+@keyframes sl{0%,100%{top:2%}50%{top:94%}}
+.scan-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;pointer-events:none}
 
-/* SCAN LINE ANIMATION */
-.scan-line{position:absolute;left:4%;right:4%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:scanAnim 2s ease-in-out infinite;top:20%}
-@keyframes scanAnim{0%{top:10%}100%{top:88%}}
+/* STATUS DOT */
+.status-dot{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none;transition:color .3s}
+.status-dot.ready{color:var(--green)}
+.status-dot.scanning{color:var(--orange)}
 
-.scan-hint{position:absolute;bottom:20%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);white-space:nowrap}
+/* RESULT OVERLAY */
+#resultOverlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
+#resultOverlay.show{display:flex}
+#resultOverlay.success{background:rgba(3,18,8,.97)}
+#resultOverlay.duplicate{background:rgba(18,3,3,.97)}
+#resultOverlay.notfound{background:rgba(18,12,3,.97)}
+#resultOverlay.unapproved{background:rgba(18,12,3,.97)}
 
-/* DARK OVERLAY around scan area */
-.cam-overlay{position:absolute;inset:0;pointer-events:none}
-.cam-overlay svg{width:100%;height:100%}
+.res-icon{font-size:64px;margin-bottom:10px;line-height:1}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;margin-bottom:16px}
+#resultOverlay.success   .res-title{color:var(--green)}
+#resultOverlay.duplicate .res-title{color:var(--red)}
+#resultOverlay.notfound  .res-title{color:var(--orange)}
+#resultOverlay.unapproved .res-title{color:var(--orange)}
 
-/* RESULT PANEL — slides up from bottom */
-.result-panel{position:absolute;bottom:0;left:0;right:0;border-radius:18px 18px 0 0;padding:24px 22px 36px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:20}
-.result-panel.show{transform:translateY(0)}
-.result-panel.success{background:#0a1f12;border-top:3px solid var(--green)}
-.result-panel.duplicate{background:#1a0a0a;border-top:3px solid var(--red)}
-.result-panel.notfound{background:#1a110a;border-top:3px solid var(--orange)}
+.res-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;width:100%;max-width:310px;margin-bottom:16px;text-align:left}
+.rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.rrow:last-child{border-bottom:none}
+.rk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
+.rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
+.rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
 
-.res-icon{font-size:44px;text-align:center;margin-bottom:10px}
-.res-status{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;text-align:center;margin-bottom:16px}
-.result-panel.success .res-status{color:var(--green)}
-.result-panel.duplicate .res-status{color:var(--red)}
-.result-panel.notfound .res-status{color:var(--orange)}
+.dismiss-btn{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
+.dismiss-btn:active{background:rgba(255,255,255,.2)}
 
-.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
-.ri{background:rgba(255,255,255,.05);border-radius:6px;padding:9px 11px}
-.ri.full{grid-column:1/-1}
-.rk{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:2px}
-.rv{font-size:14px;color:var(--white);font-weight:500}
-
-.res-dismiss{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:2px;padding:13px;cursor:pointer;text-transform:uppercase}
-.res-dismiss:hover{background:rgba(255,255,255,.13)}
-
-/* CAMERA ERROR */
-.cam-error{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;text-align:center;background:var(--black)}
-.cam-error .ico{font-size:48px}
-.cam-error p{color:var(--gray);font-size:14px;line-height:1.7}
-.cam-error button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:2px;padding:11px 24px;cursor:pointer;margin-top:4px}
-
-/* MANUAL SEARCH */
-.manual-btn{position:absolute;bottom:24px;right:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 14px;border-radius:6px;cursor:pointer;z-index:10}
-.manual-btn:hover{background:rgba(255,255,255,.14);color:#fff}
-
-/* MANUAL MODAL */
-.mback{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
-.mback.on{display:flex}
-.mmodal{background:var(--black2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:500px;padding:24px 20px 36px}
-.mmodal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
-.mrow{display:flex;gap:9px;margin-bottom:14px}
-.mrow input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:var(--white);font-size:15px;outline:none;text-transform:uppercase}
-.mrow input:focus{border-color:var(--red)}
-.mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;padding:0 18px;cursor:pointer;white-space:nowrap}
-.mcancel{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:1px;padding:11px;cursor:pointer}
+/* MANUAL */
+.manual-btn{position:absolute;bottom:14px;right:14px;z-index:20;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 14px;border-radius:6px;cursor:pointer}
+.manual-btn:active{background:rgba(255,255,255,.18)}
 
 /* STATS BAR */
-.stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:20px;flex-shrink:0}
-.stat{display:flex;flex-direction:column;align-items:center;flex:1}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;line-height:1}
-.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:1px}
-.stat.in .stat-n{color:var(--green)}
-.stat.pend .stat-n{color:var(--orange)}
-.stat.total .stat-n{color:var(--white)}
+.stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
+.stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;line-height:1}
+.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
+.stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
 
-/* HAPTIC FLASH */
-.flash{position:fixed;inset:0;pointer-events:none;z-index:99;opacity:0;transition:opacity .15s}
+/* MANUAL MODAL */
+.mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;display:none;align-items:flex-end;justify-content:center}
+.mback.on{display:flex}
+.mmodal{background:var(--black2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:24px 20px 40px}
+.mmodal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
+.mrow{display:flex;gap:9px;margin-bottom:12px}
+.mrow input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:#fff;font-size:15px;outline:none;text-transform:uppercase}
+.mrow input:focus{border-color:var(--red)}
+.mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
+.mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
+
+/* ERROR SCREEN */
+#camErrScreen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
+#camErrScreen p{color:var(--gray);font-size:14px;line-height:1.8}
+#camErrScreen button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;padding:11px 24px;cursor:pointer}
+
+.flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
 .flash.go{opacity:1}
 </style>
 </head>
@@ -123,47 +119,48 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
   <div class="lcard">
     <div class="ltitle">ARTIX <span>2026</span></div>
     <div class="lsub">Entry Check-In Scanner</div>
-    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lerr" id="lerr"></div>
     <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
   </div>
 </div>
 
-<!-- SCANNER APP -->
+<!-- APP -->
 <div id="app">
   <div class="topbar">
     <div class="brand">ARTIX <span>2026</span> Entry</div>
-    <div class="tright">
-      <div class="counter">In: <strong id="cntIn">—</strong> / <span id="cntTotal">—</span></div>
-    </div>
+    <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTotal">0</span></div>
   </div>
 
-  <div class="cam-wrap" id="camWrap">
+  <div class="cam-wrap">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
 
-    <!-- scan frame -->
-    <div class="scan-frame">
-      <div class="scan-frame-tr"></div>
-      <div class="scan-frame-bl"></div>
-      <div class="scan-line"></div>
+    <!-- frame corners -->
+    <div class="frame-box">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="scanline"></div>
     </div>
-    <div class="scan-hint">Point camera at QR code</div>
+    <div class="scan-hint">Point at student's QR code</div>
+    <div class="status-dot" id="statusDot">Loading camera…</div>
 
-    <!-- result panel -->
-    <div class="result-panel" id="resultPanel">
+    <!-- result -->
+    <div id="resultOverlay">
       <div class="res-icon" id="resIcon"></div>
-      <div class="res-status" id="resStatus"></div>
-      <div class="res-grid" id="resGrid"></div>
-      <button class="res-dismiss" onclick="dismissResult()">Tap to Scan Next →</button>
+      <div class="res-title" id="resTitle"></div>
+      <div class="res-card" id="resCard"></div>
+      <button class="dismiss-btn" onclick="dismissResult()">▶ &nbsp;Scan Next</button>
     </div>
 
-    <!-- camera error -->
-    <div class="cam-error" id="camError" style="display:none">
-      <div class="ico">📷</div>
-      <p>Camera access denied.<br>Please allow camera permission in your browser settings, then reload.</p>
-      <button onclick="startCamera()">Try Again</button>
+    <!-- cam error -->
+    <div id="camErrScreen">
+      <div style="font-size:48px">📷</div>
+      <p>Camera access needed.<br>Tap <strong>Allow</strong> when browser asks,<br>or check site permissions and reload.</p>
+      <button onclick="location.reload()">Reload & Retry</button>
     </div>
 
     <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
@@ -171,201 +168,293 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
   <div class="stats-bar">
     <div class="stat in"><div class="stat-n" id="statIn">0</div><div class="stat-l">Checked In</div></div>
-    <div class="stat pend"><div class="stat-n" id="statPend">0</div><div class="stat-l">Not Yet</div></div>
-    <div class="stat total"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Total</div></div>
+    <div class="stat rem"><div class="stat-n" id="statRem">0</div><div class="stat-l">Remaining</div></div>
+    <div class="stat tot"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Approved</div></div>
   </div>
 </div>
 
-<!-- MANUAL ENTRY MODAL -->
+<!-- MANUAL MODAL -->
 <div class="mback" id="manualModal">
   <div class="mmodal">
-    <h3>Manual Roll No Entry</h3>
+    <h3>Manual Check-In</h3>
     <div class="mrow">
       <input type="text" id="manualRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualCheckin()">
-      <button onclick="manualCheckin()">Check In</button>
+      <button onclick="manualCheckin()">Go</button>
     </div>
     <button class="mcancel" onclick="closeManual()">Cancel</button>
   </div>
 </div>
 
-<!-- FLASH OVERLAY -->
 <div class="flash" id="flash"></div>
 
 <script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
 const ADMIN_USER = 'iot@123';
 const ADMIN_PASS = '12345';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
-let scanning = true;
-let lastScanned = '';
-let lastScannedTime = 0;
-let statsCache = { total: 0, checkedIn: 0 };
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let scanning      = false; // set to true once camera is ready
+let lastScanned   = '';
+let lastScannedAt = 0;
+let detector      = null;  // BarcodeDetector if supported
+let rafId         = null;
 
+// ─── SUPABASE HELPER ─────────────────────────────────────────────────────────
 function sb(path, opts={}) {
   return fetch(SB + path, {
     ...opts,
-    headers: { apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer:opts.prefer||'', ...(opts.headers||{}) }
+    headers: {
+      apikey: KEY, Authorization: 'Bearer '+KEY,
+      'Content-Type': 'application/json',
+      Prefer: opts.prefer || '',
+      ...(opts.headers||{})
+    }
   });
 }
 
-// ── LOGIN ─────────────────────────────────────────────
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
 function doLogin(){
   const u = document.getElementById('luser').value.trim();
   const p = document.getElementById('lpass').value;
   if(u === ADMIN_USER && p === ADMIN_PASS){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    startCamera();
+    initScanner();
     loadStats();
   } else {
     document.getElementById('lerr').textContent = 'Wrong credentials.';
-    setTimeout(() => document.getElementById('lerr').textContent = '', 2500);
+    setTimeout(()=> document.getElementById('lerr').textContent = '', 2500);
   }
 }
 
-// ── CAMERA ───────────────────────────────────────────
+// ─── INIT SCANNER ─────────────────────────────────────────────────────────────
+async function initScanner(){
+  setDot('Starting camera…', '');
+
+  // 1. Try native BarcodeDetector (Chrome Android, Samsung browser)
+  if('BarcodeDetector' in window){
+    try {
+      detector = new BarcodeDetector({ formats: ['qr_code'] });
+      console.log('✓ BarcodeDetector available');
+    } catch(_){ detector = null; }
+  }
+
+  // 2. If not available, lazy-load jsQR from two CDN fallbacks
+  if(!detector){
+    console.log('BarcodeDetector not supported, loading jsQR…');
+    await loadJsQR();
+  }
+
+  // 3. Start camera
+  await startCamera();
+}
+
+function loadJsQR(){
+  return new Promise((resolve) => {
+    // Try primary CDN
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+    s.onload  = () => { console.log('jsQR loaded from jsdelivr'); resolve(); };
+    s.onerror = () => {
+      // Fallback CDN
+      const s2 = document.createElement('script');
+      s2.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
+      s2.onload  = () => { console.log('jsQR loaded from unpkg'); resolve(); };
+      s2.onerror = () => { console.warn('jsQR failed to load'); resolve(); };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+  });
+}
+
 async function startCamera(){
-  document.getElementById('camError').style.display = 'none';
+  const video = document.getElementById('video');
   try {
+    // Request rear camera
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width:{ideal:1280}, height:{ideal:720} }
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
     });
-    const video = document.getElementById('video');
     video.srcObject = stream;
-    video.play();
-    requestAnimationFrame(tick);
+    await new Promise(r => { video.onloadedmetadata = r; });
+    await video.play();
+    setDot('Ready — point at QR', 'ready');
+    scanning = true;
+    tick();
   } catch(err){
-    document.getElementById('camError').style.display = 'flex';
+    console.error('Camera error:', err);
+    document.getElementById('camErrScreen').style.display = 'flex';
+    setDot('Camera error', '');
   }
 }
 
-// ── SCAN LOOP ────────────────────────────────────────
-function tick(){
-  const video  = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  if(video.readyState === video.HAVE_ENOUGH_DATA){
+// ─── SCAN LOOP ─────────────────────────────────────────────────────────────────
+async function tick(){
+  if(!scanning){ rafId = requestAnimationFrame(tick); return; }
+
+  const video = document.getElementById('video');
+  if(video.readyState < 2 || video.videoWidth === 0){
+    rafId = requestAnimationFrame(tick); return;
+  }
+
+  let result = null;
+
+  if(detector){
+    // Native BarcodeDetector — async, very fast on Android
+    try {
+      const codes = await detector.detect(video);
+      if(codes.length > 0) result = codes[0].rawValue;
+    } catch(_){}
+  } else if(typeof jsQR !== 'undefined'){
+    // jsQR fallback — draw video to canvas, read pixels
+    const canvas = document.getElementById('canvas');
+    const ctx    = canvas.getContext('2d', { willReadFrequently: true });
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts:'dontInvert' });
+    ctx.drawImage(video, 0, 0);
+    try {
+      const id   = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(id.data, id.width, id.height, { inversionAttempts: 'attemptBoth' });
+      if(code) result = code.data;
+    } catch(_){}
+  }
 
-    if(code && scanning){
-      const now = Date.now();
-      // Debounce — don't re-process same QR within 4 seconds
-      if(code.data !== lastScanned || (now - lastScannedTime) > 4000){
-        lastScanned = code.data;
-        lastScannedTime = now;
-        scanning = false;
-        handleScan(code.data);
-      }
+  if(result){
+    const now = Date.now();
+    if(result !== lastScanned || now - lastScannedAt > 4000){
+      lastScanned   = result;
+      lastScannedAt = now;
+      scanning      = false; // pause scanning while processing
+      setDot('Processing…', 'scanning');
+      await handleScan(result);
     }
   }
-  requestAnimationFrame(tick);
+
+  rafId = requestAnimationFrame(tick);
 }
 
-// ── HANDLE QR DATA ───────────────────────────────────
+// ─── HANDLE QR DATA ────────────────────────────────────────────────────────────
 async function handleScan(raw){
   let rollno = '';
   try {
-    // Try parsing as JSON (our QR format: {name, roll, event, ...})
+    // Our QR format: JSON with roll/rollno field
     const parsed = JSON.parse(raw);
     rollno = (parsed.roll || parsed.rollno || '').toUpperCase().trim();
   } catch(_){
-    // Plain text fallback — treat raw as roll number
+    // Plain text — treat as roll number directly
     rollno = raw.toUpperCase().trim();
   }
 
-  if(!rollno){ showResult('notfound', null, 'Invalid QR code'); return; }
+  if(!rollno){
+    showResult('notfound', null, 'QR not recognized');
+    return;
+  }
   await processCheckin(rollno);
 }
 
-// ── CHECK IN LOGIC ───────────────────────────────────
+// ─── CHECK-IN LOGIC ────────────────────────────────────────────────────────────
 async function processCheckin(rollno){
   try {
-    // Fetch student record
     const res  = await sb('/rest/v1/registrations?rollno=eq.' + encodeURIComponent(rollno) + '&select=*');
     const data = await res.json();
 
     if(!data || data.length === 0){
-      flash('orange');
-      showResult('notfound', null, 'Roll No not found: ' + rollno);
+      doFlash('orange'); vib([300]);
+      showResult('notfound', null, 'Roll No not found:\n' + rollno);
       return;
     }
 
     const rec = data[0];
 
-    // Check if already checked in
+    if(rec.status !== 'Approved'){
+      doFlash('orange'); vib([200,100,200]);
+      showResult('unapproved', rec, 'Status: ' + (rec.status || 'Pending'));
+      return;
+    }
+
     if(rec.checked_in){
-      flash('red');
-      vibrate([200, 100, 200]); // double buzz = duplicate
+      doFlash('red'); vib([200,80,200,80,200]);
       showResult('duplicate', rec, null);
       return;
     }
 
-    // Not checked in yet — mark as checked in
+    // ✓ First-time check-in — write to Supabase
     await sb('/rest/v1/registrations?id=eq.' + rec.id, {
-      method: 'PATCH',
-      prefer: 'return=minimal',
+      method: 'PATCH', prefer: 'return=minimal',
       body: JSON.stringify({ checked_in: true, checked_in_at: new Date().toISOString() })
     });
 
-    flash('green');
-    vibrate([100]); // single short buzz = success
+    doFlash('green'); vib([80]);
     showResult('success', rec, null);
-    loadStats(); // refresh counter
+    loadStats();
 
   } catch(err){
-    showResult('notfound', null, 'Error: ' + err.message);
+    showResult('notfound', null, 'Network error — try again');
   }
 }
 
-// ── SHOW RESULT PANEL ─────────────────────────────────
+// ─── RESULT DISPLAY ────────────────────────────────────────────────────────────
+const CFG = {
+  success:   { icon:'✅', title:'CHECKED IN ✓' },
+  duplicate: { icon:'🚫', title:'ALREADY CHECKED IN' },
+  notfound:  { icon:'❓', title:'NOT FOUND' },
+  unapproved:{ icon:'⚠️', title:'NOT APPROVED' }
+};
+
 function showResult(type, rec, msg){
-  const panel  = document.getElementById('resultPanel');
-  const icon   = document.getElementById('resIcon');
-  const status = document.getElementById('resStatus');
-  const grid   = document.getElementById('resGrid');
+  const o = document.getElementById('resultOverlay');
+  o.className = 'show ' + type;
+  document.getElementById('resIcon').textContent  = CFG[type].icon;
+  document.getElementById('resTitle').textContent = CFG[type].title;
 
-  panel.className = 'result-panel show ' + type;
-
-  if(type === 'success'){
-    icon.textContent   = '✅';
-    status.textContent = 'CHECKED IN';
-    grid.innerHTML = buildGrid(rec);
-  } else if(type === 'duplicate'){
-    icon.textContent   = '🚫';
-    status.textContent = 'ALREADY CHECKED IN';
-    const t = rec.checked_in_at ? new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—';
-    grid.innerHTML = buildGrid(rec) + `<div class="ri full"><div class="rk">Checked In At</div><div class="rv" style="color:var(--red)">${t}</div></div>`;
+  let html = '';
+  if(rec){
+    html += rr('Name',   rec.name);
+    html += rr('Roll No',rec.rollno);
+    html += rr('Event',  rec.event);
+    if(type === 'duplicate' && rec.checked_in_at){
+      const t = new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      html += rr('Entered At', t, 'red');
+    }
+    if(type === 'unapproved') html += rr('Status', rec.status || 'Pending', 'orange');
+    if(rec.m2name) html += rr('Team', [rec.m2name, rec.m3name].filter(Boolean).join(', '));
   } else {
-    icon.textContent   = '❓';
-    status.textContent = 'NOT FOUND';
-    grid.innerHTML = `<div class="ri full"><div class="rk">Details</div><div class="rv">${msg}</div></div>`;
+    html += rr('Info', msg);
   }
+  document.getElementById('resCard').innerHTML = html;
 }
 
-function buildGrid(r){
-  return `
-    <div class="ri full"><div class="rk">Name</div><div class="rv">${r.name||'—'}</div></div>
-    <div class="ri"><div class="rk">Roll No</div><div class="rv">${r.rollno||'—'}</div></div>
-    <div class="ri"><div class="rk">Event</div><div class="rv">${r.event||'—'}</div></div>
-    <div class="ri"><div class="rk">Status</div><div class="rv">${r.status||'—'}</div></div>
-    ${r.m2name?`<div class="ri full"><div class="rk">Team</div><div class="rv">${r.m2name}${r.m3name?', '+r.m3name:''}</div></div>`:''}
-  `;
+function rr(k, v, cls=''){
+  return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${cls}">${v||'—'}</span></div>`;
 }
 
 function dismissResult(){
-  document.getElementById('resultPanel').className = 'result-panel';
-  setTimeout(() => { scanning = true; }, 800);
+  document.getElementById('resultOverlay').className = '';
+  setDot('Ready — point at QR', 'ready');
+  setTimeout(()=>{ scanning = true; }, 400);
 }
 
-// ── MANUAL ENTRY ─────────────────────────────────────
+// ─── STATS ─────────────────────────────────────────────────────────────────────
+async function loadStats(){
+  try {
+    const res  = await sb('/rest/v1/registrations?select=checked_in&status=eq.Approved');
+    const data = await res.json();
+    if(!Array.isArray(data)) return;
+    const tot = data.length;
+    const cin = data.filter(r => r.checked_in).length;
+    document.getElementById('statIn').textContent    = cin;
+    document.getElementById('statRem').textContent   = tot - cin;
+    document.getElementById('statTotal').textContent = tot;
+    document.getElementById('cntIn').textContent     = cin;
+    document.getElementById('cntTotal').textContent  = tot;
+  } catch(_){}
+}
+
+// ─── MANUAL ENTRY ──────────────────────────────────────────────────────────────
 function openManual(){
   document.getElementById('manualModal').classList.add('on');
-  setTimeout(() => document.getElementById('manualRoll').focus(), 200);
+  setTimeout(()=> document.getElementById('manualRoll').focus(), 250);
 }
 function closeManual(){
   document.getElementById('manualModal').classList.remove('on');
@@ -378,43 +467,28 @@ async function manualCheckin(){
   scanning = false;
   await processCheckin(roll);
 }
-
-// ── STATS ─────────────────────────────────────────────
-async function loadStats(){
-  try {
-    const res  = await sb('/rest/v1/registrations?select=status,checked_in');
-    const data = await res.json();
-    if(!Array.isArray(data)) return;
-    const approved   = data.filter(r => r.status === 'Approved');
-    const checkedIn  = approved.filter(r => r.checked_in).length;
-    const total      = approved.length;
-    document.getElementById('statIn').textContent    = checkedIn;
-    document.getElementById('statPend').textContent  = total - checkedIn;
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('cntIn').textContent     = checkedIn;
-    document.getElementById('cntTotal').textContent  = total;
-  } catch(_){}
-}
-
-// ── VISUAL + HAPTIC FEEDBACK ──────────────────────────
-function flash(color){
-  const el = document.getElementById('flash');
-  el.style.background = color === 'green' ? 'rgba(34,197,94,.25)' : color === 'red' ? 'rgba(217,4,41,.3)' : 'rgba(249,115,22,.25)';
-  el.classList.add('go');
-  setTimeout(() => el.classList.remove('go'), 300);
-}
-
-function vibrate(pattern){
-  if(navigator.vibrate) navigator.vibrate(pattern);
-}
-
-// Close manual modal on backdrop click
 document.getElementById('manualModal').addEventListener('click', e => {
   if(e.target === document.getElementById('manualModal')) closeManual();
 });
 
-// Refresh stats every 30s (multiple scanners syncing)
-setInterval(loadStats, 30000);
+// ─── HELPERS ───────────────────────────────────────────────────────────────────
+function setDot(text, cls){
+  const d = document.getElementById('statusDot');
+  d.textContent = text;
+  d.className   = 'status-dot ' + cls;
+}
+
+function doFlash(c){
+  const el = document.getElementById('flash');
+  el.style.background = c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)';
+  el.classList.add('go');
+  setTimeout(()=> el.classList.remove('go'), 220);
+}
+
+function vib(p){ try{ navigator.vibrate(p); }catch(_){} }
+
+// Sync stats every 20s across all scanning phones
+setInterval(loadStats, 20000);
 </script>
 </body>
 </html>
