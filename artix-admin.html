@@ -188,7 +188,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 
 <script>
 const ADMIN_USER = 'iot@123';
-const ADMIN_PASS = '12345';
+const ADMIN_HASH = '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
@@ -202,10 +202,12 @@ function sb(path, opts={}) {
 }
 
 // ── LOGIN ─────────────────────────────────────────────
-function doLogin(){
-  const u=document.getElementById('luser').value.trim();
-  const p=document.getElementById('lpass').value;
-  if(u===ADMIN_USER && p===ADMIN_PASS){
+async function doLogin(){
+  const u = document.getElementById('luser').value.trim();
+  const p = document.getElementById('lpass').value;
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
+  const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(u === ADMIN_USER && hash === ADMIN_HASH){
     document.getElementById('login').style.display='none';
     document.getElementById('panel').style.display='block';
     loadData();
