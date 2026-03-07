@@ -529,11 +529,11 @@ async function sendMail(btnEl, id, silent=false){
       }]
     };
 
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await fetch('https://ofidwodbhfchymlacukz.supabase.co/functions/v1/send-email', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + RESEND_KEY,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'apikey': 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U'
       },
       body: JSON.stringify(payload)
     });
