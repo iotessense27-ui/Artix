@@ -6,7 +6,291 @@
 <title>ARTIX 2026 – Register</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ARTIX 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--r:#D90429;--bg:#08080c;--s1:#111116;--s2:#17171e;--w:#fff;--g:#606078;--lg:#a0a0be;--bdr:rgba(255,255,255,.07)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--w);font-family:'Outfit',sans-serif;overflow-x:hidden}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(8,8,12,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
+.nb{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
+.nb em{color:var(--r);font-style:normal}
+.nlive{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--r)}
+.ldot{width:6px;height:6px;background:var(--r);border-radius:50%;animation:ld 1.8s infinite}
+@keyframes ld{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.7)}}
+
+/* HERO */
+.hero{min-height:92svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px 40px;position:relative;overflow:hidden}
+.hbg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 130% 55% at 50% -5%,rgba(217,4,41,.2) 0%,transparent 60%)}
+.hdots{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);background-size:24px 24px;mask-image:radial-gradient(ellipse 90% 90% at 50% 40%,black 15%,transparent 72%)}
+.ptcls{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.pt{position:absolute;border-radius:50%;animation:ptf linear infinite}
+@keyframes ptf{0%{transform:translateY(100%) scale(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translateY(-5%) scale(1);opacity:0}}
+.hero-inner{position:relative;z-index:2;width:100%;max-width:420px}
+.hchip{display:inline-flex;align-items:center;gap:6px;background:rgba(217,4,41,.1);border:1px solid rgba(217,4,41,.22);border-radius:100px;padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ff3355;margin-bottom:18px}
+.htitle{font-family:'Bebas Neue',sans-serif;font-size:clamp(88px,24vw,128px);line-height:.82;letter-spacing:4px;text-shadow:0 0 70px rgba(217,4,41,.3)}
+.htitle .out{color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.18)}
+.hyr{display:block;color:var(--r);font-size:clamp(56px,15vw,82px);letter-spacing:4px;text-shadow:0 0 40px rgba(217,4,41,.6),0 0 80px rgba(217,4,41,.2)}
+.hdept{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--g);margin:14px 0 4px}
+.huniv{font-size:13px;font-weight:500;color:var(--lg)}
+.hdiv{width:48px;height:1.5px;background:linear-gradient(90deg,transparent,var(--r),transparent);margin:16px auto}
+.hpills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hpill{background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:500;color:var(--lg);display:flex;align-items:center;gap:5px}
+.sdown{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:30px;color:var(--g);font-size:10px;letter-spacing:2px;text-transform:uppercase;animation:sdfade 2s 2s both}
+@keyframes sdfade{from{opacity:0}to{opacity:1}}
+.sdarr{width:18px;height:18px;border-right:1.5px solid var(--g);border-bottom:1.5px solid var(--g);transform:rotate(45deg);animation:sdbounce 1.4s infinite}
+@keyframes sdbounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(5px)}}
+
+/* GUESTS SECTION */
+.guests{padding:30px 16px 20px;background:var(--bg)}
+.sec-head{text-align:center;margin-bottom:24px}
+.sec-tag{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--r);margin-bottom:8px}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,7vw,40px);letter-spacing:3px}
+.sec-sub{font-size:12px;color:var(--g);margin-top:4px}
+
+/* 3-column grid */
+.gs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:360px){.gs-grid{grid-template-columns:repeat(2,1fr)}}
+
+.gs-card{
+  background:var(--s2);border:1px solid var(--bdr);border-radius:14px;
+  padding:14px 10px;text-align:center;
+  transition:border-color .25s,transform .2s;
+  opacity:0;transform:translateY(16px);
+}
+.gs-card.show{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease,border-color .25s,box-shadow .25s}
+.gs-card:hover{border-color:rgba(217,4,41,.35);transform:translateY(-3px);box-shadow:0 8px 24px rgba(217,4,41,.1)}
+
+.av-wrap{position:relative;width:64px;height:64px;margin:0 auto 10px}
+.av-ring{position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(var(--r) 0%,transparent 55%);animation:rspin 3s linear infinite;opacity:0;transition:opacity .3s}
+.gs-card:hover .av-ring,.gs-card.featured .av-ring{opacity:1}
+.av{position:absolute;inset:2px;border-radius:50%;background:linear-gradient(135deg,rgba(217,4,41,.18),rgba(217,4,41,.04));border:1.5px solid rgba(217,4,41,.2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--r);overflow:hidden}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+@keyframes rspin{to{transform:rotate(360deg)}}
+
+.gname{font-size:12px;font-weight:700;color:var(--w);line-height:1.25;margin-bottom:3px}
+.grole{font-size:10px;color:var(--g);line-height:1.4;margin-bottom:7px}
+.gbadge{display:inline-block;background:rgba(217,4,41,.08);border:1px solid rgba(217,4,41,.15);border-radius:100px;padding:2px 8px;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--r)}
+
+/* EVENTS */
+.events{padding:28px 16px 20px;background:var(--s1);border-top:1px solid var(--bdr)}
+.ev-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:4px}
+.ev-sub{font-size:11px;color:var(--g);margin-bottom:16px}
+.ev-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ev-card{background:var(--s2);border:1px solid var(--bdr);border-radius:11px;padding:14px 12px;transition:border-color .2s}
+.ev-card:hover{border-color:rgba(217,4,41,.25)}
+.ev-icon{font-size:22px;margin-bottom:7px;display:block}
+.ev-name{font-size:12px;font-weight:700;color:var(--w);margin-bottom:3px}
+.ev-desc{font-size:10px;color:var(--g);line-height:1.5}
+
+/* REGISTER SECTION — hidden until seen */
+.reg-section{
+  padding:32px 16px 40px;
+  background:var(--bg);
+  border-top:1px solid var(--bdr);
+  text-align:center;
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(30px);
+  transition:opacity .7s ease,transform .7s ease;
+}
+.reg-section.show{opacity:1;transform:none}
+.reg-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 70% at 50% 100%,rgba(217,4,41,.14) 0%,transparent 65%);pointer-events:none}
+.reg-tag{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--r);margin-bottom:10px;position:relative;z-index:1}
+.reg-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,9vw,52px);letter-spacing:3px;margin-bottom:6px;position:relative;z-index:1}
+.reg-title em{color:var(--r);font-style:normal}
+.reg-desc{font-size:13px;color:var(--lg);margin-bottom:26px;position:relative;z-index:1}
+.reg-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;max-width:340px;
+  background:var(--r);color:#fff;
+  font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;
+  padding:16px 24px;border-radius:14px;text-decoration:none;
+  box-shadow:0 4px 28px rgba(217,4,41,.5);
+  position:relative;z-index:1;overflow:hidden;
+  transition:transform .15s,box-shadow .2s;
+  animation:rbpulse 2.5s infinite;
+}
+@keyframes rbpulse{0%,100%{box-shadow:0 4px 28px rgba(217,4,41,.5)}50%{box-shadow:0 4px 40px rgba(217,4,41,.8),0 0 0 8px rgba(217,4,41,.1)}}
+.reg-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%);transform:translateX(-100%);transition:transform .55s}
+.reg-btn:hover::after{transform:translateX(150%)}
+.reg-btn:active{transform:scale(.97)}
+.reg-note{font-size:11px;color:var(--g);margin-top:12px;position:relative;z-index:1}
+.status-link{display:inline-block;margin-top:10px;font-size:11px;color:var(--g);text-decoration:none;letter-spacing:.5px;position:relative;z-index:1;transition:color .2s}
+.status-link:hover{color:var(--lg)}
+
+/* FOOTER */
+footer{text-align:center;padding:18px;border-top:1px solid var(--bdr);font-size:11px;color:var(--g)}
+footer strong{color:rgba(255,255,255,.3)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nb">ART<em>IX</em> 2026</div>
+  <div class="nlive"><div class="ldot"></div>Open</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hbg"></div>
+  <div class="hdots"></div>
+  <div class="ptcls" id="ptcls"></div>
+  <div class="hero-inner">
+    <div class="hchip"><div class="ldot"></div>&nbsp;16–17 March 2026</div>
+    <div class="htitle">ART<span class="out">IX</span><span class="hyr">2026</span></div>
+    <div class="hdept">Department of CSE – IoT</div>
+    <div class="huniv">Malla Reddy Deemed to be University</div>
+    <div class="hdiv"></div>
+    <div class="hpills">
+      <div class="hpill">📅 16–17 March</div>
+      <div class="hpill">📍 Sports Complex</div>
+      <div class="hpill">🎤 12 Speakers</div>
+      <div class="hpill">🔬 Project Expo</div>
+    </div>
+    <div class="sdown"><div class="sdarr"></div>Meet the Guests</div>
+  </div>
+</section>
+
+<!-- CHIEF GUESTS -->
+<section class="guests">
+  <div class="sec-head">
+    <div class="sec-tag">★ Chief Guests</div>
+    <div class="sec-title">Meet the Speakers</div>
+    <div class="sec-sub">Founders · Creators · Trailblazers</div>
+  </div>
+  <div class="gs-grid" id="gsGrid">
+
+    <div class="gs-card" data-i="0">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">VK<img src="speakers/vk.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Volleti Karthik</div><div class="grole">Founder & CEO, Flashoot</div><div class="gbadge">Entrepreneur</div>
+    </div>
+
+    <div class="gs-card" data-i="1">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">SK<img src="speakers/sk.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Sai Kumar</div><div class="grole">CEO, BMW Automotive</div><div class="gbadge">CEO</div>
+    </div>
+
+    <div class="gs-card" data-i="2">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">DM<img src="speakers/dm.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Deepak Mourya</div><div class="grole">Founder, Happy Sundays</div><div class="gbadge">Founder</div>
+    </div>
+
+    <div class="gs-card" data-i="3">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">DM<img src="speakers/megha.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Dodla Megha</div><div class="grole">Media Head, Student Tribe</div><div class="gbadge">Media</div>
+    </div>
+
+    <div class="gs-card" data-i="4">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">HV<img src="speakers/hv.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Harsha Vardhan</div><div class="grole">Founder, EKO</div><div class="gbadge">Founder</div>
+    </div>
+
+    <div class="gs-card" data-i="5">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">T<img src="speakers/thrisha.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Thrisha</div><div class="grole">Content Creator</div><div class="gbadge">Creator</div>
+    </div>
+
+    <div class="gs-card" data-i="6">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">KS<img src="speakers/karthik.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Karthik (Sudhapusa)</div><div class="grole">Content Creator</div><div class="gbadge">Creator</div>
+    </div>
+
+    <div class="gs-card" data-i="7">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">P<img src="speakers/purvik.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Purvik</div><div class="grole">Boxer & Content Creator</div><div class="gbadge">Athlete</div>
+    </div>
+
+    <div class="gs-card" data-i="8">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">SD<img src="speakers/sharan.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Sharan Dasari</div><div class="grole">Doctor & Drag Racer</div><div class="gbadge">SquadRun</div>
+    </div>
+
+    <div class="gs-card" data-i="9">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">D<img src="speakers/dileep.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Dileep</div><div class="grole">Founder, Missamma Handlooms</div><div class="gbadge">Founder</div>
+    </div>
+
+    <div class="gs-card" data-i="10">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">R<img src="speakers/rakesh.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Rakesh</div><div class="grole">Founder, Fast Tracks</div><div class="gbadge">Founder</div>
+    </div>
+
+    <div class="gs-card" data-i="11">
+      <div class="av-wrap"><div class="av-ring"></div><div class="av">R<img src="speakers/rohan.jpg" onerror="this.remove()"></div></div>
+      <div class="gname">Rohan</div><div class="grole">CMO, Fast Tracks</div><div class="gbadge">CMO</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="events">
+  <div class="ev-title">What's In Store</div>
+  <div class="ev-sub">Two days · Endless energy</div>
+  <div class="ev-grid">
+    <div class="ev-card"><span class="ev-icon">🎤</span><div class="ev-name">Guest Talks</div><div class="ev-desc">Live sessions with founders & creators</div></div>
+    <div class="ev-card"><span class="ev-icon">🔬</span><div class="ev-name">Project Expo</div><div class="ev-desc">Showcase your tech & innovation</div></div>
+    <div class="ev-card"><span class="ev-icon">🏆</span><div class="ev-name">Competitions</div><div class="ev-desc">Tech & non-tech events with prizes</div></div>
+    <div class="ev-card"><span class="ev-icon">🎭</span><div class="ev-name">Cultural</div><div class="ev-desc">Performances & celebrations</div></div>
+    <div class="ev-card"><span class="ev-icon">🤝</span><div class="ev-name">Networking</div><div class="ev-desc">Meet mentors & industry guests</div></div>
+    <div class="ev-card"><span class="ev-icon">📸</span><div class="ev-name">Memories</div><div class="ev-desc">Moments you'll never forget</div></div>
+  </div>
+</section>
+
+<!-- REGISTER — appears after scrolling past all guests -->
+<section class="reg-section" id="regSection">
+  <div class="reg-tag">You've met the guests — now join them</div>
+  <div class="reg-title">Ready to <em>Join?</em></div>
+  <div class="reg-desc">ARTIX 2026 · 16–17 March · Sports Complex Auditorium</div>
+  <a href="artix-register-form.html" class="reg-btn">Register Now &nbsp;→</a>
+  <div class="reg-note">₹70 onwards · Limited seats · CSE-IoT, MRDU</div>
+  <br>
+  <a href="artix-status.html" class="status-link">Already registered? Check status →</a>
+</section>
+
+<footer><strong>ARTIX 2026</strong> · CSE-IoT · MRDU · 16–17 March 2026</footer>
+
+<script>
+// Particles
+const pc=document.getElementById('ptcls');
+for(let i=0;i<16;i++){const p=document.createElement('div');p.className='pt';const s=1+Math.random()*2;p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;background:rgba(217,4,41,${.3+Math.random()*.4});animation-duration:${7+Math.random()*9}s;animation-delay:${Math.random()*7}s`;pc.appendChild(p)}
+
+// Animate cards in as they enter viewport
+const cards = document.querySelectorAll('.gs-card');
+const cardObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const i = parseInt(e.target.dataset.i);
+      setTimeout(()=>e.target.classList.add('show'), i*60);
+      cardObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.1});
+cards.forEach(c=>cardObs.observe(c));
+
+// Show register button ONLY after last guest card is seen
+const lastCard = document.querySelector('.gs-card[data-i="11"]');
+const regSection = document.getElementById('regSection');
+const regObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      setTimeout(()=>regSection.classList.add('show'), 400);
+      regObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+regObs.observe(lastCard);
+</script>
+</body>
+</html>
 :root{--red:#D90429;--red-dark:#a80220;--black:#090909;--black2:#111;--white:#fff;--soft:#ececec;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.07);--green:#22c55e;--orange:#f97316}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
