@@ -60,6 +60,10 @@ header{text-align:center;padding:52px 0 32px}
 .fg .full{grid-column:1/-1}
 .field{display:flex;flex-direction:column;gap:6px}
 label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600}
+select{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:11px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;width:100%;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+select:focus{border-color:var(--red);background-color:rgba(217,4,41,.04)}
+select option{background:#1a1a1a;color:#fff}
+select.inv{border-color:var(--red)!important}
 input[type=text],input[type=email],input[type=tel]{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:11px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;width:100%;outline:none;transition:border-color .2s}
 input::placeholder{color:rgba(255,255,255,.16)}
 input:focus{border-color:var(--red);background:rgba(217,4,41,.04)}
@@ -155,7 +159,32 @@ footer strong{color:var(--soft)}
       <div class="slabel">— Your Details</div>
       <div class="fg">
         <div class="field full"><label>Full Name</label><input type="text" id="fname" placeholder="e.g. Priya Sharma"></div>
-        <div class="field"><label>Roll No</label><input type="text" id="roll" placeholder="e.g. 22B91A6701"></div>
+        <div class="field full">
+          <label>Roll No</label>
+          <input type="text" id="roll" placeholder="e.g. 24J41A6667  or  25EU08R0093" oninput="detectFromRoll()" style="text-transform:uppercase">
+          <div id="autoDetectBadge" style="display:none;margin-top:6px;padding:5px 10px;background:rgba(40,200,100,.1);border:1px solid rgba(40,200,100,.25);border-radius:6px;font-size:11px;color:#3ecf6e;letter-spacing:.5px"></div>
+        </div>
+        <div class="field"><label>Branch</label>
+          <select id="branch">
+            <option value="" disabled selected>Select Branch</option>
+            <option value="CSE">CSE</option>
+            <option value="CSM">CSM</option>
+            <option value="IT">IT</option>
+            <option value="ECE">ECE</option>
+            <option value="EEE">EEE</option>
+            <option value="DS">DS</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Civil">Civil</option>
+          </select>
+        </div>
+        <div class="field"><label>Year</label>
+          <select id="year">
+            <option value="" disabled selected>Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+          </select>
+        </div>
         <div class="field"><label>Phone</label><input type="tel" id="phone" placeholder="10-digit number" maxlength="10"></div>
         <div class="field full"><label>Email</label><input type="email" id="email" placeholder="you@example.com"></div>
       </div>
@@ -238,7 +267,73 @@ function sb(path, opts={}) {
 let fd={}, ss64='';
 
 function g(id){ return document.getElementById(id).value.trim(); }
-function inv(id){ const el=document.getElementById(id); el.classList.add('inv'); el.addEventListener('input',()=>el.classList.remove('inv'),{once:true}); }
+function inv(id){ const el=document.getElementById(id); el.classList.add('inv'); el.addEventListener('input',()=>el.classList.remove('inv'),{once:true}); el.addEventListener('change',()=>el.classList.remove('inv'),{once:true}); }
+
+function detectFromRoll(){
+  const roll = document.getElementById('roll').value.toUpperCase().trim();
+  const brEl = document.getElementById('branch');
+  const yrEl = document.getElementById('year');
+  const badge = document.getElementById('autoDetectBadge');
+  let detectedBr = '', detectedYr = '';
+
+  // ── YEAR ──
+  // 25EUxxRxxxx = 1st year (e.g. 25EU02R0003, 25EU08R0093, 25EU04R0036, 25EU10R0118)
+  if(/^25EU[0-9]{2}R/.test(roll))       detectedYr = '1st Year';
+  // 24J41Axxxx  = 2nd year (e.g. 24J41A6667, 24J41A12F1, 24J41A05BK, 24J41A05AQ)
+  else if(/^24J41A/.test(roll))         detectedYr = '2nd Year';
+  // 23J41Axxxx  = 3rd year
+  else if(/^23J41A/.test(roll))         detectedYr = '3rd Year';
+
+  // ── BRANCH — 1st years (25EUxxR) ──
+  // Code after 25EU and before R is branch code (2 digits)
+  // 02=EEE, 04=ECE, 05=CSE, 06=CSM, 07=Mech, 08=DS, 09=Civil, 10=IT
+  if(/^25EU02R/.test(roll))             detectedBr = 'EEE';
+  else if(/^25EU04R/.test(roll))        detectedBr = 'ECE';
+  else if(/^25EU05R/.test(roll))        detectedBr = 'CSE';
+  else if(/^25EU06R/.test(roll))        detectedBr = 'CSM';
+  else if(/^25EU07R/.test(roll))        detectedBr = 'Mechanical';
+  else if(/^25EU08R/.test(roll))        detectedBr = 'DS';
+  else if(/^25EU09R/.test(roll))        detectedBr = 'Civil';
+  else if(/^25EU10R/.test(roll))        detectedBr = 'IT';
+
+  // ── BRANCH — 2nd years (24J41A) ──
+  // After 24J41A: 05xx=CSE, 12xx=IT, 6xxx=CSM (special range)
+  // Examples: 24J41A6667=CSM, 24J41A12F1=IT, 24J41A05BK=CSE, 24J41A05AQ=CSE
+  else if(/^24J41A6[0-9A-F]/.test(roll))  detectedBr = 'CSM';
+  else if(/^24J41A12/.test(roll))          detectedBr = 'IT';
+  else if(/^24J41A10/.test(roll))          detectedBr = 'IT';
+  else if(/^24J41A05/.test(roll))          detectedBr = 'CSE';
+  else if(/^24J41A06/.test(roll))          detectedBr = 'CSM';
+  else if(/^24J41A04/.test(roll))          detectedBr = 'ECE';
+  else if(/^24J41A02/.test(roll))          detectedBr = 'EEE';
+  else if(/^24J41A08/.test(roll))          detectedBr = 'DS';
+  else if(/^24J41A07/.test(roll))          detectedBr = 'Mechanical';
+  else if(/^24J41A09/.test(roll))          detectedBr = 'Civil';
+
+  // ── BRANCH — 3rd years (23J41A) ──
+  else if(/^23J41A6[0-9A-F]/.test(roll))  detectedBr = 'CSM';
+  else if(/^23J41A12/.test(roll))          detectedBr = 'IT';
+  else if(/^23J41A10/.test(roll))          detectedBr = 'IT';
+  else if(/^23J41A05/.test(roll))          detectedBr = 'CSE';
+  else if(/^23J41A06/.test(roll))          detectedBr = 'CSM';
+  else if(/^23J41A04/.test(roll))          detectedBr = 'ECE';
+  else if(/^23J41A02/.test(roll))          detectedBr = 'EEE';
+  else if(/^23J41A08/.test(roll))          detectedBr = 'DS';
+  else if(/^23J41A07/.test(roll))          detectedBr = 'Mechanical';
+  else if(/^23J41A09/.test(roll))          detectedBr = 'Civil';
+
+  // Apply detected values
+  if(detectedYr){ yrEl.value = detectedYr; yrEl.classList.remove('inv'); }
+  if(detectedBr){ brEl.value = detectedBr; brEl.classList.remove('inv'); }
+
+  // Show auto-detect badge
+  if(detectedBr && detectedYr && badge){
+    badge.textContent = '✓ Auto-detected: ' + detectedBr + ' · ' + detectedYr;
+    badge.style.display = 'block';
+  } else if(badge){
+    badge.style.display = 'none';
+  }
+}
 
 function onEvt(){
   const reg=document.getElementById('chkReg').checked, expo=document.getElementById('chkExpo').checked;
@@ -257,7 +352,7 @@ function validate(){
   const reg=document.getElementById('chkReg').checked,expo=document.getElementById('chkExpo').checked;
   if(!reg&&!expo){alert('Please select at least one event.');return false;}
   let ok=true;
-  [{id:'fname',t:v=>v.length>=2},{id:'roll',t:v=>v.length>=4},{id:'phone',t:v=>/^[6-9]\d{9}$/.test(v)},{id:'email',t:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}]
+  [{id:'fname',t:v=>v.length>=2},{id:'roll',t:v=>v.length>=4},{id:'phone',t:v=>/^[6-9]\d{9}$/.test(v)},{id:'email',t:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},{id:'branch',t:v=>v.length>0},{id:'year',t:v=>v.length>0}]
   .forEach(({id,t})=>{if(!t(g(id))){inv(id);ok=false;}});
   return ok;
 }
@@ -274,7 +369,7 @@ function goPhase2(){
   if(!validate()) return;
   const reg=document.getElementById('chkReg').checked,expo=document.getElementById('chkExpo').checked;
   const amt=(reg?70:0)+(expo?150:0);
-  fd={name:g('fname'),rollno:g('roll').toUpperCase(),email:g('email'),phone:g('phone'),
+  fd={name:g('fname'),rollno:g('roll').toUpperCase(),email:g('email'),phone:g('phone'),branch:g('branch'),year:g('year'),
       event:reg&&expo?'Registration + Project Expo':reg?'Registration':'Project Expo',
       amount:amt,m2name:g('m2n'),m2roll:g('m2r'),m3name:g('m3n'),m3roll:g('m3r')};
   setPhase(2);
@@ -333,6 +428,7 @@ async function submitReg(){
     const res=await sb('/rest/v1/registrations',{
       method:'POST', prefer:'return=minimal',
       body:JSON.stringify({name:fd.name,rollno:fd.rollno,email:fd.email,phone:fd.phone,
+        branch:fd.branch,year:fd.year,
         event:fd.event,amount:fd.amount,m2name:fd.m2name||null,m2roll:fd.m2roll||null,
         m3name:fd.m3name||null,m3roll:fd.m3roll||null,screenshot:ss64,status:'Pending'})
     });
