@@ -157,6 +157,15 @@ tr:hover td{background:rgba(255,255,255,.018)}
       <button class="fb" data-f="Approved" onclick="setF(this)">Approved</button>
       <button class="fb" data-f="Rejected" onclick="setF(this)">Rejected</button>
       <button class="fb" data-f="expo" onclick="setF(this)">Project Expo</button>
+      <button class="fb" data-f="CSE" onclick="setF(this)">CSE</button>
+      <button class="fb" data-f="CSM" onclick="setF(this)">CSM</button>
+      <button class="fb" data-f="IT" onclick="setF(this)">IT</button>
+      <button class="fb" data-f="ECE" onclick="setF(this)">ECE</button>
+      <button class="fb" data-f="EEE" onclick="setF(this)">EEE</button>
+      <button class="fb" data-f="DS" onclick="setF(this)">DS</button>
+      <button class="fb" data-f="1st Year" onclick="setF(this)">1st Yr</button>
+      <button class="fb" data-f="2nd Year" onclick="setF(this)">2nd Yr</button>
+      <button class="fb" data-f="3rd Year" onclick="setF(this)">3rd Yr</button>
       <input class="fsearch" type="text" placeholder="Search name / roll…" oninput="renderTable()" id="fq">
       <button class="rfbtn" onclick="loadData()" title="Refresh">↻</button>
     </div>
@@ -251,6 +260,11 @@ async function loadData(){
 }
 
 function updateStats(){
+  // branch breakdown for console/future use
+  const branchStats = {};
+  ['CSE','CSM','IT','ECE','EEE','DS','Mechanical','Civil'].forEach(b=>{
+    branchStats[b] = recs.filter(r=>r.branch===b).length;
+  });
   document.getElementById('stTotal').textContent=recs.length;
   document.getElementById('stPend').textContent=recs.filter(r=>!r.status||r.status==='Pending').length;
   document.getElementById('stAppr').textContent=recs.filter(r=>r.status==='Approved').length;
@@ -271,7 +285,13 @@ function setF(btn){
 function renderTable(){
   const q=(document.getElementById('fq').value||'').toLowerCase();
   const rows=recs.filter(r=>{
-    const fok=curF==='All'||(curF==='expo'?(r.event||'').includes('Expo'):r.status===curF);
+    const branches=['CSE','CSM','IT','ECE','EEE','DS','Mechanical','Civil'];
+    const years=['1st Year','2nd Year','3rd Year'];
+    const fok=curF==='All'
+      ||(curF==='expo'?(r.event||'').includes('Expo')
+      :branches.includes(curF)?(r.branch===curF)
+      :years.includes(curF)?(r.year===curF)
+      :r.status===curF);
     const qok=!q||(r.name||'').toLowerCase().includes(q)||(r.rollno||'').toLowerCase().includes(q);
     return fok&&qok;
   });
@@ -290,6 +310,8 @@ function renderTable(){
       <td style="color:var(--gray);font-size:12px">${i+1}</td>
       <td style="font-weight:500;color:var(--soft)">${r.name||'—'}</td>
       <td style="font-family:'Barlow Condensed',sans-serif;color:var(--lgray)">${r.rollno||'—'}</td>
+      <td style="font-size:12px;color:var(--lgray)">${r.branch||'—'}</td>
+      <td style="font-size:12px;color:var(--lgray)">${r.year||'—'}</td>
       <td><span class="bdg ${ec}">${r.event||'Reg'}</span></td>
       <td>${ssThumb}</td>
       <td><span class="bdg ${sc}">${st}</span></td>
@@ -303,7 +325,7 @@ function renderTable(){
     </tr>`;
   }).join('');
   document.getElementById('tw').innerHTML=`<table>
-    <thead><tr><th>#</th><th>Name</th><th>Roll No</th><th>Event</th><th>Screenshot</th><th>Status</th><th>Actions</th></tr></thead>
+    <thead><tr><th>#</th><th>Name</th><th>Roll No</th><th>Branch</th><th>Year</th><th>Event</th><th>Screenshot</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>${tbody}</tbody>
   </table>`;
 }
@@ -345,6 +367,8 @@ function viewRec(id){
       <div class="mf"><div class="mk">Event</div><div class="mv">${r.event||'—'}</div></div>
       <div class="mf"><div class="mk">Phone</div><div class="mv">${r.phone||'—'}</div></div>
       <div class="mf"><div class="mk">Email</div><div class="mv">${r.email||'—'}</div></div>
+      <div class="mf"><div class="mk">Branch</div><div class="mv">${r.branch||'—'}</div></div>
+      <div class="mf"><div class="mk">Year</div><div class="mv">${r.year||'—'}</div></div>
       <div class="mf"><div class="mk">Amount Paid</div><div class="mv">₹${r.amount||70}</div></div>
       ${r.m2name?`<div class="mf"><div class="mk">Member 2</div><div class="mv">${r.m2name} · ${r.m2roll||''}</div></div>`:''}
       ${r.m3name?`<div class="mf"><div class="mk">Member 3</div><div class="mv">${r.m3name} · ${r.m3roll||''}</div></div>`:''}
@@ -533,7 +557,8 @@ async function sendMail(btnEl, id, silent=false){
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U'
+        'apikey': 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U',
+        'Authorization': 'Bearer sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U'
       },
       body: JSON.stringify(payload)
     });
