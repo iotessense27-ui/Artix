@@ -26,7 +26,9 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 /* APP */
 #app{display:none;flex-direction:column;height:100vh;height:100dvh}
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10;cursor:pointer;user-select:none}
+
+/* TOPBAR */
+.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
 .brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
 .brand span{color:var(--red)}
 .counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
@@ -35,12 +37,11 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 /* CAMERA */
 .cam-wrap{flex:1;position:relative;overflow:hidden;background:#000}
 #video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#canvas{display:none}
 
 /* SCAN FRAME */
-.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:width .3s,height .3s}
-.frame-box.qr-mode {width:min(240px,65vw);height:min(240px,65vw)}
-.frame-box.bar-mode{width:min(320px,86vw);height:min(110px,30vw)}
+.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:all .3s}
+.frame-box.qr  {width:min(240px,65vw);height:min(240px,65vw)}
+.frame-box.bar {width:min(320px,86vw);height:min(110px,30vw)}
 .corner{position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
 .tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
 .tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
@@ -48,12 +49,12 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
 .scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
 @keyframes sl{0%,100%{top:2%}50%{top:94%}}
-.scan-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;pointer-events:none}
-.status-dot{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none;transition:color .3s}
+.scan-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);white-space:nowrap;pointer-events:none}
+.status-dot{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none}
 .status-dot.ready{color:var(--green)}
-.status-dot.scanning{color:var(--orange)}
+.status-dot.busy{color:var(--orange)}
 
-/* RESULT OVERLAY */
+/* RESULT */
 #resultOverlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
 #resultOverlay.show{display:flex}
 #resultOverlay.success   {background:rgba(3,18,8,.97)}
@@ -74,23 +75,23 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
 .dismiss-btn{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
 
-/* BOTTOM BUTTONS */
-.bottom-btns{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;z-index:20;pointer-events:none}
-.mode-toggle{display:flex;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);border-radius:8px;overflow:hidden;pointer-events:all}
-.mode-btn{background:none;border:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;cursor:pointer;transition:background .15s,color .15s}
-.mode-btn.active{background:var(--red);color:#fff}
-.manual-btn{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer;pointer-events:all}
-
 /* CAM ERROR */
-#camErrScreen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;background:#000;z-index:25}
-#camErrScreen p{color:var(--lgray);font-size:14px;line-height:1.9}
-#camErrScreen button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;padding:11px 24px;cursor:pointer}
+#camErr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
+#camErr p{color:var(--lgray);font-size:14px;line-height:1.9}
+#camErr button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:11px 24px;cursor:pointer}
+
+/* BOTTOM BUTTONS */
+.btns{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;z-index:20;pointer-events:none}
+.mode-toggle{display:flex;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);border-radius:8px;overflow:hidden;pointer-events:all}
+.mbtn{background:none;border:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;cursor:pointer;transition:all .15s}
+.mbtn.active{background:var(--red);color:#fff}
+.manual-btn{background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer;pointer-events:all}
 
 /* STATS */
 .stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
 .stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
 .stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;line-height:1}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
 .stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
 .stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
 
@@ -104,9 +105,6 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .mrow input:focus{border-color:var(--red)}
 .mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
 .mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
-
-/* DEBUG */
-#dbg{display:none;position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,.9);color:#0f0;font-family:monospace;font-size:11px;padding:8px 10px;z-index:50;max-height:50%;overflow-y:auto;line-height:1.7;pointer-events:none}
 
 .flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
 .flash.go{opacity:1}
@@ -128,47 +126,42 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 <!-- APP -->
 <div id="app">
-  <div class="topbar" id="topbar">
-    <div class="brand">ARTIX <span>2026</span> Entry</div>
+  <div class="topbar">
+    <div class="brand">ARTIX <span>2026</span></div>
     <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTotal">0</span></div>
   </div>
 
   <div class="cam-wrap">
     <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas"></canvas>
 
-    <div class="frame-box qr-mode" id="frameBox">
+    <div class="frame-box qr" id="frameBox">
       <div class="corner tl"></div><div class="corner tr"></div>
       <div class="corner bl"></div><div class="corner br"></div>
       <div class="scanline"></div>
     </div>
 
     <div class="scan-hint" id="scanHint">Point at QR code</div>
-    <div class="status-dot" id="statusDot">Loading…</div>
+    <div class="status-dot" id="statusDot">Starting…</div>
 
     <div id="resultOverlay">
       <div class="res-icon"  id="resIcon"></div>
       <div class="res-title" id="resTitle"></div>
       <div class="res-card"  id="resCard"></div>
-      <button class="dismiss-btn" onclick="dismissResult()">▶ &nbsp;Scan Next</button>
+      <button class="dismiss-btn" onclick="dismiss()">▶ &nbsp;Scan Next</button>
     </div>
 
-    <div id="camErrScreen">
+    <div id="camErr">
       <div style="font-size:48px">📵</div>
-      <p id="camErrMsg">Camera access denied.<br><br>
-        Open this page via <strong>https://</strong><br><br>
-        Fastest fix: go to <strong>netlify.com/drop</strong> on your laptop,<br>
-        drag this file in → open the https link on your phone.</p>
+      <p id="camErrTxt">Camera access denied.<br><br>
+        Must be opened via <strong>https://</strong><br><br>
+        Upload to <strong>netlify.com/drop</strong> → open https link on phone.</p>
       <button onclick="location.reload()">Retry</button>
     </div>
 
-    <!-- tap topbar 3x to show debug -->
-    <div id="dbg"></div>
-
-    <div class="bottom-btns">
+    <div class="btns">
       <div class="mode-toggle">
-        <button class="mode-btn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
-        <button class="mode-btn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
+        <button class="mbtn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
+        <button class="mbtn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
       </div>
       <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
     </div>
@@ -181,13 +174,13 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
   </div>
 </div>
 
-<!-- MANUAL MODAL -->
+<!-- MANUAL -->
 <div class="mback" id="manualModal">
   <div class="mmodal">
     <h3>Manual Check-In</h3>
     <div class="mrow">
-      <input type="text" id="manualRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualCheckin()">
-      <button onclick="manualCheckin()">Go</button>
+      <input type="text" id="manualRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualGo()">
+      <button onclick="manualGo()">Go</button>
     </div>
     <button class="mcancel" onclick="closeManual()">Cancel</button>
   </div>
@@ -195,61 +188,25 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 <div class="flash" id="flash"></div>
 
-<!-- jsQR loaded as blocking script tag — guaranteed available before any scan runs -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"
-        onerror="window._jsqrFailed=true"></script>
-
 <script>
 'use strict';
 
-// ── CONFIG ────────────────────────────────────────────────────────────────────
 const ADMIN_USER = 'iot@123';
 const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let scanning      = false;
-let lastScanned   = '';
-let lastScannedAt = 0;
-let detectorBar   = null;
-let scanMode      = 'qr';
-
-// ── DEBUG  (tap topbar 3×) ────────────────────────────────────────────────────
-let _taps = 0, _tapT = null;
-document.getElementById('topbar').addEventListener('click', () => {
-  if (++_taps >= 3) {
-    _taps = 0;
-    clearTimeout(_tapT);
-    const d = document.getElementById('dbg');
-    d.style.display = d.style.display === 'none' ? 'block' : 'none';
-    return;
-  }
-  clearTimeout(_tapT);
-  _tapT = setTimeout(() => { _taps = 0; }, 700);
-});
-function dbg(msg) {
-  console.log(msg);
-  const d = document.getElementById('dbg');
-  const t = new Date().toLocaleTimeString('en', { hour12: false });
-  const el = document.createElement('div');
-  el.textContent = t + ' ' + msg;
-  d.appendChild(el);
-  while (d.children.length > 50) d.firstChild.remove();
-  d.scrollTop = d.scrollHeight;
-}
+let mode      = 'qr';
+let paused    = false;
+let lastVal   = '';
+let lastTime  = 0;
+let detectors = {};
 
 // ── SUPABASE ──────────────────────────────────────────────────────────────────
-function sbFetch(path, opts = {}) {
+function sbFetch(path, opts={}) {
   return fetch(SB + path, {
     ...opts,
-    headers: {
-      apikey: KEY,
-      Authorization: 'Bearer ' + KEY,
-      'Content-Type': 'application/json',
-      Prefer: opts.prefer || '',
-      ...(opts.headers || {})
-    }
+    headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer:opts.prefer||'' }
   });
 }
 
@@ -258,258 +215,163 @@ async function doLogin() {
   const u = document.getElementById('luser').value.trim();
   const p = document.getElementById('lpass').value;
   const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
-  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  if (u === ADMIN_USER && hash === ADMIN_HASH) {
+  const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if (u===ADMIN_USER && hash===ADMIN_HASH) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    initScanner();
+    init();
     loadStats();
   } else {
     document.getElementById('lerr').textContent = 'Wrong credentials.';
-    setTimeout(() => { document.getElementById('lerr').textContent = ''; }, 2500);
+    setTimeout(()=>{ document.getElementById('lerr').textContent=''; }, 2500);
   }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-async function initScanner() {
-  setDot('Starting…', '');
-  dbg('=== initScanner ===');
-  dbg('jsQR: ' + (typeof jsQR === 'function' ? '✓ loaded' : '✗ FAILED (no internet?)'));
+async function init() {
+  dot('Starting…','');
 
-  // BarcodeDetector only for 1D barcode mode — not used for QR
+  // Build detectors
   if ('BarcodeDetector' in window) {
     try {
-      const sup = await BarcodeDetector.getSupportedFormats().catch(() => []);
-      const fmts = ['code_128', 'code_39', 'ean_13', 'ean_8'].filter(f =>
-        sup.length === 0 || sup.includes(f)
-      );
-      if (fmts.length) {
-        detectorBar = new BarcodeDetector({ formats: fmts });
-        dbg('barcode detector: ' + fmts.join(','));
-      } else {
-        dbg('no 1D formats supported');
-      }
-    } catch (e) { dbg('BarcodeDetector err: ' + e); }
-  } else {
-    dbg('BarcodeDetector: not available');
+      const sup = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
+      // QR detector
+      detectors.qr = new BarcodeDetector({ formats: ['qr_code'] });
+      // Barcode detector
+      const bf = ['code_128','code_39','ean_13','ean_8'].filter(f=> !sup.length || sup.includes(f));
+      if (bf.length) detectors.bar = new BarcodeDetector({ formats: bf });
+    } catch(e) { console.warn('BarcodeDetector err:', e); }
   }
 
-  await startCamera();
-}
-
-// ── CAMERA ────────────────────────────────────────────────────────────────────
-async function startCamera() {
-  const video = document.getElementById('video');
+  // Start camera
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1280 }, height:{ ideal:720 } }
     });
-    video.srcObject = stream;
-    await new Promise(resolve => { video.onloadedmetadata = resolve; });
-    await video.play();
-    dbg('camera: ' + video.videoWidth + 'x' + video.videoHeight);
-    setDot('Ready', 'ready');
-    scanning = true;
-    tick();  // starts the rAF loop once
-  } catch (err) {
-    dbg('camera ERROR: ' + err.name + ' — ' + err.message);
-    document.getElementById('camErrScreen').style.display = 'flex';
-    if (err.name === 'NotAllowedError') {
-      document.getElementById('camErrMsg').innerHTML =
-        '📵 <strong>Camera permission denied</strong><br><br>' +
-        'Browser blocks camera on <code>file://</code> links.<br><br>' +
-        'Fix: upload to <strong>netlify.com/drop</strong> → open https link on phone.';
+    const v = document.getElementById('video');
+    v.srcObject = stream;
+    await new Promise(r=>{ v.onloadedmetadata=r; });
+    await v.play();
+    dot('Ready','ready');
+    loop();
+  } catch(err) {
+    document.getElementById('camErr').style.display = 'flex';
+    if (err.name==='NotAllowedError') {
+      document.getElementById('camErrTxt').innerHTML =
+        '📵 <strong>Camera blocked</strong><br><br>Upload to <strong>netlify.com/drop</strong> and open the https:// link on your phone.';
     }
-    setDot('Camera error', '');
+    dot('Camera error','');
   }
 }
 
-// ── SCAN LOOP ─────────────────────────────────────────────────────────────────
-// Scan every 300ms (not every frame) to avoid killing phone CPU
-let _lastScan = 0;
+// ── SCAN LOOP — using BarcodeDetector only, no canvas ─────────────────────────
+let _scanTimer = null;
+function loop() {
+  if (paused) { _scanTimer = setTimeout(loop, 300); return; }
+  const det = mode==='qr' ? detectors.qr : detectors.bar;
+  if (!det) { _scanTimer = setTimeout(loop, 300); return; }
 
-function tick() {
-  requestAnimationFrame(tick);
-  if (!scanning) return;
-  const now = Date.now();
-  if (now - _lastScan < 300) return;   // throttle: max ~3 scans/sec
-  _lastScan = now;
-  doScan();
-}
+  const v = document.getElementById('video');
+  if (v.readyState < 2) { _scanTimer = setTimeout(loop, 300); return; }
 
-async function doScan() {
-  const video = document.getElementById('video');
-  if (video.readyState < 2 || video.videoWidth === 0) return;
-
-  let result = null;
-
-  if (scanMode === 'qr') {
-    if (typeof jsQR === 'function') {
-      try {
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-        // Scan full frame downsampled — no crop so QR can be anywhere in view
-        const maxDim = 400;
-        const scale  = Math.min(1, maxDim / Math.max(video.videoWidth, video.videoHeight));
-        canvas.width  = Math.floor(video.videoWidth  * scale);
-        canvas.height = Math.floor(video.videoHeight * scale);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imgData.data, canvas.width, canvas.height, { inversionAttempts: 'attemptBoth' });
-        if (code) {
-          dbg('QR: ' + code.data.substring(0, 60));
-          result = code.data;
-        }
-      } catch (e) { dbg('jsQR err: ' + e); }
-    } else {
-      if (!window._warnedNoJsQR) {
-        window._warnedNoJsQR = true;
-        dbg('⚠ jsQR not loaded — check internet');
-        setDot('jsQR missing', 'scanning');
+  det.detect(v).then(codes => {
+    if (codes.length > 0) {
+      const val = codes[0].rawValue;
+      const now = Date.now();
+      if (val !== lastVal || now - lastTime > 4000) {
+        lastVal  = val;
+        lastTime = now;
+        paused   = true;
+        dot('Processing…','busy');
+        handleScan(val);
+        return;
       }
     }
-
-  } else {
-    if (detectorBar) {
-      try {
-        const codes = await detectorBar.detect(video);
-        if (codes.length > 0) { dbg('Bar: ' + codes[0].rawValue); result = codes[0].rawValue; }
-      } catch (e) { dbg('bar err: ' + e); }
-    } else {
-      if (!window._warnedNoBar) {
-        window._warnedNoBar = true;
-        dbg('⚠ no barcode detector — use Manual');
-      }
-    }
-  }
-
-  if (result) {
-    const now = Date.now();
-    if (result !== lastScanned || now - lastScannedAt > 4000) {
-      lastScanned   = result;
-      lastScannedAt = now;
-      scanning = false;
-      setDot('Processing…', 'scanning');
-      await handleScan(result);
-    }
-  }
+    _scanTimer = setTimeout(loop, 300);
+  }).catch(()=>{
+    _scanTimer = setTimeout(loop, 300);
+  });
 }
 
 // ── HANDLE SCAN ───────────────────────────────────────────────────────────────
 async function handleScan(raw) {
-  dbg('raw: ' + raw.substring(0, 80));
   let rollno = '';
   try {
-    const parsed = JSON.parse(raw);
-    rollno = (parsed.roll || parsed.rollno || parsed.r || '').toUpperCase().trim();
-    dbg('JSON → rollno: ' + rollno);
-  } catch (_) {
+    const p = JSON.parse(raw);
+    rollno = (p.roll || p.rollno || p.r || '').toUpperCase().trim();
+  } catch(_) {
     rollno = raw.toUpperCase().trim();
-    dbg('plain → rollno: ' + rollno);
   }
-  if (!rollno) {
-    showResult('notfound', null, 'Unreadable code');
-    return;
-  }
+  if (!rollno) { showResult('notfound', null, 'Unreadable code'); return; }
   await processCheckin(rollno);
 }
 
 // ── CHECKIN ───────────────────────────────────────────────────────────────────
 async function processCheckin(rollno) {
   try {
-    dbg('lookup: ' + rollno);
-    const res  = await sbFetch('/rest/v1/registrations?rollno=eq.' + encodeURIComponent(rollno) + '&select=*');
+    const res  = await sbFetch('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(rollno)+'&select=*');
     const data = await res.json();
 
-    if (!data || !data.length) {
-      doFlash('orange'); vib([300]);
-      showResult('notfound', null, rollno + '\n\nNot registered in ARTIX.');
-      return;
-    }
-
+    if (!data||!data.length) { flash('orange'); vib([300]); showResult('notfound',null,rollno+'\n\nNot registered.'); return; }
     const rec = data[0];
+    if (rec.status!=='Approved') { flash('orange'); vib([200,100,200]); showResult('unapproved',rec,'Status: '+(rec.status||'Pending')); return; }
+    if (rec.checked_in) { flash('red'); vib([200,80,200,80,200]); showResult('duplicate',rec,null); return; }
 
-    if (rec.status !== 'Approved') {
-      doFlash('orange'); vib([200, 100, 200]);
-      showResult('unapproved', rec, 'Status: ' + (rec.status || 'Pending'));
-      return;
-    }
-
-    if (rec.checked_in) {
-      doFlash('red'); vib([200, 80, 200, 80, 200]);
-      showResult('duplicate', rec, null);
-      return;
-    }
-
-    await sbFetch('/rest/v1/registrations?id=eq.' + rec.id, {
-      method: 'PATCH',
-      prefer: 'return=minimal',
-      body: JSON.stringify({ checked_in: true, checked_in_at: new Date().toISOString() })
+    await sbFetch('/rest/v1/registrations?id=eq.'+rec.id, {
+      method:'PATCH', prefer:'return=minimal',
+      body:JSON.stringify({ checked_in:true, checked_in_at:new Date().toISOString() })
     });
-
-    doFlash('green'); vib([80]);
+    flash('green'); vib([80]);
     showResult('success', rec, null);
     loadStats();
-
-  } catch (err) {
-    dbg('network err: ' + err);
-    showResult('notfound', null, 'Network error — check connection');
+  } catch(e) {
+    showResult('notfound', null, 'Network error — try again');
   }
 }
 
-// ── RESULT UI ─────────────────────────────────────────────────────────────────
+// ── RESULT ────────────────────────────────────────────────────────────────────
 const CFG = {
-  success:    { icon: '✅', title: 'CHECKED IN ✓'   },
-  duplicate:  { icon: '🚫', title: 'ALREADY IN'      },
-  notfound:   { icon: '❓', title: 'NOT FOUND'        },
-  unapproved: { icon: '⚠️', title: 'NOT APPROVED'    }
+  success:   {icon:'✅',title:'CHECKED IN ✓'},
+  duplicate: {icon:'🚫',title:'ALREADY IN'},
+  notfound:  {icon:'❓',title:'NOT FOUND'},
+  unapproved:{icon:'⚠️',title:'NOT APPROVED'}
 };
-
 function showResult(type, rec, msg) {
   const o = document.getElementById('resultOverlay');
-  o.className = 'show ' + type;
+  o.className = 'show '+type;
   document.getElementById('resIcon').textContent  = CFG[type].icon;
   document.getElementById('resTitle').textContent = CFG[type].title;
   let html = '';
   if (rec) {
-    html += rr('Name',    rec.name);
+    html += rr('Name', rec.name);
     html += rr('Roll No', rec.rollno);
     if (rec.branch) html += rr('Branch', rec.branch);
-    html += rr('Event',   rec.event);
-    if (type === 'duplicate' && rec.checked_in_at) {
-      const t = new Date(rec.checked_in_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      html += rr('Entered At', t, 'red');
-    }
-    if (type === 'unapproved') html += rr('Status', rec.status || 'Pending', 'orange');
-    if (rec.m2name) html += rr('Team', [rec.m2name, rec.m3name].filter(Boolean).join(', '));
-  } else {
-    html += rr('Info', msg);
-  }
+    html += rr('Event', rec.event);
+    if (type==='duplicate'&&rec.checked_in_at)
+      html += rr('Entered At', new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), 'red');
+    if (type==='unapproved') html += rr('Status', rec.status||'Pending','orange');
+  } else { html += rr('Info', msg); }
   document.getElementById('resCard').innerHTML = html;
 }
-
-function rr(k, v, cls = '') {
-  return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${cls}">${v || '—'}</span></div>`;
+function rr(k,v,c='') {
+  return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${c}">${v||'—'}</span></div>`;
 }
-
-function dismissResult() {
+function dismiss() {
   document.getElementById('resultOverlay').className = '';
-  setDot('Ready', 'ready');
-  setTimeout(() => { scanning = true; }, 400);
+  dot('Ready','ready');
+  lastVal = '';
+  setTimeout(()=>{ paused=false; loop(); }, 400);
 }
 
-// ── MODE SWITCH ───────────────────────────────────────────────────────────────
-function setMode(mode) {
-  scanMode = mode;
-  document.getElementById('btnQR').classList.toggle('active',  mode === 'qr');
-  document.getElementById('btnBar').classList.toggle('active', mode === 'bar');
-  document.getElementById('frameBox').className  = 'frame-box ' + (mode === 'qr' ? 'qr-mode' : 'bar-mode');
-  document.getElementById('scanHint').textContent = mode === 'qr' ? 'Point at QR code' : 'Point at ID card barcode';
-  lastScanned = '';
-  setDot('Ready', 'ready');
-  dbg('mode → ' + mode);
+// ── MODE ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnQR').classList.toggle('active', m==='qr');
+  document.getElementById('btnBar').classList.toggle('active', m==='bar');
+  document.getElementById('frameBox').className = 'frame-box '+(m==='qr'?'qr':'bar');
+  document.getElementById('scanHint').textContent = m==='qr' ? 'Point at QR code' : 'Point at ID card barcode';
+  lastVal = '';
+  dot('Ready','ready');
 }
 
 // ── STATS ─────────────────────────────────────────────────────────────────────
@@ -518,47 +380,30 @@ async function loadStats() {
     const res  = await sbFetch('/rest/v1/registrations?select=checked_in&status=eq.Approved');
     const data = await res.json();
     if (!Array.isArray(data)) return;
-    const tot = data.length;
-    const cin = data.filter(r => r.checked_in).length;
-    ['statIn','statRem','statTotal','cntIn','cntTotal'].forEach((id, i) => {
-      document.getElementById(id).textContent = [cin, tot - cin, tot, cin, tot][i];
-    });
-  } catch (_) {}
+    const tot=data.length, cin=data.filter(r=>r.checked_in).length;
+    document.getElementById('statIn').textContent    = cin;
+    document.getElementById('statRem').textContent   = tot-cin;
+    document.getElementById('statTotal').textContent = tot;
+    document.getElementById('cntIn').textContent     = cin;
+    document.getElementById('cntTotal').textContent  = tot;
+  } catch(_){}
 }
 
 // ── MANUAL ────────────────────────────────────────────────────────────────────
-function openManual() {
-  document.getElementById('manualModal').classList.add('on');
-  setTimeout(() => document.getElementById('manualRoll').focus(), 250);
-}
-function closeManual() {
-  document.getElementById('manualModal').classList.remove('on');
-  document.getElementById('manualRoll').value = '';
-}
-async function manualCheckin() {
+function openManual() { document.getElementById('manualModal').classList.add('on'); setTimeout(()=>document.getElementById('manualRoll').focus(),250); }
+function closeManual(){ document.getElementById('manualModal').classList.remove('on'); document.getElementById('manualRoll').value=''; }
+async function manualGo() {
   const roll = document.getElementById('manualRoll').value.trim().toUpperCase();
   if (!roll) return;
-  closeManual();
-  scanning = false;
+  closeManual(); paused=true;
   await processCheckin(roll);
 }
-document.getElementById('manualModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('manualModal')) closeManual();
-});
+document.getElementById('manualModal').addEventListener('click', e=>{ if(e.target===document.getElementById('manualModal')) closeManual(); });
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function setDot(text, cls) {
-  const d = document.getElementById('statusDot');
-  d.textContent = text;
-  d.className   = 'status-dot ' + cls;
-}
-function doFlash(c) {
-  const el = document.getElementById('flash');
-  el.style.background = c === 'green' ? 'rgba(34,197,94,.28)' : c === 'red' ? 'rgba(217,4,41,.32)' : 'rgba(249,115,22,.28)';
-  el.classList.add('go');
-  setTimeout(() => el.classList.remove('go'), 220);
-}
-function vib(p) { try { navigator.vibrate(p); } catch (_) {} }
+function dot(t,c){ const d=document.getElementById('statusDot'); d.textContent=t; d.className='status-dot '+c; }
+function flash(c){ const el=document.getElementById('flash'); el.style.background=c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)'; el.classList.add('go'); setTimeout(()=>el.classList.remove('go'),220); }
+function vib(p){ try{ navigator.vibrate(p); }catch(_){} }
 
 setInterval(loadStats, 20000);
 </script>
