@@ -349,16 +349,17 @@ async function doScan() {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-        // Scan only a 300×300 crop from the centre — much faster than full frame
-        const size = 300;
-        canvas.width  = size;
-        canvas.height = size;
-        const sx = (video.videoWidth  - size) / 2;
-        const sy = (video.videoHeight - size) / 2;
-        ctx.drawImage(video, sx, sy, size, size, 0, 0, size, size);
+        // Crop centre square — use 60% of the shorter video dimension
+        const cropSize = Math.floor(Math.min(video.videoWidth, video.videoHeight) * 0.6);
+        canvas.width  = cropSize;
+        canvas.height = cropSize;
+        const sx = (video.videoWidth  - cropSize) / 2;
+        const sy = (video.videoHeight - cropSize) / 2;
+        ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, cropSize, cropSize);
 
-        const imgData = ctx.getImageData(0, 0, size, size);
-        const code = jsQR(imgData.data, size, size, { inversionAttempts: 'dontInvert' });
+        const imgData = ctx.getImageData(0, 0, cropSize, cropSize);
+        // attemptBoth handles both normal AND inverted (dark bg) QR codes like our card
+        const code = jsQR(imgData.data, cropSize, cropSize, { inversionAttempts: 'attemptBoth' });
         if (code) {
           dbg('QR: ' + code.data.substring(0, 60));
           result = code.data;
