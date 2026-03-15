@@ -213,8 +213,7 @@ const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 let scanning      = false;
 let lastScanned   = '';
 let lastScannedAt = 0;
-let detectorQR    = null;
-let detectorBar   = null;
+let detectorBar   = null;  // BarcodeDetector for 1D barcodes (ID cards)
 let rafId         = null;
 let scanMode      = 'qr';  // 'qr' or 'bar'
 
@@ -252,35 +251,24 @@ async function doLogin(){
 async function initScanner(){
   setDot('Starting camera…', '');
 
-  // 1. Try native BarcodeDetector (Chrome Android, Samsung browser)
-  // Use TWO separate detectors — mixing formats in one can silently break QR on some devices
+  // Always load jsQR — it's the most reliable QR scanner for in-browser use
+  await loadJsQR();
+
+  // BarcodeDetector only for 1D barcodes (ID cards) — NOT used for QR
   if('BarcodeDetector' in window){
     try {
       const supported = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
-      console.log('Supported formats:', supported);
-
-      // Dedicated QR detector
-      detectorQR = new BarcodeDetector({ formats: ['qr_code'] });
-      console.log('✓ QR detector ready');
-
-      // Dedicated 1D barcode detector for ID cards
       const barFormats = ['code_128','code_39','ean_13','ean_8'].filter(f =>
         supported.length === 0 || supported.includes(f)
       );
       if(barFormats.length > 0){
         detectorBar = new BarcodeDetector({ formats: barFormats });
-        console.log('✓ Barcode detector formats:', barFormats);
+        console.log('✓ Barcode detector:', barFormats);
       }
-    } catch(_){ detectorQR = null; detectorBar = null; }
+    } catch(_){ detectorBar = null; }
   }
 
-  // 2. If native not available, lazy-load jsQR (QR) + ZXing (1D barcodes) as fallbacks
-  if(!detectorQR){
-    console.log('BarcodeDetector not supported, loading fallback libs…');
-    await Promise.all([loadJsQR(), loadZXing()]);
-  }
-
-  // 3. Start camera
+  // Start camera
   await startCamera();
 }
 
@@ -342,15 +330,8 @@ async function tick(){
   let result = null;
 
   if(scanMode === 'qr'){
-    // ── QR MODE ──
-    if(detectorQR){
-      try {
-        const codes = await detectorQR.detect(video);
-        if(codes.length > 0) result = codes[0].rawValue;
-      } catch(_){}
-    }
-    // jsQR canvas fallback
-    if(!result && typeof jsQR !== 'undefined'){
+    // ── QR MODE — always use jsQR (canvas-based, proven reliable) ──
+    if(typeof jsQR !== 'undefined'){
       try {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
