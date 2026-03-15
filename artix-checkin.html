@@ -178,6 +178,9 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
       <button class="mode-btn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
     </div>
 
+    <!-- debug overlay — tap topbar 3x to toggle -->
+    <div id="dbg" style="display:none;position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,.82);color:#0f0;font-family:monospace;font-size:11px;padding:8px;z-index:50;max-height:45%;overflow-y:auto;pointer-events:none"></div>
+
     <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
   </div>
 
@@ -247,28 +250,55 @@ async function doLogin(){
   }
 }
 
+// ─── DEBUG ─────────────────────────────────────────────────────────────────────
+let dbgTaps = 0, dbgTimer = null;
+document.querySelector('.topbar').addEventListener('click', ()=>{
+  dbgTaps++;
+  clearTimeout(dbgTimer);
+  dbgTimer = setTimeout(()=>{ dbgTaps=0; }, 800);
+  if(dbgTaps >= 3){
+    const d = document.getElementById('dbg');
+    d.style.display = d.style.display==='none' ? 'block' : 'none';
+    dbgTaps = 0;
+  }
+});
+function dbg(msg){
+  console.log(msg);
+  const d = document.getElementById('dbg');
+  const line = document.createElement('div');
+  line.textContent = new Date().toLocaleTimeString('en',{hour12:false}) + ' ' + msg;
+  d.appendChild(line);
+  if(d.children.length > 30) d.removeChild(d.firstChild);
+  d.scrollTop = d.scrollHeight;
+}
+
 // ─── INIT SCANNER ─────────────────────────────────────────────────────────────
 async function initScanner(){
   setDot('Starting camera…', '');
+  dbg('initScanner start');
 
-  // Always load jsQR — it's the most reliable QR scanner for in-browser use
+  // Always load jsQR — most reliable QR scanner for in-browser use
+  dbg('loading jsQR…');
   await loadJsQR();
+  dbg('jsQR status: ' + (typeof jsQR !== 'undefined' ? '✓ loaded' : '✗ FAILED'));
 
-  // BarcodeDetector only for 1D barcodes (ID cards) — NOT used for QR
+  // BarcodeDetector only for 1D barcodes
   if('BarcodeDetector' in window){
     try {
       const supported = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
+      dbg('BarcodeDetector supported: ' + supported.join(','));
       const barFormats = ['code_128','code_39','ean_13','ean_8'].filter(f =>
         supported.length === 0 || supported.includes(f)
       );
       if(barFormats.length > 0){
         detectorBar = new BarcodeDetector({ formats: barFormats });
-        console.log('✓ Barcode detector:', barFormats);
+        dbg('barcode detector: ' + barFormats.join(','));
       }
-    } catch(_){ detectorBar = null; }
+    } catch(e){ dbg('BarcodeDetector error: '+e); detectorBar = null; }
+  } else {
+    dbg('BarcodeDetector NOT in window');
   }
 
-  // Start camera
   await startCamera();
 }
 
@@ -339,8 +369,12 @@ async function tick(){
         ctx.drawImage(video, 0, 0);
         const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(id.data, id.width, id.height, { inversionAttempts: 'attemptBoth' });
-        if(code) result = code.data;
-      } catch(_){}
+        if(code){ dbg('QR found: '+code.data.substring(0,40)); result = code.data; }
+      } catch(e){ dbg('jsQR error: '+e); }
+    } else {
+      // jsQR not loaded — show this in debug once
+      if(!window._jsqrWarn){ window._jsqrWarn=true; dbg('⚠ jsQR not loaded!'); }
+    }
     }
 
   } else {
@@ -381,14 +415,15 @@ async function tick(){
 
 // ─── HANDLE QR DATA ────────────────────────────────────────────────────────────
 async function handleScan(raw){
+  dbg('handleScan raw: '+raw.substring(0,50));
   let rollno = '';
   try {
-    // Our QR format: JSON with roll/rollno field
     const parsed = JSON.parse(raw);
     rollno = (parsed.roll || parsed.rollno || '').toUpperCase().trim();
+    dbg('parsed JSON, rollno: '+rollno);
   } catch(_){
-    // Plain text — treat as roll number directly
     rollno = raw.toUpperCase().trim();
+    dbg('plain text rollno: '+rollno);
   }
 
   if(!rollno){
