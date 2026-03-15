@@ -358,8 +358,9 @@ async function doScan() {
         ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, cropSize, cropSize);
 
         const imgData = ctx.getImageData(0, 0, cropSize, cropSize);
-        // attemptBoth handles both normal AND inverted (dark bg) QR codes like our card
-        const code = jsQR(imgData.data, cropSize, cropSize, { inversionAttempts: 'attemptBoth' });
+        // Our QR cards have BLACK background — try invertOnly first, then attemptBoth
+        const code = jsQR(imgData.data, cropSize, cropSize, { inversionAttempts: 'onlyInvert' })
+                  || jsQR(imgData.data, cropSize, cropSize, { inversionAttempts: 'dontInvert' });
         if (code) {
           dbg('QR: ' + code.data.substring(0, 60));
           result = code.data;
