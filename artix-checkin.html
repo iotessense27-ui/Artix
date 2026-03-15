@@ -358,9 +358,14 @@ async function doScan() {
         ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, cropSize, cropSize);
 
         const imgData = ctx.getImageData(0, 0, cropSize, cropSize);
-        // Our QR cards have BLACK background — try invertOnly first, then attemptBoth
-        const code = jsQR(imgData.data, cropSize, cropSize, { inversionAttempts: 'onlyInvert' })
-                  || jsQR(imgData.data, cropSize, cropSize, { inversionAttempts: 'dontInvert' });
+        // Manually invert pixels — black bg becomes white bg, jsQR reads it natively
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          d[i]   = 255 - d[i];
+          d[i+1] = 255 - d[i+1];
+          d[i+2] = 255 - d[i+2];
+        }
+        const code = jsQR(d, cropSize, cropSize, { inversionAttempts: 'dontInvert' });
         if (code) {
           dbg('QR: ' + code.data.substring(0, 60));
           result = code.data;
