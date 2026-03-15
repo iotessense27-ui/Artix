@@ -174,6 +174,365 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 <script>
 'use strict';
+const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
+const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
+
+let mode    = 'qr';
+let paused  = false;
+let lastVal = '';
+let lastTime= 0;
+let detBar  = null;
+let timer   = null;
+
+function sb(path, opts={}) {
+  return fetch(SB+path,{...opts,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:opts.prefer||''}});
+}
+
+async function doLogin(){
+  const u=document.getElementById('luser').value.trim();
+  const p=document.getElementById('lpass').value;
+  if(u==='iot@123' && p==='iot@2027'){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    startCamera();
+    loadStats();
+  } else {
+    document.getElementById('lerr').textContent='Wrong credentials.';
+    setTimeout(()=>{document.getElementById('lerr').textContent='';},2500);
+  }
+}
+
+async function startCamera(){
+  // BarcodeDetector for barcode mode
+  if('BarcodeDetector' in window){
+    try{
+      const sup=await BarcodeDetector.getSupportedFormats().catch(()=>[]);
+      const fmts=['code_128','code_39','ean_13','ean_8'].filter(f=>!sup.length||sup.includes(f));
+      if(fmts.length) detBar=new BarcodeDetector({formats:fmts});
+    }catch(e){}
+  }
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
+    const v=document.getElementById('video');
+    v.srcObject=stream;
+    await new Promise(r=>{v.onloadedmetadata=r;});
+    await v.play();
+    setDot('Ready','ready');
+    scheduleNext();
+  }catch(err){
+    document.getElementById('camErr').style.display='flex';
+    setDot('Camera error','');
+  }
+}
+
+function scheduleNext(){ timer=setTimeout(scan, 300); }
+
+async function scan(){
+  if(paused) return;
+  const v=document.getElementById('video');
+  if(v.readyState<2||!v.videoWidth){ scheduleNext(); return; }
+
+  let result=null;
+
+  if(mode==='qr'){
+    // ── jsQR: draw video to canvas, scan pixels ──
+    if(typeof jsQR==='function'){
+      try{
+        const c=document.getElementById('canvas');
+        const ctx=c.getContext('2d',{willReadFrequently:true});
+        // Scale down for speed, keep aspect
+        const W=Math.min(v.videoWidth,640);
+        const H=Math.round(v.videoHeight*(W/v.videoWidth));
+        c.width=W; c.height=H;
+        // White fill first — gives jsQR clean borders even if QR near edge
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+        ctx.drawImage(v,0,0,W,H);
+        const d=ctx.getImageData(0,0,W,H);
+        // dontInvert = standard black-on-white QR (our new white card)
+        result = jsQR(d.data,W,H,{inversionAttempts:'dontInvert'});
+        if(result) result=result.data;
+      }catch(e){}
+    }
+  } else {
+    // ── BarcodeDetector: ID card barcode ──
+    if(detBar){
+      try{
+        const codes=await detBar.detect(v);
+        if(codes.length) result=codes[0].rawValue;
+      }catch(e){}
+    }
+  }
+
+  if(result){
+    const now=Date.now();
+    if(result!==lastVal||now-lastTime>4000){
+      lastVal=result; lastTime=now;
+      paused=true;
+      setDot('Processing…','busy');
+      await handleScan(result);
+      return;
+    }
+  }
+  scheduleNext();
+}
+
+async function handleScan(raw){
+  let roll='';
+  try{ const p=JSON.parse(raw); roll=(p.roll||p.rollno||p.r||'').toUpperCase().trim(); }
+  catch(_){ roll=raw.toUpperCase().trim(); }
+  if(!roll){ showResult('notfound',null,'Unreadable code'); return; }
+  await processCheckin(roll);
+}
+
+async function processCheckin(roll){
+  try{
+    const res=await sb('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(roll)+'&select=*');
+    const data=await res.json();
+    if(!data||!data.length){ flash('orange'); vib([300]); showResult('notfound',null,roll+'\nNot in ARTIX database.'); return; }
+    const rec=data[0];
+    if(rec.status!=='Approved'){ flash('orange'); vib([200,100,200]); showResult('unapproved',rec,'Status: '+(rec.status||'Pending')); return; }
+    if(rec.checked_in){ flash('red'); vib([200,80,200,80,200]); showResult('duplicate',rec,null); return; }
+    await sb('/rest/v1/registrations?id=eq.'+rec.id,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({checked_in:true,checked_in_at:new Date().toISOString()})});
+    flash('green'); vib([80]); showResult('success',rec,null); loadStats();
+  }catch(e){ showResult('notfound',null,'Network error — try again'); }
+}
+
+const CFG={success:{icon:'✅',title:'CHECKED IN ✓'},duplicate:{icon:'🚫',title:'ALREADY IN'},notfound:{icon:'❓',title:'NOT FOUND'},unapproved:{icon:'⚠️',title:'NOT APPROVED'}};
+function showResult(type,rec,msg){
+  const o=document.getElementById('overlay'); o.className='show '+type;
+  document.getElementById('resIcon').textContent=CFG[type].icon;
+  document.getElementById('resTitle').textContent=CFG[type].title;
+  let h='';
+  if(rec){
+    h+=rr('Name',rec.name); h+=rr('Roll No',rec.rollno);
+    if(rec.branch) h+=rr('Branch',rec.branch);
+    h+=rr('Event',rec.event);
+    if(type==='duplicate'&&rec.checked_in_at) h+=rr('Entered At',new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'red');
+    if(type==='unapproved') h+=rr('Status',rec.status||'Pending','orange');
+  } else { h+=rr('Info',msg); }
+  document.getElementById('resCard').innerHTML=h;
+}
+function rr(k,v,c=''){return`<div class="rrow"><span class="rk">${k}</span><span class="rv ${c}">${v||'—'}</span></div>`;}
+function dismiss(){
+  document.getElementById('overlay').className='';
+  setDot('Ready','ready'); lastVal='';
+  setTimeout(()=>{paused=false; scheduleNext();},400);
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('btnQR').classList.toggle('active',m==='qr');
+  document.getElementById('btnBar').classList.toggle('active',m==='bar');
+  document.getElementById('frameBox').className='frame-box '+(m==='qr'?'qr':'bar');
+  document.getElementById('hint').textContent=m==='qr'?'Point at QR code':'Point at ID card barcode';
+  lastVal=''; setDot('Ready','ready');
+}
+
+async function loadStats(){
+  try{
+    const r=await sb('/rest/v1/registrations?select=checked_in&status=eq.Approved');
+    const d=await r.json(); if(!Array.isArray(d))return;
+    const tot=d.length,cin=d.filter(x=>x.checked_in).length;
+    document.getElementById('sIn').textContent=cin;
+    document.getElementById('sRem').textContent=tot-cin;
+    document.getElementById('sTot').textContent=tot;
+    document.getElementById('cntIn').textContent=cin;
+    document.getElementById('cntTot').textContent=tot;
+  }catch(_){}
+}
+
+function openManual(){document.getElementById('mm').classList.add('on');setTimeout(()=>document.getElementById('mRoll').focus(),250);}
+function closeManual(){document.getElementById('mm').classList.remove('on');document.getElementById('mRoll').value='';}
+async function manualGo(){
+  const roll=document.getElementById('mRoll').value.trim().toUpperCase();
+  if(!roll)return; closeManual(); paused=true;
+  await processCheckin(roll);
+}
+document.getElementById('mm').addEventListener('click',e=>{if(e.target===document.getElementById('mm'))closeManual();});
+
+function setDot(t,c){const d=document.getElementById('dot');d.textContent=t;d.className='dot '+c;}
+function flash(c){const el=document.getElementById('flash');el.style.background=c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)';el.classList.add('go');setTimeout(()=>el.classList.remove('go'),220);}
+function vib(p){try{navigator.vibrate(p);}catch(_){}}
+
+setInterval(loadStats,20000);
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ARTIX 2026 – Check In</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- jsQR — loaded before anything else -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<style>
+:root{--red:#D90429;--black:#090909;--black2:#111;--white:#fff;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.08);--green:#22c55e;--orange:#f97316}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;height:100vh;height:100dvh;overflow:hidden}
+#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
+.lcard{background:var(--black2);border:1px solid var(--border);border-radius:12px;padding:36px 28px;width:100%;max-width:340px;text-align:center}
+.ltitle{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:4px}
+.ltitle span{color:var(--red)}
+.lsub{color:var(--gray);font-size:13px;margin-bottom:26px}
+.lf{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;text-align:left}
+.lf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:600}
+.lf input{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:var(--white);font-size:15px;outline:none;width:100%;transition:border-color .2s}
+.lf input:focus{border-color:var(--red)}
+.lerr{color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px}
+.lbtn{width:100%;background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:13px;cursor:pointer;margin-top:4px}
+.lbtn:active{background:#a80220}
+#app{display:none;flex-direction:column;height:100vh;height:100dvh}
+.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.brand span{color:var(--red)}
+.counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
+.counter strong{color:var(--green);font-size:16px}
+.cam-wrap{flex:1;position:relative;overflow:hidden;background:#000}
+#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#canvas{display:none}
+/* mode toggle */
+.mode-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);border-radius:20px;overflow:hidden;z-index:20}
+.mbtn{background:none;border:none;color:rgba(255,255,255,.45);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;cursor:pointer;transition:all .15s}
+.mbtn.active{background:var(--red);color:#fff;border-radius:20px}
+/* frame */
+.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:all .3s}
+.frame-box.qr {width:min(240px,65vw);height:min(240px,65vw)}
+.frame-box.bar{width:min(320px,86vw);height:min(110px,30vw)}
+.corner{position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
+.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
+.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
+.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
+@keyframes sl{0%,100%{top:2%}50%{top:94%}}
+.hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;pointer-events:none}
+.dot{position:absolute;bottom:14%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none}
+.dot.ready{color:var(--green)}.dot.busy{color:var(--orange)}
+/* result */
+#overlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
+#overlay.show{display:flex}
+#overlay.success{background:rgba(3,18,8,.97)}
+#overlay.duplicate{background:rgba(18,3,3,.97)}
+#overlay.notfound{background:rgba(18,12,3,.97)}
+#overlay.unapproved{background:rgba(18,12,3,.97)}
+.res-icon{font-size:64px;margin-bottom:10px;line-height:1}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;margin-bottom:16px}
+#overlay.success .res-title{color:var(--green)}
+#overlay.duplicate .res-title{color:var(--red)}
+#overlay.notfound .res-title{color:var(--orange)}
+#overlay.unapproved .res-title{color:var(--orange)}
+.res-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;width:100%;max-width:310px;margin-bottom:16px;text-align:left}
+.rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.rrow:last-child{border-bottom:none}
+.rk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
+.rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
+.rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
+.dismiss{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
+/* bottom */
+.bottom-btns{position:absolute;bottom:14px;right:14px;z-index:20}
+.manual-btn{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer}
+/* cam error */
+#camErr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
+#camErr p{color:var(--lgray);font-size:14px;line-height:1.9}
+#camErr button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:11px 24px;cursor:pointer}
+/* stats */
+.stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
+.stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
+.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
+.stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
+/* manual modal */
+.mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;display:none;align-items:flex-end;justify-content:center}
+.mback.on{display:flex}
+.mmodal{background:var(--black2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:24px 20px 40px}
+.mmodal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
+.mrow{display:flex;gap:9px;margin-bottom:12px}
+.mrow input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:#fff;font-size:15px;outline:none;text-transform:uppercase}
+.mrow input:focus{border-color:var(--red)}
+.mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
+.mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
+.flash.go{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="lcard">
+    <div class="ltitle">ARTIX <span>2026</span></div>
+    <div class="lsub">Entry Check-In Scanner</div>
+    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lerr" id="lerr"></div>
+    <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="brand">ARTIX <span>2026</span></div>
+    <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTot">0</span></div>
+  </div>
+  <div class="cam-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+
+    <div class="mode-bar">
+      <button class="mbtn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
+      <button class="mbtn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
+    </div>
+
+    <div class="frame-box qr" id="frameBox">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <div class="scanline"></div>
+    </div>
+    <div class="hint" id="hint">Point at QR code</div>
+    <div class="dot ready" id="dot">Ready</div>
+
+    <div id="overlay">
+      <div class="res-icon"  id="resIcon"></div>
+      <div class="res-title" id="resTitle"></div>
+      <div class="res-card"  id="resCard"></div>
+      <button class="dismiss" onclick="dismiss()">▶ &nbsp;Scan Next</button>
+    </div>
+
+    <div id="camErr">
+      <div style="font-size:48px">📵</div>
+      <p>Camera blocked.<br><br>
+         Must open via <strong>https://</strong><br><br>
+         Go to <strong>netlify.com/drop</strong> on laptop →<br>
+         drag this file → open the https link on phone.</p>
+      <button onclick="location.reload()">Retry</button>
+    </div>
+
+    <div class="bottom-btns">
+      <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat in" ><div class="stat-n" id="sIn">0</div><div class="stat-l">Checked In</div></div>
+    <div class="stat rem"><div class="stat-n" id="sRem">0</div><div class="stat-l">Remaining</div></div>
+    <div class="stat tot"><div class="stat-n" id="sTot">0</div><div class="stat-l">Approved</div></div>
+  </div>
+</div>
+
+<div class="mback" id="mm">
+  <div class="mmodal">
+    <h3>Manual Check-In</h3>
+    <div class="mrow">
+      <input type="text" id="mRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualGo()">
+      <button onclick="manualGo()">Go</button>
+    </div>
+    <button class="mcancel" onclick="closeManual()">Cancel</button>
+  </div>
+</div>
+<div class="flash" id="flash"></div>
+
+<script>
+'use strict';
 const ADMIN_USER = 'iot@123';
 const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
