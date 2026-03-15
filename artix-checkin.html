@@ -310,7 +310,7 @@ async function startCamera() {
     dbg('camera: ' + video.videoWidth + 'x' + video.videoHeight);
     setDot('Ready', 'ready');
     scanning = true;
-    requestAnimationFrame(tick);
+    tick();  // starts the rAF loop once
   } catch (err) {
     dbg('camera ERROR: ' + err.name + ' — ' + err.message);
     document.getElementById('camErrScreen').style.display = 'flex';
@@ -325,57 +325,63 @@ async function startCamera() {
 }
 
 // ── SCAN LOOP ─────────────────────────────────────────────────────────────────
-async function tick() {
-  if (!scanning) { requestAnimationFrame(tick); return; }
+// Scan every 300ms (not every frame) to avoid killing phone CPU
+let _lastScan = 0;
 
+function tick() {
+  requestAnimationFrame(tick);
+  if (!scanning) return;
+  const now = Date.now();
+  if (now - _lastScan < 300) return;   // throttle: max ~3 scans/sec
+  _lastScan = now;
+  doScan();
+}
+
+async function doScan() {
   const video = document.getElementById('video');
-  if (video.readyState < 2 || video.videoWidth === 0) {
-    requestAnimationFrame(tick); return;
-  }
+  if (video.readyState < 2 || video.videoWidth === 0) return;
 
   let result = null;
 
   if (scanMode === 'qr') {
-    // ── QR: always jsQR, canvas pixel scan ──
     if (typeof jsQR === 'function') {
       try {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        canvas.width  = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imgData.data, imgData.width, imgData.height, {
-          inversionAttempts: 'attemptBoth'
-        });
+
+        // Scan only a 300×300 crop from the centre — much faster than full frame
+        const size = 300;
+        canvas.width  = size;
+        canvas.height = size;
+        const sx = (video.videoWidth  - size) / 2;
+        const sy = (video.videoHeight - size) / 2;
+        ctx.drawImage(video, sx, sy, size, size, 0, 0, size, size);
+
+        const imgData = ctx.getImageData(0, 0, size, size);
+        const code = jsQR(imgData.data, size, size, { inversionAttempts: 'dontInvert' });
         if (code) {
-          dbg('QR detected: ' + code.data.substring(0, 60));
+          dbg('QR: ' + code.data.substring(0, 60));
           result = code.data;
         }
-      } catch (e) { dbg('jsQR error: ' + e); }
+      } catch (e) { dbg('jsQR err: ' + e); }
     } else {
       if (!window._warnedNoJsQR) {
         window._warnedNoJsQR = true;
-        dbg('⚠ jsQR not loaded! Check internet.');
-        setDot('jsQR missing — check internet', 'scanning');
+        dbg('⚠ jsQR not loaded — check internet');
+        setDot('jsQR missing', 'scanning');
       }
     }
 
   } else {
-    // ── BARCODE: BarcodeDetector (native) ──
     if (detectorBar) {
       try {
         const codes = await detectorBar.detect(video);
-        if (codes.length > 0) {
-          dbg('Barcode: ' + codes[0].rawValue);
-          result = codes[0].rawValue;
-        }
-      } catch (e) { dbg('barcode err: ' + e); }
+        if (codes.length > 0) { dbg('Bar: ' + codes[0].rawValue); result = codes[0].rawValue; }
+      } catch (e) { dbg('bar err: ' + e); }
     } else {
       if (!window._warnedNoBar) {
         window._warnedNoBar = true;
         dbg('⚠ no barcode detector — use Manual');
-        setDot('Use Manual for barcodes', 'scanning');
       }
     }
   }
@@ -390,8 +396,6 @@ async function tick() {
       await handleScan(result);
     }
   }
-
-  requestAnimationFrame(tick);
 }
 
 // ── HANDLE SCAN ───────────────────────────────────────────────────────────────
