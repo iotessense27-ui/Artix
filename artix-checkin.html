@@ -133,6 +133,7 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
   <div class="cam-wrap">
     <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas" style="display:none"></canvas>
 
     <div class="frame-box qr" id="frameBox">
       <div class="corner tl"></div><div class="corner tr"></div>
@@ -188,6 +189,7 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 <div class="flash" id="flash"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 'use strict';
 
@@ -264,33 +266,51 @@ async function init() {
   }
 }
 
-// ── SCAN LOOP — using BarcodeDetector only, no canvas ─────────────────────────
+// ── SCAN LOOP ─────────────────────────────────────────────────────────────────
 let _scanTimer = null;
+
 function loop() {
-  if (paused) { _scanTimer = setTimeout(loop, 300); return; }
-  const det = mode==='qr' ? detectors.qr : detectors.bar;
-  if (!det) { _scanTimer = setTimeout(loop, 300); return; }
+  if (paused) { _scanTimer = setTimeout(loop, 400); return; }
 
   const v = document.getElementById('video');
-  if (v.readyState < 2) { _scanTimer = setTimeout(loop, 300); return; }
+  if (v.readyState < 2 || v.videoWidth === 0) { _scanTimer = setTimeout(loop, 400); return; }
 
-  det.detect(v).then(codes => {
-    if (codes.length > 0) {
-      const val = codes[0].rawValue;
-      const now = Date.now();
-      if (val !== lastVal || now - lastTime > 4000) {
-        lastVal  = val;
-        lastTime = now;
-        paused   = true;
-        dot('Processing…','busy');
-        handleScan(val);
-        return;
-      }
-    }
-    _scanTimer = setTimeout(loop, 300);
-  }).catch(()=>{
-    _scanTimer = setTimeout(loop, 300);
-  });
+  if (mode === 'qr') {
+    // QR mode — jsQR canvas scan (works on all browsers incl iPhone Safari)
+    if (typeof jsQR !== 'function') { _scanTimer = setTimeout(loop, 400); return; }
+    try {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const scale  = Math.min(1, 400 / v.videoWidth);
+      canvas.width  = Math.round(v.videoWidth  * scale);
+      canvas.height = Math.round(v.videoHeight * scale);
+      ctx.filter = 'contrast(1.4) brightness(1.1)';
+      ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+      ctx.filter = 'none';
+      const img  = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(img.data, canvas.width, canvas.height, { inversionAttempts: 'attemptBoth' });
+      if (code) { onDetected(code.data); return; }
+    } catch(e) { console.warn('jsQR:', e); }
+    _scanTimer = setTimeout(loop, 400);
+
+  } else {
+    // Barcode mode — BarcodeDetector (native, works for Code128 ID cards)
+    const det = detectors.bar;
+    if (!det) { _scanTimer = setTimeout(loop, 400); return; }
+    det.detect(v).then(codes => {
+      if (codes.length > 0) { onDetected(codes[0].rawValue); return; }
+      _scanTimer = setTimeout(loop, 400);
+    }).catch(() => { _scanTimer = setTimeout(loop, 400); });
+  }
+}
+
+function onDetected(val) {
+  const now = Date.now();
+  if (val === lastVal && now - lastTime < 4000) { _scanTimer = setTimeout(loop, 400); return; }
+  lastVal = val; lastTime = now;
+  paused  = true;
+  dot('Processing…', 'busy');
+  handleScan(val);
 }
 
 // ── HANDLE SCAN ───────────────────────────────────────────────────────────────
