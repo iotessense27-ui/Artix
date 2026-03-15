@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ARTIX 2026 – Check In</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- jsQR — loaded before anything else -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
 :root{--red:#D90429;--black:#090909;--black2:#111;--white:#fff;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.08);--green:#22c55e;--orange:#f97316}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;height:100vh;height:100dvh;overflow:hidden}
+
+/* ── LOGIN ── */
 #loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
 .lcard{background:var(--black2);border:1px solid var(--border);border-radius:12px;padding:36px 28px;width:100%;max-width:340px;text-align:center}
 .ltitle{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:4px}
@@ -18,25 +19,31 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .lsub{color:var(--gray);font-size:13px;margin-bottom:26px}
 .lf{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;text-align:left}
 .lf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:600}
-.lf input{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:var(--white);font-size:15px;outline:none;width:100%;transition:border-color .2s}
+.lf input{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:#fff;font-size:15px;outline:none;width:100%}
 .lf input:focus{border-color:var(--red)}
 .lerr{color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px}
 .lbtn{width:100%;background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:13px;cursor:pointer;margin-top:4px}
 .lbtn:active{background:#a80220}
+
+/* ── APP ── */
 #app{display:none;flex-direction:column;height:100vh;height:100dvh}
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
 .brand span{color:var(--red)}
 .counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
 .counter strong{color:var(--green);font-size:16px}
+
+/* ── CAMERA ── */
 .cam-wrap{flex:1;position:relative;overflow:hidden;background:#000}
 #video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #canvas{display:none}
-/* mode toggle */
-.mode-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);border-radius:20px;overflow:hidden;z-index:20}
-.mbtn{background:none;border:none;color:rgba(255,255,255,.45);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;cursor:pointer;transition:all .15s}
-.mbtn.active{background:var(--red);color:#fff;border-radius:20px}
-/* frame */
+
+/* ── MODE TOGGLE ── */
+.mode-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);border-radius:20px;overflow:hidden;z-index:20}
+.mbtn{background:none;border:none;color:rgba(255,255,255,.45);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 20px;cursor:pointer;transition:all .15s}
+.mbtn.active{background:var(--red);color:#fff}
+
+/* ── SCAN FRAME ── */
 .frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:all .3s}
 .frame-box.qr {width:min(240px,65vw);height:min(240px,65vw)}
 .frame-box.bar{width:min(320px,86vw);height:min(110px,30vw)}
@@ -48,20 +55,21 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
 @keyframes sl{0%,100%{top:2%}50%{top:94%}}
 .hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;pointer-events:none}
-.dot{position:absolute;bottom:14%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none}
+.dot{position:absolute;bottom:14%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;pointer-events:none;color:rgba(255,255,255,.3)}
 .dot.ready{color:var(--green)}.dot.busy{color:var(--orange)}
-/* result */
+
+/* ── RESULT ── */
 #overlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
 #overlay.show{display:flex}
-#overlay.success{background:rgba(3,18,8,.97)}
-#overlay.duplicate{background:rgba(18,3,3,.97)}
-#overlay.notfound{background:rgba(18,12,3,.97)}
+#overlay.success   {background:rgba(3,18,8,.97)}
+#overlay.duplicate {background:rgba(18,3,3,.97)}
+#overlay.notfound  {background:rgba(18,12,3,.97)}
 #overlay.unapproved{background:rgba(18,12,3,.97)}
 .res-icon{font-size:64px;margin-bottom:10px;line-height:1}
 .res-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;margin-bottom:16px}
-#overlay.success .res-title{color:var(--green)}
-#overlay.duplicate .res-title{color:var(--red)}
-#overlay.notfound .res-title{color:var(--orange)}
+#overlay.success    .res-title{color:var(--green)}
+#overlay.duplicate  .res-title{color:var(--red)}
+#overlay.notfound   .res-title{color:var(--orange)}
 #overlay.unapproved .res-title{color:var(--orange)}
 .res-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;width:100%;max-width:310px;margin-bottom:16px;text-align:left}
 .rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -70,21 +78,25 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
 .rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
 .dismiss{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
-/* bottom */
+
+/* ── BOTTOM BUTTONS ── */
 .bottom-btns{position:absolute;bottom:14px;right:14px;z-index:20}
 .manual-btn{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer}
-/* cam error */
+
+/* ── CAM ERROR ── */
 #camErr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
 #camErr p{color:var(--lgray);font-size:14px;line-height:1.9}
 #camErr button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:11px 24px;cursor:pointer}
-/* stats */
+
+/* ── STATS ── */
 .stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
 .stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
 .stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
 .stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
 .stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
 .stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
-/* manual modal */
+
+/* ── MANUAL MODAL ── */
 .mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;display:none;align-items:flex-end;justify-content:center}
 .mback.on{display:flex}
 .mmodal{background:var(--black2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:24px 20px 40px}
@@ -94,752 +106,8 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .mrow input:focus{border-color:var(--red)}
 .mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
 .mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
+
 .flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
-.flash.go{opacity:1}
-</style>
-</head>
-<body>
-
-<div id="loginScreen">
-  <div class="lcard">
-    <div class="ltitle">ARTIX <span>2026</span></div>
-    <div class="lsub">Entry Check-In Scanner</div>
-    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lerr" id="lerr"></div>
-    <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
-  </div>
-</div>
-
-<div id="app">
-  <div class="topbar">
-    <div class="brand">ARTIX <span>2026</span></div>
-    <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTot">0</span></div>
-  </div>
-  <div class="cam-wrap">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas"></canvas>
-
-    <div class="mode-bar">
-      <button class="mbtn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
-      <button class="mbtn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
-    </div>
-
-    <div class="frame-box qr" id="frameBox">
-      <div class="corner tl"></div><div class="corner tr"></div>
-      <div class="corner bl"></div><div class="corner br"></div>
-      <div class="scanline"></div>
-    </div>
-    <div class="hint" id="hint">Point at QR code</div>
-    <div class="dot ready" id="dot">Ready</div>
-
-    <div id="overlay">
-      <div class="res-icon"  id="resIcon"></div>
-      <div class="res-title" id="resTitle"></div>
-      <div class="res-card"  id="resCard"></div>
-      <button class="dismiss" onclick="dismiss()">▶ &nbsp;Scan Next</button>
-    </div>
-
-    <div id="camErr">
-      <div style="font-size:48px">📵</div>
-      <p>Camera blocked.<br><br>
-         Must open via <strong>https://</strong><br><br>
-         Go to <strong>netlify.com/drop</strong> on laptop →<br>
-         drag this file → open the https link on phone.</p>
-      <button onclick="location.reload()">Retry</button>
-    </div>
-
-    <div class="bottom-btns">
-      <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
-    </div>
-  </div>
-  <div class="stats-bar">
-    <div class="stat in" ><div class="stat-n" id="sIn">0</div><div class="stat-l">Checked In</div></div>
-    <div class="stat rem"><div class="stat-n" id="sRem">0</div><div class="stat-l">Remaining</div></div>
-    <div class="stat tot"><div class="stat-n" id="sTot">0</div><div class="stat-l">Approved</div></div>
-  </div>
-</div>
-
-<div class="mback" id="mm">
-  <div class="mmodal">
-    <h3>Manual Check-In</h3>
-    <div class="mrow">
-      <input type="text" id="mRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualGo()">
-      <button onclick="manualGo()">Go</button>
-    </div>
-    <button class="mcancel" onclick="closeManual()">Cancel</button>
-  </div>
-</div>
-<div class="flash" id="flash"></div>
-
-<script>
-'use strict';
-const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
-const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
-
-let mode    = 'qr';
-let paused  = false;
-let lastVal = '';
-let lastTime= 0;
-let detBar  = null;
-let timer   = null;
-
-function sb(path, opts={}) {
-  return fetch(SB+path,{...opts,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:opts.prefer||''}});
-}
-
-async function doLogin(){
-  const u=document.getElementById('luser').value.trim();
-  const p=document.getElementById('lpass').value;
-  if(u==='iot@123' && p==='iot@2027'){
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    startCamera();
-    loadStats();
-  } else {
-    document.getElementById('lerr').textContent='Wrong credentials.';
-    setTimeout(()=>{document.getElementById('lerr').textContent='';},2500);
-  }
-}
-
-async function startCamera(){
-  // BarcodeDetector for barcode mode
-  if('BarcodeDetector' in window){
-    try{
-      const sup=await BarcodeDetector.getSupportedFormats().catch(()=>[]);
-      const fmts=['code_128','code_39','ean_13','ean_8'].filter(f=>!sup.length||sup.includes(f));
-      if(fmts.length) detBar=new BarcodeDetector({formats:fmts});
-    }catch(e){}
-  }
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
-    const v=document.getElementById('video');
-    v.srcObject=stream;
-    await new Promise(r=>{v.onloadedmetadata=r;});
-    await v.play();
-    setDot('Ready','ready');
-    scheduleNext();
-  }catch(err){
-    document.getElementById('camErr').style.display='flex';
-    setDot('Camera error','');
-  }
-}
-
-function scheduleNext(){ timer=setTimeout(scan, 300); }
-
-async function scan(){
-  if(paused) return;
-  const v=document.getElementById('video');
-  if(v.readyState<2||!v.videoWidth){ scheduleNext(); return; }
-
-  let result=null;
-
-  if(mode==='qr'){
-    // ── jsQR: draw video to canvas, scan pixels ──
-    if(typeof jsQR==='function'){
-      try{
-        const c=document.getElementById('canvas');
-        const ctx=c.getContext('2d',{willReadFrequently:true});
-        // Scale down for speed, keep aspect
-        const W=Math.min(v.videoWidth,640);
-        const H=Math.round(v.videoHeight*(W/v.videoWidth));
-        c.width=W; c.height=H;
-        // White fill first — gives jsQR clean borders even if QR near edge
-        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
-        ctx.drawImage(v,0,0,W,H);
-        const d=ctx.getImageData(0,0,W,H);
-        // dontInvert = standard black-on-white QR (our new white card)
-        result = jsQR(d.data,W,H,{inversionAttempts:'dontInvert'});
-        if(result) result=result.data;
-      }catch(e){}
-    }
-  } else {
-    // ── BarcodeDetector: ID card barcode ──
-    if(detBar){
-      try{
-        const codes=await detBar.detect(v);
-        if(codes.length) result=codes[0].rawValue;
-      }catch(e){}
-    }
-  }
-
-  if(result){
-    const now=Date.now();
-    if(result!==lastVal||now-lastTime>4000){
-      lastVal=result; lastTime=now;
-      paused=true;
-      setDot('Processing…','busy');
-      await handleScan(result);
-      return;
-    }
-  }
-  scheduleNext();
-}
-
-async function handleScan(raw){
-  let roll='';
-  try{ const p=JSON.parse(raw); roll=(p.roll||p.rollno||p.r||'').toUpperCase().trim(); }
-  catch(_){ roll=raw.toUpperCase().trim(); }
-  if(!roll){ showResult('notfound',null,'Unreadable code'); return; }
-  await processCheckin(roll);
-}
-
-async function processCheckin(roll){
-  try{
-    const res=await sb('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(roll)+'&select=*');
-    const data=await res.json();
-    if(!data||!data.length){ flash('orange'); vib([300]); showResult('notfound',null,roll+'\nNot in ARTIX database.'); return; }
-    const rec=data[0];
-    if(rec.status!=='Approved'){ flash('orange'); vib([200,100,200]); showResult('unapproved',rec,'Status: '+(rec.status||'Pending')); return; }
-    if(rec.checked_in){ flash('red'); vib([200,80,200,80,200]); showResult('duplicate',rec,null); return; }
-    await sb('/rest/v1/registrations?id=eq.'+rec.id,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({checked_in:true,checked_in_at:new Date().toISOString()})});
-    flash('green'); vib([80]); showResult('success',rec,null); loadStats();
-  }catch(e){ showResult('notfound',null,'Network error — try again'); }
-}
-
-const CFG={success:{icon:'✅',title:'CHECKED IN ✓'},duplicate:{icon:'🚫',title:'ALREADY IN'},notfound:{icon:'❓',title:'NOT FOUND'},unapproved:{icon:'⚠️',title:'NOT APPROVED'}};
-function showResult(type,rec,msg){
-  const o=document.getElementById('overlay'); o.className='show '+type;
-  document.getElementById('resIcon').textContent=CFG[type].icon;
-  document.getElementById('resTitle').textContent=CFG[type].title;
-  let h='';
-  if(rec){
-    h+=rr('Name',rec.name); h+=rr('Roll No',rec.rollno);
-    if(rec.branch) h+=rr('Branch',rec.branch);
-    h+=rr('Event',rec.event);
-    if(type==='duplicate'&&rec.checked_in_at) h+=rr('Entered At',new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'red');
-    if(type==='unapproved') h+=rr('Status',rec.status||'Pending','orange');
-  } else { h+=rr('Info',msg); }
-  document.getElementById('resCard').innerHTML=h;
-}
-function rr(k,v,c=''){return`<div class="rrow"><span class="rk">${k}</span><span class="rv ${c}">${v||'—'}</span></div>`;}
-function dismiss(){
-  document.getElementById('overlay').className='';
-  setDot('Ready','ready'); lastVal='';
-  setTimeout(()=>{paused=false; scheduleNext();},400);
-}
-
-function setMode(m){
-  mode=m;
-  document.getElementById('btnQR').classList.toggle('active',m==='qr');
-  document.getElementById('btnBar').classList.toggle('active',m==='bar');
-  document.getElementById('frameBox').className='frame-box '+(m==='qr'?'qr':'bar');
-  document.getElementById('hint').textContent=m==='qr'?'Point at QR code':'Point at ID card barcode';
-  lastVal=''; setDot('Ready','ready');
-}
-
-async function loadStats(){
-  try{
-    const r=await sb('/rest/v1/registrations?select=checked_in&status=eq.Approved');
-    const d=await r.json(); if(!Array.isArray(d))return;
-    const tot=d.length,cin=d.filter(x=>x.checked_in).length;
-    document.getElementById('sIn').textContent=cin;
-    document.getElementById('sRem').textContent=tot-cin;
-    document.getElementById('sTot').textContent=tot;
-    document.getElementById('cntIn').textContent=cin;
-    document.getElementById('cntTot').textContent=tot;
-  }catch(_){}
-}
-
-function openManual(){document.getElementById('mm').classList.add('on');setTimeout(()=>document.getElementById('mRoll').focus(),250);}
-function closeManual(){document.getElementById('mm').classList.remove('on');document.getElementById('mRoll').value='';}
-async function manualGo(){
-  const roll=document.getElementById('mRoll').value.trim().toUpperCase();
-  if(!roll)return; closeManual(); paused=true;
-  await processCheckin(roll);
-}
-document.getElementById('mm').addEventListener('click',e=>{if(e.target===document.getElementById('mm'))closeManual();});
-
-function setDot(t,c){const d=document.getElementById('dot');d.textContent=t;d.className='dot '+c;}
-function flash(c){const el=document.getElementById('flash');el.style.background=c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)';el.classList.add('go');setTimeout(()=>el.classList.remove('go'),220);}
-function vib(p){try{navigator.vibrate(p);}catch(_){}}
-
-setInterval(loadStats,20000);
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>ARTIX 2026 – Check In</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- jsQR — loaded before anything else -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-<style>
-:root{--red:#D90429;--black:#090909;--black2:#111;--white:#fff;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.08);--green:#22c55e;--orange:#f97316}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;height:100vh;height:100dvh;overflow:hidden}
-#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
-.lcard{background:var(--black2);border:1px solid var(--border);border-radius:12px;padding:36px 28px;width:100%;max-width:340px;text-align:center}
-.ltitle{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:4px}
-.ltitle span{color:var(--red)}
-.lsub{color:var(--gray);font-size:13px;margin-bottom:26px}
-.lf{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;text-align:left}
-.lf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:600}
-.lf input{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:var(--white);font-size:15px;outline:none;width:100%;transition:border-color .2s}
-.lf input:focus{border-color:var(--red)}
-.lerr{color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px}
-.lbtn{width:100%;background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:13px;cursor:pointer;margin-top:4px}
-.lbtn:active{background:#a80220}
-#app{display:none;flex-direction:column;height:100vh;height:100dvh}
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
-.brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
-.brand span{color:var(--red)}
-.counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
-.counter strong{color:var(--green);font-size:16px}
-.cam-wrap{flex:1;position:relative;overflow:hidden;background:#000}
-#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#canvas{display:none}
-/* mode toggle */
-.mode-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);border-radius:20px;overflow:hidden;z-index:20}
-.mbtn{background:none;border:none;color:rgba(255,255,255,.45);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;cursor:pointer;transition:all .15s}
-.mbtn.active{background:var(--red);color:#fff;border-radius:20px}
-/* frame */
-.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:all .3s}
-.frame-box.qr {width:min(240px,65vw);height:min(240px,65vw)}
-.frame-box.bar{width:min(320px,86vw);height:min(110px,30vw)}
-.corner{position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
-.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
-.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
-.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
-.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
-.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
-@keyframes sl{0%,100%{top:2%}50%{top:94%}}
-.hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;pointer-events:none}
-.dot{position:absolute;bottom:14%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none}
-.dot.ready{color:var(--green)}.dot.busy{color:var(--orange)}
-/* result */
-#overlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
-#overlay.show{display:flex}
-#overlay.success{background:rgba(3,18,8,.97)}
-#overlay.duplicate{background:rgba(18,3,3,.97)}
-#overlay.notfound{background:rgba(18,12,3,.97)}
-#overlay.unapproved{background:rgba(18,12,3,.97)}
-.res-icon{font-size:64px;margin-bottom:10px;line-height:1}
-.res-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;margin-bottom:16px}
-#overlay.success .res-title{color:var(--green)}
-#overlay.duplicate .res-title{color:var(--red)}
-#overlay.notfound .res-title{color:var(--orange)}
-#overlay.unapproved .res-title{color:var(--orange)}
-.res-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;width:100%;max-width:310px;margin-bottom:16px;text-align:left}
-.rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.rrow:last-child{border-bottom:none}
-.rk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
-.rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
-.rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
-.dismiss{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
-/* bottom */
-.bottom-btns{position:absolute;bottom:14px;right:14px;z-index:20}
-.manual-btn{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer}
-/* cam error */
-#camErr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
-#camErr p{color:var(--lgray);font-size:14px;line-height:1.9}
-#camErr button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:11px 24px;cursor:pointer}
-/* stats */
-.stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
-.stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
-.stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
-.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
-.stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
-/* manual modal */
-.mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;display:none;align-items:flex-end;justify-content:center}
-.mback.on{display:flex}
-.mmodal{background:var(--black2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:24px 20px 40px}
-.mmodal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
-.mrow{display:flex;gap:9px;margin-bottom:12px}
-.mrow input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:#fff;font-size:15px;outline:none;text-transform:uppercase}
-.mrow input:focus{border-color:var(--red)}
-.mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
-.mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
-.flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
-.flash.go{opacity:1}
-</style>
-</head>
-<body>
-
-<div id="loginScreen">
-  <div class="lcard">
-    <div class="ltitle">ARTIX <span>2026</span></div>
-    <div class="lsub">Entry Check-In Scanner</div>
-    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lerr" id="lerr"></div>
-    <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
-  </div>
-</div>
-
-<div id="app">
-  <div class="topbar">
-    <div class="brand">ARTIX <span>2026</span></div>
-    <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTot">0</span></div>
-  </div>
-  <div class="cam-wrap">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas"></canvas>
-
-    <div class="mode-bar">
-      <button class="mbtn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
-      <button class="mbtn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
-    </div>
-
-    <div class="frame-box qr" id="frameBox">
-      <div class="corner tl"></div><div class="corner tr"></div>
-      <div class="corner bl"></div><div class="corner br"></div>
-      <div class="scanline"></div>
-    </div>
-    <div class="hint" id="hint">Point at QR code</div>
-    <div class="dot ready" id="dot">Ready</div>
-
-    <div id="overlay">
-      <div class="res-icon"  id="resIcon"></div>
-      <div class="res-title" id="resTitle"></div>
-      <div class="res-card"  id="resCard"></div>
-      <button class="dismiss" onclick="dismiss()">▶ &nbsp;Scan Next</button>
-    </div>
-
-    <div id="camErr">
-      <div style="font-size:48px">📵</div>
-      <p>Camera blocked.<br><br>
-         Must open via <strong>https://</strong><br><br>
-         Go to <strong>netlify.com/drop</strong> on laptop →<br>
-         drag this file → open the https link on phone.</p>
-      <button onclick="location.reload()">Retry</button>
-    </div>
-
-    <div class="bottom-btns">
-      <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
-    </div>
-  </div>
-  <div class="stats-bar">
-    <div class="stat in" ><div class="stat-n" id="sIn">0</div><div class="stat-l">Checked In</div></div>
-    <div class="stat rem"><div class="stat-n" id="sRem">0</div><div class="stat-l">Remaining</div></div>
-    <div class="stat tot"><div class="stat-n" id="sTot">0</div><div class="stat-l">Approved</div></div>
-  </div>
-</div>
-
-<div class="mback" id="mm">
-  <div class="mmodal">
-    <h3>Manual Check-In</h3>
-    <div class="mrow">
-      <input type="text" id="mRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualGo()">
-      <button onclick="manualGo()">Go</button>
-    </div>
-    <button class="mcancel" onclick="closeManual()">Cancel</button>
-  </div>
-</div>
-<div class="flash" id="flash"></div>
-
-<script>
-'use strict';
-const ADMIN_USER = 'iot@123';
-const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
-const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
-const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
-
-let mode    = 'qr';
-let paused  = false;
-let lastVal = '';
-let lastTime= 0;
-let detBar  = null;
-let timer   = null;
-
-function sb(path, opts={}) {
-  return fetch(SB+path,{...opts,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:opts.prefer||''}});
-}
-
-async function doLogin(){
-  const u=document.getElementById('luser').value.trim();
-  const p=document.getElementById('lpass').value;
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));
-  const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  if(u===ADMIN_USER&&hash===ADMIN_HASH){
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    startCamera();
-    loadStats();
-  } else {
-    document.getElementById('lerr').textContent='Wrong credentials.';
-    setTimeout(()=>{document.getElementById('lerr').textContent='';},2500);
-  }
-}
-
-async function startCamera(){
-  // BarcodeDetector for barcode mode
-  if('BarcodeDetector' in window){
-    try{
-      const sup=await BarcodeDetector.getSupportedFormats().catch(()=>[]);
-      const fmts=['code_128','code_39','ean_13','ean_8'].filter(f=>!sup.length||sup.includes(f));
-      if(fmts.length) detBar=new BarcodeDetector({formats:fmts});
-    }catch(e){}
-  }
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
-    const v=document.getElementById('video');
-    v.srcObject=stream;
-    await new Promise(r=>{v.onloadedmetadata=r;});
-    await v.play();
-    setDot('Ready','ready');
-    scheduleNext();
-  }catch(err){
-    document.getElementById('camErr').style.display='flex';
-    setDot('Camera error','');
-  }
-}
-
-function scheduleNext(){ timer=setTimeout(scan, 300); }
-
-async function scan(){
-  if(paused) return;
-  const v=document.getElementById('video');
-  if(v.readyState<2||!v.videoWidth){ scheduleNext(); return; }
-
-  let result=null;
-
-  if(mode==='qr'){
-    // ── jsQR: draw video to canvas, scan pixels ──
-    if(typeof jsQR==='function'){
-      try{
-        const c=document.getElementById('canvas');
-        const ctx=c.getContext('2d',{willReadFrequently:true});
-        // Scale down for speed, keep aspect
-        const W=Math.min(v.videoWidth,640);
-        const H=Math.round(v.videoHeight*(W/v.videoWidth));
-        c.width=W; c.height=H;
-        // White fill first — gives jsQR clean borders even if QR near edge
-        ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
-        ctx.drawImage(v,0,0,W,H);
-        const d=ctx.getImageData(0,0,W,H);
-        // dontInvert = standard black-on-white QR (our new white card)
-        result = jsQR(d.data,W,H,{inversionAttempts:'dontInvert'});
-        if(result) result=result.data;
-      }catch(e){}
-    }
-  } else {
-    // ── BarcodeDetector: ID card barcode ──
-    if(detBar){
-      try{
-        const codes=await detBar.detect(v);
-        if(codes.length) result=codes[0].rawValue;
-      }catch(e){}
-    }
-  }
-
-  if(result){
-    const now=Date.now();
-    if(result!==lastVal||now-lastTime>4000){
-      lastVal=result; lastTime=now;
-      paused=true;
-      setDot('Processing…','busy');
-      await handleScan(result);
-      return;
-    }
-  }
-  scheduleNext();
-}
-
-async function handleScan(raw){
-  let roll='';
-  try{ const p=JSON.parse(raw); roll=(p.roll||p.rollno||p.r||'').toUpperCase().trim(); }
-  catch(_){ roll=raw.toUpperCase().trim(); }
-  if(!roll){ showResult('notfound',null,'Unreadable code'); return; }
-  await processCheckin(roll);
-}
-
-async function processCheckin(roll){
-  try{
-    const res=await sb('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(roll)+'&select=*');
-    const data=await res.json();
-    if(!data||!data.length){ flash('orange'); vib([300]); showResult('notfound',null,roll+'\nNot in ARTIX database.'); return; }
-    const rec=data[0];
-    if(rec.status!=='Approved'){ flash('orange'); vib([200,100,200]); showResult('unapproved',rec,'Status: '+(rec.status||'Pending')); return; }
-    if(rec.checked_in){ flash('red'); vib([200,80,200,80,200]); showResult('duplicate',rec,null); return; }
-    await sb('/rest/v1/registrations?id=eq.'+rec.id,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({checked_in:true,checked_in_at:new Date().toISOString()})});
-    flash('green'); vib([80]); showResult('success',rec,null); loadStats();
-  }catch(e){ showResult('notfound',null,'Network error — try again'); }
-}
-
-const CFG={success:{icon:'✅',title:'CHECKED IN ✓'},duplicate:{icon:'🚫',title:'ALREADY IN'},notfound:{icon:'❓',title:'NOT FOUND'},unapproved:{icon:'⚠️',title:'NOT APPROVED'}};
-function showResult(type,rec,msg){
-  const o=document.getElementById('overlay'); o.className='show '+type;
-  document.getElementById('resIcon').textContent=CFG[type].icon;
-  document.getElementById('resTitle').textContent=CFG[type].title;
-  let h='';
-  if(rec){
-    h+=rr('Name',rec.name); h+=rr('Roll No',rec.rollno);
-    if(rec.branch) h+=rr('Branch',rec.branch);
-    h+=rr('Event',rec.event);
-    if(type==='duplicate'&&rec.checked_in_at) h+=rr('Entered At',new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'red');
-    if(type==='unapproved') h+=rr('Status',rec.status||'Pending','orange');
-  } else { h+=rr('Info',msg); }
-  document.getElementById('resCard').innerHTML=h;
-}
-function rr(k,v,c=''){return`<div class="rrow"><span class="rk">${k}</span><span class="rv ${c}">${v||'—'}</span></div>`;}
-function dismiss(){
-  document.getElementById('overlay').className='';
-  setDot('Ready','ready'); lastVal='';
-  setTimeout(()=>{paused=false; scheduleNext();},400);
-}
-
-function setMode(m){
-  mode=m;
-  document.getElementById('btnQR').classList.toggle('active',m==='qr');
-  document.getElementById('btnBar').classList.toggle('active',m==='bar');
-  document.getElementById('frameBox').className='frame-box '+(m==='qr'?'qr':'bar');
-  document.getElementById('hint').textContent=m==='qr'?'Point at QR code':'Point at ID card barcode';
-  lastVal=''; setDot('Ready','ready');
-}
-
-async function loadStats(){
-  try{
-    const r=await sb('/rest/v1/registrations?select=checked_in&status=eq.Approved');
-    const d=await r.json(); if(!Array.isArray(d))return;
-    const tot=d.length,cin=d.filter(x=>x.checked_in).length;
-    document.getElementById('sIn').textContent=cin;
-    document.getElementById('sRem').textContent=tot-cin;
-    document.getElementById('sTot').textContent=tot;
-    document.getElementById('cntIn').textContent=cin;
-    document.getElementById('cntTot').textContent=tot;
-  }catch(_){}
-}
-
-function openManual(){document.getElementById('mm').classList.add('on');setTimeout(()=>document.getElementById('mRoll').focus(),250);}
-function closeManual(){document.getElementById('mm').classList.remove('on');document.getElementById('mRoll').value='';}
-async function manualGo(){
-  const roll=document.getElementById('mRoll').value.trim().toUpperCase();
-  if(!roll)return; closeManual(); paused=true;
-  await processCheckin(roll);
-}
-document.getElementById('mm').addEventListener('click',e=>{if(e.target===document.getElementById('mm'))closeManual();});
-
-function setDot(t,c){const d=document.getElementById('dot');d.textContent=t;d.className='dot '+c;}
-function flash(c){const el=document.getElementById('flash');el.style.background=c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)';el.classList.add('go');setTimeout(()=>el.classList.remove('go'),220);}
-function vib(p){try{navigator.vibrate(p);}catch(_){}}
-
-setInterval(loadStats,20000);
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>ARTIX 2026 – Check In</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--red:#D90429;--black:#090909;--black2:#111;--white:#fff;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.08);--green:#22c55e;--orange:#f97316}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
-
-/* LOGIN */
-#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
-.lcard{background:var(--black2);border:1px solid var(--border);border-radius:12px;padding:36px 28px;width:100%;max-width:340px;text-align:center}
-.ltitle{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:4px}
-.ltitle span{color:var(--red)}
-.lsub{color:var(--gray);font-size:13px;margin-bottom:26px}
-.lf{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;text-align:left}
-.lf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:600}
-.lf input{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:var(--white);font-size:15px;outline:none;width:100%;transition:border-color .2s}
-.lf input:focus{border-color:var(--red)}
-.lerr{color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px}
-.lbtn{width:100%;background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:13px;cursor:pointer;margin-top:4px}
-.lbtn:active{background:#a80220}
-
-/* APP */
-#app{display:none;flex-direction:column;min-height:100vh}
-
-/* TOPBAR */
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
-.brand span{color:var(--red)}
-.counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
-.counter strong{color:var(--green);font-size:16px}
-
-/* STATS */
-.stats-bar{display:flex;background:var(--black2);border-bottom:1px solid var(--border)}
-.stat{display:flex;flex-direction:column;align-items:center;flex:1;padding:10px 0;position:relative}
-.stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}
-.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
-.stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
-
-/* SCAN AREA */
-.scan-area{padding:20px 16px;display:flex;flex-direction:column;gap:12px}
-
-/* BIG SCAN BUTTON */
-.scan-btn{
-  width:100%;background:var(--red);border:none;border-radius:14px;
-  color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;
-  padding:28px 20px;cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;gap:6px;transition:background .15s;position:relative;overflow:hidden
-}
-.scan-btn:active{background:#a80220}
-.scan-btn .icon{font-size:48px;line-height:1}
-.scan-btn .sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;opacity:.75;text-transform:uppercase}
-/* Hidden file input sits on top of button */
-.scan-btn input[type=file]{
-  position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0
-}
-
-/* BARCODE BUTTON */
-.bar-btn{
-  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
-  border-radius:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:22px;
-  letter-spacing:3px;padding:20px;cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;gap:4px;transition:background .15s;position:relative;overflow:hidden
-}
-.bar-btn:active{background:rgba(255,255,255,.1)}
-.bar-btn .icon{font-size:36px;line-height:1}
-.bar-btn .sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;opacity:.5;text-transform:uppercase}
-.bar-btn input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0}
-
-/* STATUS */
-.status-pill{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  background:rgba(255,255,255,.04);border:1px solid var(--border);
-  border-radius:8px;padding:12px;font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;letter-spacing:1px;color:var(--gray)
-}
-.status-pill.processing{border-color:rgba(249,115,22,.3);color:var(--orange);background:rgba(249,115,22,.05)}
-.status-pill.ok{border-color:rgba(34,197,94,.3);color:var(--green);background:rgba(34,197,94,.05)}
-.status-pill.err{border-color:rgba(217,4,41,.3);color:var(--red);background:rgba(217,4,41,.05)}
-.spin{display:inline-block;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* RESULT CARD */
-.result-card{
-  background:var(--black2);border:1px solid var(--border);border-radius:12px;
-  overflow:hidden;display:none
-}
-.result-card.show{display:block}
-.result-card.success{border-color:rgba(34,197,94,.35)}
-.result-card.duplicate{border-color:rgba(217,4,41,.35)}
-.result-card.notfound{border-color:rgba(249,115,22,.35)}
-.result-card.unapproved{border-color:rgba(249,115,22,.35)}
-.rc-head{padding:16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
-.rc-icon{font-size:36px;line-height:1}
-.rc-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px}
-.result-card.success   .rc-title{color:var(--green)}
-.result-card.duplicate .rc-title{color:var(--red)}
-.result-card.notfound  .rc-title{color:var(--orange)}
-.result-card.unapproved .rc-title{color:var(--orange)}
-.rc-body{padding:14px 16px}
-.rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.rrow:last-child{border-bottom:none}
-.rk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
-.rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
-.rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
-
-/* MANUAL */
-.manual-wrap{padding:0 16px 16px}
-.manual-row{display:flex;gap:8px}
-.manual-row input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 13px;color:#fff;font-size:15px;outline:none;text-transform:uppercase;font-family:'Barlow',sans-serif}
-.manual-row input:focus{border-color:var(--red)}
-.manual-row input::placeholder{color:rgba(255,255,255,.2);text-transform:none}
-.manual-row button{background:var(--red);border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:1px;padding:0 18px;cursor:pointer}
-
-.flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .1s}
 .flash.go{opacity:1}
 </style>
 </head>
@@ -849,11 +117,11 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 <div id="loginScreen">
   <div class="lcard">
     <div class="ltitle">ARTIX <span>2026</span></div>
-    <div class="lsub">Entry Check-In</div>
+    <div class="lsub">Entry Check-In Scanner</div>
     <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lerr" id="lerr"></div>
-    <button class="lbtn" onclick="doLogin()">Enter →</button>
+    <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
   </div>
 </div>
 
@@ -861,87 +129,90 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 <div id="app">
   <div class="topbar">
     <div class="brand">ARTIX <span>2026</span></div>
-    <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTotal">0</span></div>
+    <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTot">0</span></div>
+  </div>
+
+  <div class="cam-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+
+    <!-- MODE TOGGLE -->
+    <div class="mode-bar">
+      <button class="mbtn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
+      <button class="mbtn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
+    </div>
+
+    <!-- FRAME -->
+    <div class="frame-box qr" id="frameBox">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <div class="scanline"></div>
+    </div>
+    <div class="hint" id="hint">Point at QR code</div>
+    <div class="dot ready" id="dot">Ready</div>
+
+    <!-- RESULT -->
+    <div id="overlay">
+      <div class="res-icon"  id="resIcon"></div>
+      <div class="res-title" id="resTitle"></div>
+      <div class="res-card"  id="resCard"></div>
+      <button class="dismiss" onclick="dismiss()">▶ &nbsp;Scan Next</button>
+    </div>
+
+    <!-- CAM ERROR -->
+    <div id="camErr">
+      <div style="font-size:48px">📵</div>
+      <p>Camera blocked.<br><br>Open via <strong>https://</strong> (GitHub Pages).<br><br>Make sure you pushed the file and are opening the GitHub Pages URL.</p>
+      <button onclick="location.reload()">Retry</button>
+    </div>
+
+    <div class="bottom-btns">
+      <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
+    </div>
   </div>
 
   <div class="stats-bar">
-    <div class="stat in" ><div class="stat-n" id="statIn">0</div><div class="stat-l">Checked In</div></div>
-    <div class="stat rem"><div class="stat-n" id="statRem">0</div><div class="stat-l">Remaining</div></div>
-    <div class="stat tot"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Approved</div></div>
+    <div class="stat in" ><div class="stat-n" id="sIn">0</div><div class="stat-l">Checked In</div></div>
+    <div class="stat rem"><div class="stat-n" id="sRem">0</div><div class="stat-l">Remaining</div></div>
+    <div class="stat tot"><div class="stat-n" id="sTot">0</div><div class="stat-l">Approved</div></div>
   </div>
-
-  <div class="scan-area">
-
-    <!-- QR SCAN BUTTON — opens native camera -->
-    <button class="scan-btn" onclick="void 0">
-      <div class="icon">📷</div>
-      <div style="font-size:28px;letter-spacing:4px">SCAN QR CODE</div>
-      <div class="sub">Tap · point at QR card · done</div>
-      <input type="file" accept="image/*" capture="environment" onchange="onPhoto(this,'qr')">
-    </button>
-
-    <!-- BARCODE BUTTON — opens native camera for ID cards -->
-    <button class="bar-btn" onclick="void 0">
-      <div class="icon">🪪</div>
-      <div>SCAN ID CARD BARCODE</div>
-      <div class="sub">For students without QR mail</div>
-      <input type="file" accept="image/*" capture="environment" onchange="onPhoto(this,'bar')">
-    </button>
-
-    <!-- STATUS -->
-    <div class="status-pill" id="statusPill">Ready to scan</div>
-
-    <!-- RESULT -->
-    <div class="result-card" id="resultCard">
-      <div class="rc-head">
-        <div class="rc-icon" id="rcIcon"></div>
-        <div class="rc-title" id="rcTitle"></div>
-      </div>
-      <div class="rc-body" id="rcBody"></div>
-    </div>
-
-  </div>
-
-  <!-- MANUAL -->
-  <div class="manual-wrap">
-    <div class="manual-row">
-      <input type="text" id="manualRoll" placeholder="Or type roll number manually…" onkeydown="if(event.key==='Enter')manualGo()">
-      <button onclick="manualGo()">Go</button>
-    </div>
-  </div>
-
 </div>
 
-<canvas id="canvas" style="display:none"></canvas>
+<!-- MANUAL MODAL -->
+<div class="mback" id="mm">
+  <div class="mmodal">
+    <h3>Manual Check-In</h3>
+    <div class="mrow">
+      <input type="text" id="mRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualGo()">
+      <button onclick="manualGo()">Go</button>
+    </div>
+    <button class="mcancel" onclick="closeManual()">Cancel</button>
+  </div>
+</div>
+
 <div class="flash" id="flash"></div>
 
-<!-- jsQR for decoding photo -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 'use strict';
 
-const ADMIN_USER = 'iot@123';
-const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
-// ── SUPABASE ──────────────────────────────────────────────────────────────────
-function sbFetch(path, opts={}) {
-  return fetch(SB + path, {
-    ...opts,
-    headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer:opts.prefer||'' }
-  });
-}
+let mode    = 'qr';
+let paused  = false;
+let lastVal = '';
+let lastTime= 0;
+let detBar  = null;
+let timer   = null;
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
-async function doLogin() {
+function doLogin(){
   const u = document.getElementById('luser').value.trim();
   const p = document.getElementById('lpass').value;
-  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
-  const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  if (u===ADMIN_USER && hash===ADMIN_HASH) {
+  if(u === 'iot@123' && p === 'iot@2027'){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
+    startCamera();
     loadStats();
   } else {
     document.getElementById('lerr').textContent = 'Wrong credentials.';
@@ -949,238 +220,188 @@ async function doLogin() {
   }
 }
 
-// ── PHOTO CAPTURED ────────────────────────────────────────────────────────────
-async function onPhoto(input, type) {
-  const file = input.files[0];
-  input.value = ''; // reset so same file can trigger again
-  if (!file) return;
-
-  status('processing', '⏳ Reading image…');
-  hideResult();
-
-  const img = await loadImage(file);
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-  if (type === 'qr') {
-    // Try multiple crop regions and scales to find the QR
-    const result = await tryDecodeQR(img, ctx, canvas);
-    if (result) {
-      await handleScan(result);
-    } else {
-      status('err', '❌ No QR found — hold phone closer and try again');
-    }
-
-  } else {
-    // Barcode from ID card — use BarcodeDetector on the image
-    const result = await tryDecodeBarcode(img, canvas, ctx);
-    if (result) {
-      await processCheckin(result.toUpperCase().trim());
-    } else {
-      status('err', '❌ No barcode found — try again');
-    }
-  }
-}
-
-// ── LOAD IMAGE FILE ───────────────────────────────────────────────────────────
-function loadImage(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = reject;
-    img.src = url;
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+function sbFetch(path, opts={}){
+  return fetch(SB+path,{
+    ...opts,
+    headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer:opts.prefer||'' }
   });
 }
 
-// ── DECODE QR FROM IMAGE ──────────────────────────────────────────────────────
-async function tryDecodeQR(img, ctx, canvas) {
-  // Try multiple scales — phone photos are very high res, QR might be small
-  const scales = [0.3, 0.5, 0.8, 1.0];
-  const inversions = ['attemptBoth', 'dontInvert', 'onlyInvert'];
+// ── CAMERA ────────────────────────────────────────────────────────────────────
+async function startCamera(){
+  // BarcodeDetector for barcode mode only
+  if('BarcodeDetector' in window){
+    try{
+      const sup = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
+      const fmts = ['code_128','code_39','ean_13','ean_8'].filter(f=>!sup.length||sup.includes(f));
+      if(fmts.length) detBar = new BarcodeDetector({formats:fmts});
+    }catch(e){}
+  }
 
-  for (const scale of scales) {
-    const w = Math.round(img.width  * scale);
-    const h = Math.round(img.height * scale);
-    canvas.width  = w;
-    canvas.height = h;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} }
+    });
+    const v = document.getElementById('video');
+    v.srcObject = stream;
+    await new Promise(r=>{ v.onloadedmetadata=r; });
+    await v.play();
+    setDot('Ready','ready');
+    timer = setTimeout(scan, 500);
+  }catch(err){
+    document.getElementById('camErr').style.display = 'flex';
+    setDot('Camera error','');
+  }
+}
 
-    // Draw with contrast boost — helps dark card backgrounds
-    ctx.filter = 'contrast(1.8) brightness(1.2)';
-    ctx.drawImage(img, 0, 0, w, h);
-    ctx.filter = 'none';
+// ── SCAN LOOP ─────────────────────────────────────────────────────────────────
+async function scan(){
+  if(paused){ timer=setTimeout(scan,400); return; }
 
-    const data = ctx.getImageData(0, 0, w, h);
-    for (const inv of inversions) {
-      const code = jsQR(data.data, w, h, { inversionAttempts: inv });
-      if (code) return code.data;
+  const v = document.getElementById('video');
+  if(v.readyState < 2 || !v.videoWidth){ timer=setTimeout(scan,400); return; }
+
+  let result = null;
+
+  if(mode === 'qr'){
+    if(typeof jsQR === 'function'){
+      try{
+        const c   = document.getElementById('canvas');
+        const ctx = c.getContext('2d',{willReadFrequently:true});
+        const W   = Math.min(v.videoWidth, 640);
+        const H   = Math.round(v.videoHeight * (W/v.videoWidth));
+        c.width=W; c.height=H;
+        ctx.drawImage(v, 0, 0, W, H);
+        const d = ctx.getImageData(0,0,W,H);
+        const code = jsQR(d.data, W, H, {inversionAttempts:'attemptBoth'});
+        if(code) result = code.data;
+      }catch(e){}
+    }
+
+  } else {
+    if(detBar){
+      try{
+        const codes = await detBar.detect(v);
+        if(codes.length) result = codes[0].rawValue;
+      }catch(e){}
     }
   }
 
-  // Last attempt: crop just the centre 60% where QR likely is
-  const cw = Math.round(img.width  * 0.6);
-  const ch = Math.round(img.height * 0.6);
-  const cx = (img.width  - cw) / 2;
-  const cy = (img.height - ch) / 2;
-  canvas.width  = cw;
-  canvas.height = ch;
-  ctx.filter = 'contrast(2) brightness(1.3) saturate(0)';
-  ctx.drawImage(img, cx, cy, cw, ch, 0, 0, cw, ch);
-  ctx.filter = 'none';
-  const data = ctx.getImageData(0, 0, cw, ch);
-  for (const inv of inversions) {
-    const code = jsQR(data.data, cw, ch, { inversionAttempts: inv });
-    if (code) return code.data;
+  if(result){
+    const now = Date.now();
+    if(result !== lastVal || now-lastTime > 4000){
+      lastVal=result; lastTime=now;
+      paused=true;
+      setDot('Processing…','busy');
+      await handleScan(result);
+      return;
+    }
   }
-
-  return null;
+  timer = setTimeout(scan, 300);
 }
 
-// ── DECODE BARCODE FROM IMAGE ─────────────────────────────────────────────────
-async function tryDecodeBarcode(img, canvas, ctx) {
-  if (!('BarcodeDetector' in window)) return null;
-  try {
-    canvas.width  = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-    const det = new BarcodeDetector({ formats: ['code_128','code_39','ean_13','ean_8','qr_code'] });
-    const codes = await det.detect(canvas);
-    if (codes.length > 0) return codes[0].rawValue;
-  } catch(e) { console.warn('barcode detect:', e); }
-  return null;
-}
-
-// ── HANDLE SCAN DATA ──────────────────────────────────────────────────────────
-async function handleScan(raw) {
-  let rollno = '';
-  try {
-    const p = JSON.parse(raw);
-    rollno = (p.roll || p.rollno || p.r || '').toUpperCase().trim();
-  } catch(_) {
-    rollno = raw.toUpperCase().trim();
-  }
-  if (!rollno) { status('err', '❌ Unreadable QR data'); return; }
-  await processCheckin(rollno);
+// ── HANDLE SCAN ───────────────────────────────────────────────────────────────
+async function handleScan(raw){
+  let roll = '';
+  try{ const p=JSON.parse(raw); roll=(p.roll||p.rollno||p.r||'').toUpperCase().trim(); }
+  catch(_){ roll=raw.toUpperCase().trim(); }
+  if(!roll){ showResult('notfound',null,'Unreadable code'); return; }
+  await processCheckin(roll);
 }
 
 // ── CHECKIN ───────────────────────────────────────────────────────────────────
-async function processCheckin(rollno) {
-  status('processing', '⏳ Looking up ' + rollno + '…');
-  try {
-    const res  = await sbFetch('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(rollno)+'&select=*');
+async function processCheckin(roll){
+  try{
+    const res  = await sbFetch('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(roll)+'&select=*');
     const data = await res.json();
-
-    if (!data || !data.length) {
-      doFlash('orange'); vib([300]);
-      status('err', '❌ Not registered');
-      showResult('notfound', null, rollno + ' — Not found in ARTIX database');
-      return;
-    }
-
+    if(!data||!data.length){ doFlash('orange'); vib([300]); showResult('notfound',null,roll+'\nNot in ARTIX database.'); return; }
     const rec = data[0];
-
-    if (rec.status !== 'Approved') {
-      doFlash('orange'); vib([200,100,200]);
-      status('err', '⚠️ Not approved yet');
-      showResult('unapproved', rec, 'Status: ' + (rec.status || 'Pending'));
-      return;
-    }
-
-    if (rec.checked_in) {
-      doFlash('red'); vib([200,80,200,80,200]);
-      status('err', '🚫 Already checked in');
-      showResult('duplicate', rec, null);
-      return;
-    }
-
-    await sbFetch('/rest/v1/registrations?id=eq.'+rec.id, {
-      method: 'PATCH', prefer: 'return=minimal',
-      body: JSON.stringify({ checked_in: true, checked_in_at: new Date().toISOString() })
+    if(rec.status!=='Approved'){ doFlash('orange'); vib([200,100,200]); showResult('unapproved',rec,'Status: '+(rec.status||'Pending')); return; }
+    if(rec.checked_in){ doFlash('red'); vib([200,80,200,80,200]); showResult('duplicate',rec,null); return; }
+    await sbFetch('/rest/v1/registrations?id=eq.'+rec.id,{
+      method:'PATCH', prefer:'return=minimal',
+      body:JSON.stringify({checked_in:true, checked_in_at:new Date().toISOString()})
     });
-
-    doFlash('green'); vib([80]);
-    status('ok', '✅ Checked in!');
-    showResult('success', rec, null);
-    loadStats();
-
-  } catch(e) {
-    status('err', '❌ Network error — check connection');
-  }
+    doFlash('green'); vib([80]); showResult('success',rec,null); loadStats();
+  }catch(e){ showResult('notfound',null,'Network error — try again'); }
 }
 
 // ── RESULT UI ─────────────────────────────────────────────────────────────────
 const CFG = {
-  success:    { icon:'✅', title:'CHECKED IN ✓'  },
-  duplicate:  { icon:'🚫', title:'ALREADY IN'     },
-  notfound:   { icon:'❓', title:'NOT FOUND'       },
-  unapproved: { icon:'⚠️', title:'NOT APPROVED'   }
+  success:   {icon:'✅',title:'CHECKED IN ✓'},
+  duplicate: {icon:'🚫',title:'ALREADY IN'},
+  notfound:  {icon:'❓',title:'NOT FOUND'},
+  unapproved:{icon:'⚠️',title:'NOT APPROVED'}
 };
-
-function showResult(type, rec, msg) {
-  const card = document.getElementById('resultCard');
-  card.className = 'result-card show ' + type;
-  document.getElementById('rcIcon').textContent  = CFG[type].icon;
-  document.getElementById('rcTitle').textContent = CFG[type].title;
-  let html = '';
-  if (rec) {
-    html += rr('Name',    rec.name);
-    html += rr('Roll No', rec.rollno);
-    if (rec.branch) html += rr('Branch', rec.branch);
-    html += rr('Event',   rec.event);
-    if (type==='duplicate' && rec.checked_in_at)
-      html += rr('Entered At', new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), 'red');
-    if (type==='unapproved') html += rr('Status', rec.status||'Pending','orange');
-  } else {
-    html += rr('Info', msg);
-  }
-  document.getElementById('rcBody').innerHTML = html;
-  card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+function showResult(type,rec,msg){
+  const o=document.getElementById('overlay');
+  o.className='show '+type;
+  document.getElementById('resIcon').textContent  = CFG[type].icon;
+  document.getElementById('resTitle').textContent = CFG[type].title;
+  let h='';
+  if(rec){
+    h+=rr('Name',rec.name);
+    h+=rr('Roll No',rec.rollno);
+    if(rec.branch) h+=rr('Branch',rec.branch);
+    h+=rr('Event',rec.event);
+    if(type==='duplicate'&&rec.checked_in_at)
+      h+=rr('Entered At',new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'red');
+    if(type==='unapproved') h+=rr('Status',rec.status||'Pending','orange');
+  } else { h+=rr('Info',msg); }
+  document.getElementById('resCard').innerHTML=h;
 }
-
-function hideResult() { document.getElementById('resultCard').className = 'result-card'; }
-function rr(k,v,c='') {
+function rr(k,v,c=''){
   return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${c}">${v||'—'}</span></div>`;
 }
+function dismiss(){
+  document.getElementById('overlay').className='';
+  setDot('Ready','ready');
+  lastVal='';
+  setTimeout(()=>{ paused=false; timer=setTimeout(scan,400); },400);
+}
 
-// ── STATUS ────────────────────────────────────────────────────────────────────
-function status(type, msg) {
-  const el = document.getElementById('statusPill');
-  el.className = 'status-pill ' + (type==='processing'?'processing':type==='ok'?'ok':'err');
-  el.innerHTML = type==='processing' ? '<span class="spin">⏳</span> ' + msg : msg;
+// ── MODE ──────────────────────────────────────────────────────────────────────
+function setMode(m){
+  mode=m;
+  document.getElementById('btnQR').classList.toggle('active', m==='qr');
+  document.getElementById('btnBar').classList.toggle('active', m==='bar');
+  document.getElementById('frameBox').className = 'frame-box '+(m==='qr'?'qr':'bar');
+  document.getElementById('hint').textContent = m==='qr' ? 'Point at QR code' : 'Point at ID card barcode';
+  lastVal='';
+  setDot('Ready','ready');
 }
 
 // ── STATS ─────────────────────────────────────────────────────────────────────
-async function loadStats() {
-  try {
-    const res  = await sbFetch('/rest/v1/registrations?select=checked_in&status=eq.Approved');
-    const data = await res.json();
-    if (!Array.isArray(data)) return;
-    const tot=data.length, cin=data.filter(r=>r.checked_in).length;
-    document.getElementById('statIn').textContent    = cin;
-    document.getElementById('statRem').textContent   = tot-cin;
-    document.getElementById('statTotal').textContent = tot;
-    document.getElementById('cntIn').textContent     = cin;
-    document.getElementById('cntTotal').textContent  = tot;
-  } catch(_){}
+async function loadStats(){
+  try{
+    const r    = await sbFetch('/rest/v1/registrations?select=checked_in&status=eq.Approved');
+    const data = await r.json();
+    if(!Array.isArray(data)) return;
+    const tot=data.length, cin=data.filter(x=>x.checked_in).length;
+    document.getElementById('sIn').textContent  = cin;
+    document.getElementById('sRem').textContent = tot-cin;
+    document.getElementById('sTot').textContent = tot;
+    document.getElementById('cntIn').textContent  = cin;
+    document.getElementById('cntTot').textContent = tot;
+  }catch(_){}
 }
 
 // ── MANUAL ────────────────────────────────────────────────────────────────────
-async function manualGo() {
-  const roll = document.getElementById('manualRoll').value.trim().toUpperCase();
-  if (!roll) return;
-  document.getElementById('manualRoll').value = '';
-  hideResult();
+function openManual(){ document.getElementById('mm').classList.add('on'); setTimeout(()=>document.getElementById('mRoll').focus(),250); }
+function closeManual(){ document.getElementById('mm').classList.remove('on'); document.getElementById('mRoll').value=''; }
+async function manualGo(){
+  const roll = document.getElementById('mRoll').value.trim().toUpperCase();
+  if(!roll) return;
+  closeManual(); paused=true;
   await processCheckin(roll);
 }
+document.getElementById('mm').addEventListener('click',e=>{ if(e.target===document.getElementById('mm')) closeManual(); });
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function doFlash(c) {
-  const el = document.getElementById('flash');
-  el.style.background = c==='green'?'rgba(34,197,94,.3)':c==='red'?'rgba(217,4,41,.35)':'rgba(249,115,22,.3)';
-  el.classList.add('go');
-  setTimeout(()=>el.classList.remove('go'), 250);
-}
-function vib(p){ try{ navigator.vibrate(p); }catch(_){} }
+function setDot(t,c){ const d=document.getElementById('dot'); d.textContent=t; d.className='dot '+c; }
+function doFlash(c){ const el=document.getElementById('flash'); el.style.background=c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)'; el.classList.add('go'); setTimeout(()=>el.classList.remove('go'),220); }
+function vib(p){ try{navigator.vibrate(p);}catch(_){} }
 
 setInterval(loadStats, 20000);
 </script>
