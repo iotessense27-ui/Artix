@@ -195,10 +195,11 @@ const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
-let scanning      = false; // set to true once camera is ready
+let scanning      = false;
 let lastScanned   = '';
 let lastScannedAt = 0;
-let detector      = null;  // BarcodeDetector if supported
+let detectorQR    = null;  // dedicated QR detector
+let detectorBar   = null;  // dedicated 1D barcode detector
 let rafId         = null;
 
 // ─── SUPABASE HELPER ─────────────────────────────────────────────────────────
@@ -236,19 +237,29 @@ async function initScanner(){
   setDot('Starting camera…', '');
 
   // 1. Try native BarcodeDetector (Chrome Android, Samsung browser)
-  // Supports BOTH QR codes and 1D barcodes (Code128 on ID cards)
+  // Use TWO separate detectors — mixing formats in one can silently break QR on some devices
   if('BarcodeDetector' in window){
     try {
-      const supported = await BarcodeDetector.getSupportedFormats().catch(()=>['qr_code']);
-      const want = ['qr_code','code_128','code_39','ean_13','ean_8','itf','codabar'];
-      const formats = want.filter(f => supported.includes(f));
-      detector = new BarcodeDetector({ formats: formats.length ? formats : ['qr_code'] });
-      console.log('✓ BarcodeDetector formats:', formats);
-    } catch(_){ detector = null; }
+      const supported = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
+      console.log('Supported formats:', supported);
+
+      // Dedicated QR detector
+      detectorQR = new BarcodeDetector({ formats: ['qr_code'] });
+      console.log('✓ QR detector ready');
+
+      // Dedicated 1D barcode detector for ID cards
+      const barFormats = ['code_128','code_39','ean_13','ean_8'].filter(f =>
+        supported.length === 0 || supported.includes(f)
+      );
+      if(barFormats.length > 0){
+        detectorBar = new BarcodeDetector({ formats: barFormats });
+        console.log('✓ Barcode detector formats:', barFormats);
+      }
+    } catch(_){ detectorQR = null; detectorBar = null; }
   }
 
-  // 2. If not available, lazy-load jsQR (QR) + ZXing (1D barcodes) as fallbacks
-  if(!detector){
+  // 2. If native not available, lazy-load jsQR (QR) + ZXing (1D barcodes) as fallbacks
+  if(!detectorQR){
     console.log('BarcodeDetector not supported, loading fallback libs…');
     await Promise.all([loadJsQR(), loadZXing()]);
   }
@@ -314,12 +325,20 @@ async function tick(){
 
   let result = null;
 
-  if(detector){
-    // Native BarcodeDetector — async, very fast on Android
+  if(detectorQR){
+    // Try QR first
     try {
-      const codes = await detector.detect(video);
+      const codes = await detectorQR.detect(video);
       if(codes.length > 0) result = codes[0].rawValue;
     } catch(_){}
+
+    // Then try 1D barcode if QR didn't fire
+    if(!result && detectorBar){
+      try {
+        const codes = await detectorBar.detect(video);
+        if(codes.length > 0) result = codes[0].rawValue;
+      } catch(_){}
+    }
   } else if(typeof jsQR !== 'undefined' || (typeof ZXingBrowser !== 'undefined')){
     // Canvas-based fallback — draw video frame
     const canvas = document.getElementById('canvas');
