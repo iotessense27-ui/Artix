@@ -349,23 +349,15 @@ async function doScan() {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-        // Crop centre square — use 60% of the shorter video dimension
-        const cropSize = Math.floor(Math.min(video.videoWidth, video.videoHeight) * 0.6);
-        canvas.width  = cropSize;
-        canvas.height = cropSize;
-        const sx = (video.videoWidth  - cropSize) / 2;
-        const sy = (video.videoHeight - cropSize) / 2;
-        ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, cropSize, cropSize);
+        // Scan full frame downsampled — no crop so QR can be anywhere in view
+        const maxDim = 400;
+        const scale  = Math.min(1, maxDim / Math.max(video.videoWidth, video.videoHeight));
+        canvas.width  = Math.floor(video.videoWidth  * scale);
+        canvas.height = Math.floor(video.videoHeight * scale);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        const imgData = ctx.getImageData(0, 0, cropSize, cropSize);
-        // Manually invert pixels — black bg becomes white bg, jsQR reads it natively
-        const d = imgData.data;
-        for (let i = 0; i < d.length; i += 4) {
-          d[i]   = 255 - d[i];
-          d[i+1] = 255 - d[i+1];
-          d[i+2] = 255 - d[i+2];
-        }
-        const code = jsQR(d, cropSize, cropSize, { inversionAttempts: 'dontInvert' });
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, canvas.width, canvas.height, { inversionAttempts: 'attemptBoth' });
         if (code) {
           dbg('QR: ' + code.data.substring(0, 60));
           result = code.data;
