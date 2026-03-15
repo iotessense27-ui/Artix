@@ -8,7 +8,7 @@
 <style>
 :root{--red:#D90429;--black:#090909;--black2:#111;--white:#fff;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.08);--green:#22c55e;--orange:#f97316}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;height:100vh;height:100dvh;overflow:hidden}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
 
 /* LOGIN */
 #loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,4,41,.18) 0%,transparent 70%)}
@@ -25,88 +25,99 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .lbtn:active{background:#a80220}
 
 /* APP */
-#app{display:none;flex-direction:column;height:100vh;height:100dvh}
+#app{display:none;flex-direction:column;min-height:100vh}
 
 /* TOPBAR */
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
 .brand span{color:var(--red)}
 .counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
 .counter strong{color:var(--green);font-size:16px}
 
-/* CAMERA */
-.cam-wrap{flex:1;position:relative;overflow:hidden;background:#000}
-#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* STATS */
+.stats-bar{display:flex;background:var(--black2);border-bottom:1px solid var(--border)}
+.stat{display:flex;flex-direction:column;align-items:center;flex:1;padding:10px 0;position:relative}
+.stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}
+.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
+.stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
 
-/* SCAN FRAME */
-.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:all .3s}
-.frame-box.qr  {width:min(240px,65vw);height:min(240px,65vw)}
-.frame-box.bar {width:min(320px,86vw);height:min(110px,30vw)}
-.corner{position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
-.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
-.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
-.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
-.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
-.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
-@keyframes sl{0%,100%{top:2%}50%{top:94%}}
-.scan-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);white-space:nowrap;pointer-events:none}
-.status-dot{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none}
-.status-dot.ready{color:var(--green)}
-.status-dot.busy{color:var(--orange)}
+/* SCAN AREA */
+.scan-area{padding:20px 16px;display:flex;flex-direction:column;gap:12px}
 
-/* RESULT */
-#resultOverlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
-#resultOverlay.show{display:flex}
-#resultOverlay.success   {background:rgba(3,18,8,.97)}
-#resultOverlay.duplicate {background:rgba(18,3,3,.97)}
-#resultOverlay.notfound  {background:rgba(18,12,3,.97)}
-#resultOverlay.unapproved{background:rgba(18,12,3,.97)}
-.res-icon{font-size:64px;margin-bottom:10px;line-height:1}
-.res-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;margin-bottom:16px}
-#resultOverlay.success    .res-title{color:var(--green)}
-#resultOverlay.duplicate  .res-title{color:var(--red)}
-#resultOverlay.notfound   .res-title{color:var(--orange)}
-#resultOverlay.unapproved .res-title{color:var(--orange)}
-.res-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;width:100%;max-width:310px;margin-bottom:16px;text-align:left}
-.rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+/* BIG SCAN BUTTON */
+.scan-btn{
+  width:100%;background:var(--red);border:none;border-radius:14px;
+  color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;
+  padding:28px 20px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:6px;transition:background .15s;position:relative;overflow:hidden
+}
+.scan-btn:active{background:#a80220}
+.scan-btn .icon{font-size:48px;line-height:1}
+.scan-btn .sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;opacity:.75;text-transform:uppercase}
+/* Hidden file input sits on top of button */
+.scan-btn input[type=file]{
+  position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0
+}
+
+/* BARCODE BUTTON */
+.bar-btn{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:22px;
+  letter-spacing:3px;padding:20px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:4px;transition:background .15s;position:relative;overflow:hidden
+}
+.bar-btn:active{background:rgba(255,255,255,.1)}
+.bar-btn .icon{font-size:36px;line-height:1}
+.bar-btn .sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;opacity:.5;text-transform:uppercase}
+.bar-btn input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0}
+
+/* STATUS */
+.status-pill{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:8px;padding:12px;font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;letter-spacing:1px;color:var(--gray)
+}
+.status-pill.processing{border-color:rgba(249,115,22,.3);color:var(--orange);background:rgba(249,115,22,.05)}
+.status-pill.ok{border-color:rgba(34,197,94,.3);color:var(--green);background:rgba(34,197,94,.05)}
+.status-pill.err{border-color:rgba(217,4,41,.3);color:var(--red);background:rgba(217,4,41,.05)}
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULT CARD */
+.result-card{
+  background:var(--black2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;display:none
+}
+.result-card.show{display:block}
+.result-card.success{border-color:rgba(34,197,94,.35)}
+.result-card.duplicate{border-color:rgba(217,4,41,.35)}
+.result-card.notfound{border-color:rgba(249,115,22,.35)}
+.result-card.unapproved{border-color:rgba(249,115,22,.35)}
+.rc-head{padding:16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.rc-icon{font-size:36px;line-height:1}
+.rc-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px}
+.result-card.success   .rc-title{color:var(--green)}
+.result-card.duplicate .rc-title{color:var(--red)}
+.result-card.notfound  .rc-title{color:var(--orange)}
+.result-card.unapproved .rc-title{color:var(--orange)}
+.rc-body{padding:14px 16px}
+.rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .rrow:last-child{border-bottom:none}
 .rk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
 .rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
 .rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
-.dismiss-btn{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
 
-/* CAM ERROR */
-#camErr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
-#camErr p{color:var(--lgray);font-size:14px;line-height:1.9}
-#camErr button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:11px 24px;cursor:pointer}
+/* MANUAL */
+.manual-wrap{padding:0 16px 16px}
+.manual-row{display:flex;gap:8px}
+.manual-row input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 13px;color:#fff;font-size:15px;outline:none;text-transform:uppercase;font-family:'Barlow',sans-serif}
+.manual-row input:focus{border-color:var(--red)}
+.manual-row input::placeholder{color:rgba(255,255,255,.2);text-transform:none}
+.manual-row button{background:var(--red);border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:1px;padding:0 18px;cursor:pointer}
 
-/* BOTTOM BUTTONS */
-.btns{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;z-index:20;pointer-events:none}
-.mode-toggle{display:flex;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);border-radius:8px;overflow:hidden;pointer-events:all}
-.mbtn{background:none;border:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;cursor:pointer;transition:all .15s}
-.mbtn.active{background:var(--red);color:#fff}
-.manual-btn{background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer;pointer-events:all}
-
-/* STATS */
-.stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
-.stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
-.stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
-.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
-.stat.in .stat-n{color:var(--green)}.stat.rem .stat-n{color:var(--orange)}.stat.tot .stat-n{color:#fff}
-
-/* MANUAL MODAL */
-.mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;display:none;align-items:flex-end;justify-content:center}
-.mback.on{display:flex}
-.mmodal{background:var(--black2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:24px 20px 40px}
-.mmodal h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
-.mrow{display:flex;gap:9px;margin-bottom:12px}
-.mrow input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:6px;padding:12px 13px;color:#fff;font-size:15px;outline:none;text-transform:uppercase}
-.mrow input:focus{border-color:var(--red)}
-.mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
-.mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
-
-.flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .1s}
 .flash.go{opacity:1}
 </style>
 </head>
@@ -116,11 +127,11 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 <div id="loginScreen">
   <div class="lcard">
     <div class="ltitle">ARTIX <span>2026</span></div>
-    <div class="lsub">Entry Check-In Scanner</div>
+    <div class="lsub">Entry Check-In</div>
     <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lerr" id="lerr"></div>
-    <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
+    <button class="lbtn" onclick="doLogin()">Enter →</button>
   </div>
 </div>
 
@@ -131,65 +142,59 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
     <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTotal">0</span></div>
   </div>
 
-  <div class="cam-wrap">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas" style="display:none"></canvas>
-
-    <div class="frame-box qr" id="frameBox">
-      <div class="corner tl"></div><div class="corner tr"></div>
-      <div class="corner bl"></div><div class="corner br"></div>
-      <div class="scanline"></div>
-    </div>
-
-    <div class="scan-hint" id="scanHint">Point at QR code</div>
-    <div class="status-dot" id="statusDot">Starting…</div>
-
-    <div id="resultOverlay">
-      <div class="res-icon"  id="resIcon"></div>
-      <div class="res-title" id="resTitle"></div>
-      <div class="res-card"  id="resCard"></div>
-      <button class="dismiss-btn" onclick="dismiss()">▶ &nbsp;Scan Next</button>
-    </div>
-
-    <div id="camErr">
-      <div style="font-size:48px">📵</div>
-      <p id="camErrTxt">Camera access denied.<br><br>
-        Must be opened via <strong>https://</strong><br><br>
-        Upload to <strong>netlify.com/drop</strong> → open https link on phone.</p>
-      <button onclick="location.reload()">Retry</button>
-    </div>
-
-    <div class="btns">
-      <div class="mode-toggle">
-        <button class="mbtn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
-        <button class="mbtn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
-      </div>
-      <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
-    </div>
-  </div>
-
   <div class="stats-bar">
     <div class="stat in" ><div class="stat-n" id="statIn">0</div><div class="stat-l">Checked In</div></div>
     <div class="stat rem"><div class="stat-n" id="statRem">0</div><div class="stat-l">Remaining</div></div>
     <div class="stat tot"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Approved</div></div>
   </div>
-</div>
 
-<!-- MANUAL -->
-<div class="mback" id="manualModal">
-  <div class="mmodal">
-    <h3>Manual Check-In</h3>
-    <div class="mrow">
-      <input type="text" id="manualRoll" placeholder="ROLL NUMBER" onkeydown="if(event.key==='Enter')manualGo()">
+  <div class="scan-area">
+
+    <!-- QR SCAN BUTTON — opens native camera -->
+    <button class="scan-btn" onclick="void 0">
+      <div class="icon">📷</div>
+      <div style="font-size:28px;letter-spacing:4px">SCAN QR CODE</div>
+      <div class="sub">Tap · point at QR card · done</div>
+      <input type="file" accept="image/*" capture="environment" onchange="onPhoto(this,'qr')">
+    </button>
+
+    <!-- BARCODE BUTTON — opens native camera for ID cards -->
+    <button class="bar-btn" onclick="void 0">
+      <div class="icon">🪪</div>
+      <div>SCAN ID CARD BARCODE</div>
+      <div class="sub">For students without QR mail</div>
+      <input type="file" accept="image/*" capture="environment" onchange="onPhoto(this,'bar')">
+    </button>
+
+    <!-- STATUS -->
+    <div class="status-pill" id="statusPill">Ready to scan</div>
+
+    <!-- RESULT -->
+    <div class="result-card" id="resultCard">
+      <div class="rc-head">
+        <div class="rc-icon" id="rcIcon"></div>
+        <div class="rc-title" id="rcTitle"></div>
+      </div>
+      <div class="rc-body" id="rcBody"></div>
+    </div>
+
+  </div>
+
+  <!-- MANUAL -->
+  <div class="manual-wrap">
+    <div class="manual-row">
+      <input type="text" id="manualRoll" placeholder="Or type roll number manually…" onkeydown="if(event.key==='Enter')manualGo()">
       <button onclick="manualGo()">Go</button>
     </div>
-    <button class="mcancel" onclick="closeManual()">Cancel</button>
   </div>
+
 </div>
 
+<canvas id="canvas" style="display:none"></canvas>
 <div class="flash" id="flash"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
+<!-- jsQR for decoding photo -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 'use strict';
 
@@ -197,12 +202,6 @@ const ADMIN_USER = 'iot@123';
 const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
-
-let mode      = 'qr';
-let paused    = false;
-let lastVal   = '';
-let lastTime  = 0;
-let detectors = {};
 
 // ── SUPABASE ──────────────────────────────────────────────────────────────────
 function sbFetch(path, opts={}) {
@@ -221,7 +220,6 @@ async function doLogin() {
   if (u===ADMIN_USER && hash===ADMIN_HASH) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    init();
     loadStats();
   } else {
     document.getElementById('lerr').textContent = 'Wrong credentials.';
@@ -229,96 +227,108 @@ async function doLogin() {
   }
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-async function init() {
-  dot('Starting…','');
+// ── PHOTO CAPTURED ────────────────────────────────────────────────────────────
+async function onPhoto(input, type) {
+  const file = input.files[0];
+  input.value = ''; // reset so same file can trigger again
+  if (!file) return;
 
-  // ZXing for QR mode — handles dark backgrounds, inverted QRs natively
-  try {
-    const hints = new Map();
-    hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-    hints.set(ZXing.DecodeHintType.ALSO_INVERTED, true);
-    zxingReader = new ZXing.BrowserQRCodeReader(hints);
-    console.log('✓ ZXing ready');
-  } catch(e) {
-    console.warn('ZXing failed:', e);
-    zxingReader = null;
-  }
+  status('processing', '⏳ Reading image…');
+  hideResult();
 
-  // BarcodeDetector only for barcode mode (Code128 ID cards)
-  if ('BarcodeDetector' in window) {
-    try {
-      const sup = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
-      const bf = ['code_128','code_39','ean_13','ean_8'].filter(f=> !sup.length || sup.includes(f));
-      if (bf.length) detectors.bar = new BarcodeDetector({ formats: bf });
-    } catch(e) { console.warn('BarcodeDetector err:', e); }
-  }
+  const img = await loadImage(file);
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-  // Start camera
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1280 }, height:{ ideal:720 } }
-    });
-    const v = document.getElementById('video');
-    v.srcObject = stream;
-    await new Promise(r=>{ v.onloadedmetadata=r; });
-    await v.play();
-    dot('Ready','ready');
-    loop();
-  } catch(err) {
-    document.getElementById('camErr').style.display = 'flex';
-    if (err.name==='NotAllowedError') {
-      document.getElementById('camErrTxt').innerHTML =
-        '📵 <strong>Camera blocked</strong><br><br>Upload to <strong>netlify.com/drop</strong> and open the https:// link on your phone.';
+  if (type === 'qr') {
+    // Try multiple crop regions and scales to find the QR
+    const result = await tryDecodeQR(img, ctx, canvas);
+    if (result) {
+      await handleScan(result);
+    } else {
+      status('err', '❌ No QR found — hold phone closer and try again');
     }
-    dot('Camera error','');
-  }
-}
-
-// ── SCAN LOOP ─────────────────────────────────────────────────────────────────
-let zxingReader = null;
-let _scanTimer  = null;
-
-function loop() {
-  if (paused) { _scanTimer = setTimeout(loop, 300); return; }
-  const v = document.getElementById('video');
-  if (v.readyState < 2 || v.videoWidth === 0) { _scanTimer = setTimeout(loop, 300); return; }
-
-  if (mode === 'qr') {
-    // QR mode — ZXing decodes from canvas (TRY_HARDER handles dark/inverted backgrounds)
-    if (!zxingReader) { _scanTimer = setTimeout(loop, 300); return; }
-    try {
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      const scale = Math.min(1, 500 / v.videoWidth);
-      canvas.width  = Math.round(v.videoWidth  * scale);
-      canvas.height = Math.round(v.videoHeight * scale);
-      ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-      zxingReader.decodeFromCanvas(canvas)
-        .then(result => { onDetected(result.getText()); })
-        .catch(() => { _scanTimer = setTimeout(loop, 300); });
-    } catch(e) { _scanTimer = setTimeout(loop, 300); }
 
   } else {
-    // Barcode mode — BarcodeDetector native (Code128 ID cards)
-    const det = detectors.bar;
-    if (!det) { _scanTimer = setTimeout(loop, 300); return; }
-    det.detect(v)
-      .then(codes => { if (codes.length > 0) { onDetected(codes[0].rawValue); return; } _scanTimer = setTimeout(loop, 300); })
-      .catch(() => { _scanTimer = setTimeout(loop, 300); });
+    // Barcode from ID card — use BarcodeDetector on the image
+    const result = await tryDecodeBarcode(img, canvas, ctx);
+    if (result) {
+      await processCheckin(result.toUpperCase().trim());
+    } else {
+      status('err', '❌ No barcode found — try again');
+    }
   }
 }
 
-function onDetected(val) {
-  const now = Date.now();
-  if (val === lastVal && now - lastTime < 4000) { _scanTimer = setTimeout(loop, 300); return; }
-  lastVal = val; lastTime = now;
-  paused  = true;
-  dot('Processing…', 'busy');
-  handleScan(val);
+// ── LOAD IMAGE FILE ───────────────────────────────────────────────────────────
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = reject;
+    img.src = url;
+  });
 }
 
-// ── HANDLE SCAN ───────────────────────────────────────────────────────────────
+// ── DECODE QR FROM IMAGE ──────────────────────────────────────────────────────
+async function tryDecodeQR(img, ctx, canvas) {
+  // Try multiple scales — phone photos are very high res, QR might be small
+  const scales = [0.3, 0.5, 0.8, 1.0];
+  const inversions = ['attemptBoth', 'dontInvert', 'onlyInvert'];
+
+  for (const scale of scales) {
+    const w = Math.round(img.width  * scale);
+    const h = Math.round(img.height * scale);
+    canvas.width  = w;
+    canvas.height = h;
+
+    // Draw with contrast boost — helps dark card backgrounds
+    ctx.filter = 'contrast(1.8) brightness(1.2)';
+    ctx.drawImage(img, 0, 0, w, h);
+    ctx.filter = 'none';
+
+    const data = ctx.getImageData(0, 0, w, h);
+    for (const inv of inversions) {
+      const code = jsQR(data.data, w, h, { inversionAttempts: inv });
+      if (code) return code.data;
+    }
+  }
+
+  // Last attempt: crop just the centre 60% where QR likely is
+  const cw = Math.round(img.width  * 0.6);
+  const ch = Math.round(img.height * 0.6);
+  const cx = (img.width  - cw) / 2;
+  const cy = (img.height - ch) / 2;
+  canvas.width  = cw;
+  canvas.height = ch;
+  ctx.filter = 'contrast(2) brightness(1.3) saturate(0)';
+  ctx.drawImage(img, cx, cy, cw, ch, 0, 0, cw, ch);
+  ctx.filter = 'none';
+  const data = ctx.getImageData(0, 0, cw, ch);
+  for (const inv of inversions) {
+    const code = jsQR(data.data, cw, ch, { inversionAttempts: inv });
+    if (code) return code.data;
+  }
+
+  return null;
+}
+
+// ── DECODE BARCODE FROM IMAGE ─────────────────────────────────────────────────
+async function tryDecodeBarcode(img, canvas, ctx) {
+  if (!('BarcodeDetector' in window)) return null;
+  try {
+    canvas.width  = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    const det = new BarcodeDetector({ formats: ['code_128','code_39','ean_13','ean_8','qr_code'] });
+    const codes = await det.detect(canvas);
+    if (codes.length > 0) return codes[0].rawValue;
+  } catch(e) { console.warn('barcode detect:', e); }
+  return null;
+}
+
+// ── HANDLE SCAN DATA ──────────────────────────────────────────────────────────
 async function handleScan(raw) {
   let rollno = '';
   try {
@@ -327,76 +337,94 @@ async function handleScan(raw) {
   } catch(_) {
     rollno = raw.toUpperCase().trim();
   }
-  if (!rollno) { showResult('notfound', null, 'Unreadable code'); return; }
+  if (!rollno) { status('err', '❌ Unreadable QR data'); return; }
   await processCheckin(rollno);
 }
 
 // ── CHECKIN ───────────────────────────────────────────────────────────────────
 async function processCheckin(rollno) {
+  status('processing', '⏳ Looking up ' + rollno + '…');
   try {
     const res  = await sbFetch('/rest/v1/registrations?rollno=eq.'+encodeURIComponent(rollno)+'&select=*');
     const data = await res.json();
 
-    if (!data||!data.length) { flash('orange'); vib([300]); showResult('notfound',null,rollno+'\n\nNot registered.'); return; }
+    if (!data || !data.length) {
+      doFlash('orange'); vib([300]);
+      status('err', '❌ Not registered');
+      showResult('notfound', null, rollno + ' — Not found in ARTIX database');
+      return;
+    }
+
     const rec = data[0];
-    if (rec.status!=='Approved') { flash('orange'); vib([200,100,200]); showResult('unapproved',rec,'Status: '+(rec.status||'Pending')); return; }
-    if (rec.checked_in) { flash('red'); vib([200,80,200,80,200]); showResult('duplicate',rec,null); return; }
+
+    if (rec.status !== 'Approved') {
+      doFlash('orange'); vib([200,100,200]);
+      status('err', '⚠️ Not approved yet');
+      showResult('unapproved', rec, 'Status: ' + (rec.status || 'Pending'));
+      return;
+    }
+
+    if (rec.checked_in) {
+      doFlash('red'); vib([200,80,200,80,200]);
+      status('err', '🚫 Already checked in');
+      showResult('duplicate', rec, null);
+      return;
+    }
 
     await sbFetch('/rest/v1/registrations?id=eq.'+rec.id, {
-      method:'PATCH', prefer:'return=minimal',
-      body:JSON.stringify({ checked_in:true, checked_in_at:new Date().toISOString() })
+      method: 'PATCH', prefer: 'return=minimal',
+      body: JSON.stringify({ checked_in: true, checked_in_at: new Date().toISOString() })
     });
-    flash('green'); vib([80]);
+
+    doFlash('green'); vib([80]);
+    status('ok', '✅ Checked in!');
     showResult('success', rec, null);
     loadStats();
+
   } catch(e) {
-    showResult('notfound', null, 'Network error — try again');
+    status('err', '❌ Network error — check connection');
   }
 }
 
-// ── RESULT ────────────────────────────────────────────────────────────────────
+// ── RESULT UI ─────────────────────────────────────────────────────────────────
 const CFG = {
-  success:   {icon:'✅',title:'CHECKED IN ✓'},
-  duplicate: {icon:'🚫',title:'ALREADY IN'},
-  notfound:  {icon:'❓',title:'NOT FOUND'},
-  unapproved:{icon:'⚠️',title:'NOT APPROVED'}
+  success:    { icon:'✅', title:'CHECKED IN ✓'  },
+  duplicate:  { icon:'🚫', title:'ALREADY IN'     },
+  notfound:   { icon:'❓', title:'NOT FOUND'       },
+  unapproved: { icon:'⚠️', title:'NOT APPROVED'   }
 };
+
 function showResult(type, rec, msg) {
-  const o = document.getElementById('resultOverlay');
-  o.className = 'show '+type;
-  document.getElementById('resIcon').textContent  = CFG[type].icon;
-  document.getElementById('resTitle').textContent = CFG[type].title;
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card show ' + type;
+  document.getElementById('rcIcon').textContent  = CFG[type].icon;
+  document.getElementById('rcTitle').textContent = CFG[type].title;
   let html = '';
   if (rec) {
-    html += rr('Name', rec.name);
+    html += rr('Name',    rec.name);
     html += rr('Roll No', rec.rollno);
     if (rec.branch) html += rr('Branch', rec.branch);
-    html += rr('Event', rec.event);
-    if (type==='duplicate'&&rec.checked_in_at)
+    html += rr('Event',   rec.event);
+    if (type==='duplicate' && rec.checked_in_at)
       html += rr('Entered At', new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), 'red');
     if (type==='unapproved') html += rr('Status', rec.status||'Pending','orange');
-  } else { html += rr('Info', msg); }
-  document.getElementById('resCard').innerHTML = html;
+  } else {
+    html += rr('Info', msg);
+  }
+  document.getElementById('rcBody').innerHTML = html;
+  card.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
+
+function hideResult() { document.getElementById('resultCard').className = 'result-card'; }
 function rr(k,v,c='') {
   return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${c}">${v||'—'}</span></div>`;
 }
-function dismiss() {
-  document.getElementById('resultOverlay').className = '';
-  dot('Ready','ready');
-  lastVal = '';
-  setTimeout(()=>{ paused=false; loop(); }, 400);
-}
 
-// ── MODE ──────────────────────────────────────────────────────────────────────
-function setMode(m) {
-  mode = m;
-  document.getElementById('btnQR').classList.toggle('active', m==='qr');
-  document.getElementById('btnBar').classList.toggle('active', m==='bar');
-  document.getElementById('frameBox').className = 'frame-box '+(m==='qr'?'qr':'bar');
-  document.getElementById('scanHint').textContent = m==='qr' ? 'Point at QR code' : 'Point at ID card barcode';
-  lastVal = '';
-  dot('Ready','ready');
+// ── STATUS ────────────────────────────────────────────────────────────────────
+function status(type, msg) {
+  const el = document.getElementById('statusPill');
+  el.className = 'status-pill ' + (type==='processing'?'processing':type==='ok'?'ok':'err');
+  el.innerHTML = type==='processing' ? '<span class="spin">⏳</span> ' + msg : msg;
 }
 
 // ── STATS ─────────────────────────────────────────────────────────────────────
@@ -415,19 +443,21 @@ async function loadStats() {
 }
 
 // ── MANUAL ────────────────────────────────────────────────────────────────────
-function openManual() { document.getElementById('manualModal').classList.add('on'); setTimeout(()=>document.getElementById('manualRoll').focus(),250); }
-function closeManual(){ document.getElementById('manualModal').classList.remove('on'); document.getElementById('manualRoll').value=''; }
 async function manualGo() {
   const roll = document.getElementById('manualRoll').value.trim().toUpperCase();
   if (!roll) return;
-  closeManual(); paused=true;
+  document.getElementById('manualRoll').value = '';
+  hideResult();
   await processCheckin(roll);
 }
-document.getElementById('manualModal').addEventListener('click', e=>{ if(e.target===document.getElementById('manualModal')) closeManual(); });
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function dot(t,c){ const d=document.getElementById('statusDot'); d.textContent=t; d.className='status-dot '+c; }
-function flash(c){ const el=document.getElementById('flash'); el.style.background=c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)'; el.classList.add('go'); setTimeout(()=>el.classList.remove('go'),220); }
+function doFlash(c) {
+  const el = document.getElementById('flash');
+  el.style.background = c==='green'?'rgba(34,197,94,.3)':c==='red'?'rgba(217,4,41,.35)':'rgba(249,115,22,.3)';
+  el.classList.add('go');
+  setTimeout(()=>el.classList.remove('go'), 250);
+}
 function vib(p){ try{ navigator.vibrate(p); }catch(_){} }
 
 setInterval(loadStats, 20000);
