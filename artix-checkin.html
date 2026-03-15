@@ -26,21 +26,21 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 /* APP */
 #app{display:none;flex-direction:column;height:100vh;height:100dvh}
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10;cursor:pointer;user-select:none}
 .brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
 .brand span{color:var(--red)}
 .counter{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--lgray)}
 .counter strong{color:var(--green);font-size:16px}
 
 /* CAMERA */
-.cam-wrap{flex:1;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
+.cam-wrap{flex:1;position:relative;overflow:hidden;background:#000}
 #video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #canvas{display:none}
 
 /* SCAN FRAME */
-.overlay{position:absolute;inset:0;pointer-events:none}
-.overlay svg{width:100%;height:100%}
-.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:width .3s,height .3s;width:min(240px,65vw);height:min(240px,65vw)}
+.frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);transition:width .3s,height .3s}
+.frame-box.qr-mode {width:min(240px,65vw);height:min(240px,65vw)}
+.frame-box.bar-mode{width:min(320px,86vw);height:min(110px,30vw)}
 .corner{position:absolute;width:36px;height:36px;border-color:var(--red);border-style:solid}
 .tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
 .tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
@@ -49,8 +49,6 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:sl 1.8s ease-in-out infinite}
 @keyframes sl{0%,100%{top:2%}50%{top:94%}}
 .scan-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;pointer-events:none}
-
-/* STATUS DOT */
 .status-dot{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none;transition:color .3s}
 .status-dot.ready{color:var(--green)}
 .status-dot.scanning{color:var(--orange)}
@@ -58,42 +56,37 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 /* RESULT OVERLAY */
 #resultOverlay{position:absolute;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
 #resultOverlay.show{display:flex}
-#resultOverlay.success{background:rgba(3,18,8,.97)}
-#resultOverlay.duplicate{background:rgba(18,3,3,.97)}
-#resultOverlay.notfound{background:rgba(18,12,3,.97)}
+#resultOverlay.success   {background:rgba(3,18,8,.97)}
+#resultOverlay.duplicate {background:rgba(18,3,3,.97)}
+#resultOverlay.notfound  {background:rgba(18,12,3,.97)}
 #resultOverlay.unapproved{background:rgba(18,12,3,.97)}
-
 .res-icon{font-size:64px;margin-bottom:10px;line-height:1}
 .res-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;margin-bottom:16px}
-#resultOverlay.success   .res-title{color:var(--green)}
-#resultOverlay.duplicate .res-title{color:var(--red)}
-#resultOverlay.notfound  .res-title{color:var(--orange)}
+#resultOverlay.success    .res-title{color:var(--green)}
+#resultOverlay.duplicate  .res-title{color:var(--red)}
+#resultOverlay.notfound   .res-title{color:var(--orange)}
 #resultOverlay.unapproved .res-title{color:var(--orange)}
-
 .res-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;width:100%;max-width:310px;margin-bottom:16px;text-align:left}
 .rrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .rrow:last-child{border-bottom:none}
 .rk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);flex-shrink:0}
 .rv{font-size:14px;font-weight:600;text-align:right;word-break:break-word}
 .rv.red{color:var(--red)}.rv.green{color:var(--green)}.rv.orange{color:var(--orange)}
-
 .dismiss-btn{width:100%;max-width:310px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:2px;padding:15px;cursor:pointer}
-.dismiss-btn:active{background:rgba(255,255,255,.2)}
 
-/* MANUAL */
-.manual-btn{position:absolute;bottom:14px;right:14px;z-index:20;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 14px;border-radius:6px;cursor:pointer}
-.manual-btn:active{background:rgba(255,255,255,.18)}
-
-/* MODE TOGGLE */
-.mode-toggle{position:absolute;bottom:14px;left:14px;z-index:20;display:flex;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.13);border-radius:8px;overflow:hidden}
-.mode-btn{background:none;border:none;color:rgba(255,255,255,.45);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 13px;cursor:pointer;transition:background .2s,color .2s}
+/* BOTTOM BUTTONS */
+.bottom-btns{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;z-index:20;pointer-events:none}
+.mode-toggle{display:flex;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);border-radius:8px;overflow:hidden;pointer-events:all}
+.mode-btn{background:none;border:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;cursor:pointer;transition:background .15s,color .15s}
 .mode-btn.active{background:var(--red);color:#fff}
+.manual-btn{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border-radius:8px;cursor:pointer;pointer-events:all}
 
-/* Frame shape changes per mode */
-.frame-box.qr-mode{width:min(240px,65vw);height:min(240px,65vw)}
-.frame-box.bar-mode{width:min(320px,86vw);height:min(120px,32vw)}
+/* CAM ERROR */
+#camErrScreen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;background:#000;z-index:25}
+#camErrScreen p{color:var(--lgray);font-size:14px;line-height:1.9}
+#camErrScreen button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;padding:11px 24px;cursor:pointer}
 
-/* STATS BAR */
+/* STATS */
 .stats-bar{background:var(--black2);border-top:1px solid var(--border);padding:10px 0;display:flex;flex-shrink:0}
 .stat{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
 .stat:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:1px;background:var(--border)}
@@ -112,10 +105,8 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 .mrow button{background:var(--red);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 20px;cursor:pointer}
 .mcancel{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:12px;cursor:pointer;margin-top:4px}
 
-/* ERROR SCREEN */
-#camErrScreen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:#000;z-index:25}
-#camErrScreen p{color:var(--gray);font-size:14px;line-height:1.8}
-#camErrScreen button{background:var(--red);border:none;color:#fff;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;padding:11px 24px;cursor:pointer}
+/* DEBUG */
+#dbg{display:none;position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,.9);color:#0f0;font-family:monospace;font-size:11px;padding:8px 10px;z-index:50;max-height:50%;overflow-y:auto;line-height:1.7;pointer-events:none}
 
 .flash{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:0;transition:opacity .08s}
 .flash.go{opacity:1}
@@ -128,7 +119,7 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
   <div class="lcard">
     <div class="ltitle">ARTIX <span>2026</span></div>
     <div class="lsub">Entry Check-In Scanner</div>
-    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="iot@123" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="lerr" id="lerr"></div>
     <button class="lbtn" onclick="doLogin()">Start Scanning →</button>
@@ -137,7 +128,7 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 <!-- APP -->
 <div id="app">
-  <div class="topbar">
+  <div class="topbar" id="topbar">
     <div class="brand">ARTIX <span>2026</span> Entry</div>
     <div class="counter">In: <strong id="cntIn">0</strong> / <span id="cntTotal">0</span></div>
   </div>
@@ -146,46 +137,45 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
 
-    <!-- frame corners -->
     <div class="frame-box qr-mode" id="frameBox">
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
       <div class="scanline"></div>
     </div>
-    <div class="scan-hint" id="scanHint">Point at QR code</div>
-    <div class="status-dot" id="statusDot">Loading camera…</div>
 
-    <!-- result -->
+    <div class="scan-hint" id="scanHint">Point at QR code</div>
+    <div class="status-dot" id="statusDot">Loading…</div>
+
     <div id="resultOverlay">
-      <div class="res-icon" id="resIcon"></div>
+      <div class="res-icon"  id="resIcon"></div>
       <div class="res-title" id="resTitle"></div>
-      <div class="res-card" id="resCard"></div>
+      <div class="res-card"  id="resCard"></div>
       <button class="dismiss-btn" onclick="dismissResult()">▶ &nbsp;Scan Next</button>
     </div>
 
-    <!-- cam error -->
     <div id="camErrScreen">
-      <div style="font-size:48px">📷</div>
-      <p>Camera access needed.<br>Tap <strong>Allow</strong> when browser asks,<br>or check site permissions and reload.</p>
-      <button onclick="location.reload()">Reload & Retry</button>
+      <div style="font-size:48px">📵</div>
+      <p id="camErrMsg">Camera access denied.<br><br>
+        Open this page via <strong>https://</strong><br><br>
+        Fastest fix: go to <strong>netlify.com/drop</strong> on your laptop,<br>
+        drag this file in → open the https link on your phone.</p>
+      <button onclick="location.reload()">Retry</button>
     </div>
 
-    <!-- mode toggle -->
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
-      <button class="mode-btn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
+    <!-- tap topbar 3x to show debug -->
+    <div id="dbg"></div>
+
+    <div class="bottom-btns">
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btnQR"  onclick="setMode('qr')">▣ QR</button>
+        <button class="mode-btn"        id="btnBar" onclick="setMode('bar')">▤ Barcode</button>
+      </div>
+      <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
     </div>
-
-    <!-- debug overlay — tap topbar 3x to toggle -->
-    <div id="dbg" style="display:none;position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,.82);color:#0f0;font-family:monospace;font-size:11px;padding:8px;z-index:50;max-height:45%;overflow-y:auto;pointer-events:none"></div>
-
-    <button class="manual-btn" onclick="openManual()">⌨ Manual</button>
   </div>
 
   <div class="stats-bar">
-    <div class="stat in"><div class="stat-n" id="statIn">0</div><div class="stat-l">Checked In</div></div>
+    <div class="stat in" ><div class="stat-n" id="statIn">0</div><div class="stat-l">Checked In</div></div>
     <div class="stat rem"><div class="stat-n" id="statRem">0</div><div class="stat-l">Remaining</div></div>
     <div class="stat tot"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Approved</div></div>
   </div>
@@ -205,262 +195,254 @@ body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;
 
 <div class="flash" id="flash"></div>
 
+<!-- jsQR loaded as blocking script tag — guaranteed available before any scan runs -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"
+        onerror="window._jsqrFailed=true"></script>
+
 <script>
-// ─── CONFIG ──────────────────────────────────────────────────────────────────
+'use strict';
+
+// ── CONFIG ────────────────────────────────────────────────────────────────────
 const ADMIN_USER = 'iot@123';
 const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────────────────
 let scanning      = false;
 let lastScanned   = '';
 let lastScannedAt = 0;
-let detectorBar   = null;  // BarcodeDetector for 1D barcodes (ID cards)
-let rafId         = null;
-let scanMode      = 'qr';  // 'qr' or 'bar'
+let detectorBar   = null;
+let scanMode      = 'qr';
 
-// ─── SUPABASE HELPER ─────────────────────────────────────────────────────────
-function sb(path, opts={}) {
+// ── DEBUG  (tap topbar 3×) ────────────────────────────────────────────────────
+let _taps = 0, _tapT = null;
+document.getElementById('topbar').addEventListener('click', () => {
+  if (++_taps >= 3) {
+    _taps = 0;
+    clearTimeout(_tapT);
+    const d = document.getElementById('dbg');
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    return;
+  }
+  clearTimeout(_tapT);
+  _tapT = setTimeout(() => { _taps = 0; }, 700);
+});
+function dbg(msg) {
+  console.log(msg);
+  const d = document.getElementById('dbg');
+  const t = new Date().toLocaleTimeString('en', { hour12: false });
+  const el = document.createElement('div');
+  el.textContent = t + ' ' + msg;
+  d.appendChild(el);
+  while (d.children.length > 50) d.firstChild.remove();
+  d.scrollTop = d.scrollHeight;
+}
+
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+function sbFetch(path, opts = {}) {
   return fetch(SB + path, {
     ...opts,
     headers: {
-      apikey: KEY, Authorization: 'Bearer '+KEY,
+      apikey: KEY,
+      Authorization: 'Bearer ' + KEY,
       'Content-Type': 'application/json',
       Prefer: opts.prefer || '',
-      ...(opts.headers||{})
+      ...(opts.headers || {})
     }
   });
 }
 
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
-async function doLogin(){
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
   const u = document.getElementById('luser').value.trim();
   const p = document.getElementById('lpass').value;
   const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
-  const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  if(u === ADMIN_USER && hash === ADMIN_HASH){
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  if (u === ADMIN_USER && hash === ADMIN_HASH) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     initScanner();
     loadStats();
   } else {
     document.getElementById('lerr').textContent = 'Wrong credentials.';
-    setTimeout(()=> document.getElementById('lerr').textContent = '', 2500);
+    setTimeout(() => { document.getElementById('lerr').textContent = ''; }, 2500);
   }
 }
 
-// ─── DEBUG ─────────────────────────────────────────────────────────────────────
-let dbgTaps = 0, dbgTimer = null;
-document.querySelector('.topbar').addEventListener('click', ()=>{
-  dbgTaps++;
-  clearTimeout(dbgTimer);
-  dbgTimer = setTimeout(()=>{ dbgTaps=0; }, 800);
-  if(dbgTaps >= 3){
-    const d = document.getElementById('dbg');
-    d.style.display = d.style.display==='none' ? 'block' : 'none';
-    dbgTaps = 0;
-  }
-});
-function dbg(msg){
-  console.log(msg);
-  const d = document.getElementById('dbg');
-  const line = document.createElement('div');
-  line.textContent = new Date().toLocaleTimeString('en',{hour12:false}) + ' ' + msg;
-  d.appendChild(line);
-  if(d.children.length > 30) d.removeChild(d.firstChild);
-  d.scrollTop = d.scrollHeight;
-}
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function initScanner() {
+  setDot('Starting…', '');
+  dbg('=== initScanner ===');
+  dbg('jsQR: ' + (typeof jsQR === 'function' ? '✓ loaded' : '✗ FAILED (no internet?)'));
 
-// ─── INIT SCANNER ─────────────────────────────────────────────────────────────
-async function initScanner(){
-  setDot('Starting camera…', '');
-  dbg('initScanner start');
-
-  // Always load jsQR — most reliable QR scanner for in-browser use
-  dbg('loading jsQR…');
-  await loadJsQR();
-  dbg('jsQR status: ' + (typeof jsQR !== 'undefined' ? '✓ loaded' : '✗ FAILED'));
-
-  // BarcodeDetector only for 1D barcodes
-  if('BarcodeDetector' in window){
+  // BarcodeDetector only for 1D barcode mode — not used for QR
+  if ('BarcodeDetector' in window) {
     try {
-      const supported = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
-      dbg('BarcodeDetector supported: ' + supported.join(','));
-      const barFormats = ['code_128','code_39','ean_13','ean_8'].filter(f =>
-        supported.length === 0 || supported.includes(f)
+      const sup = await BarcodeDetector.getSupportedFormats().catch(() => []);
+      const fmts = ['code_128', 'code_39', 'ean_13', 'ean_8'].filter(f =>
+        sup.length === 0 || sup.includes(f)
       );
-      if(barFormats.length > 0){
-        detectorBar = new BarcodeDetector({ formats: barFormats });
-        dbg('barcode detector: ' + barFormats.join(','));
+      if (fmts.length) {
+        detectorBar = new BarcodeDetector({ formats: fmts });
+        dbg('barcode detector: ' + fmts.join(','));
+      } else {
+        dbg('no 1D formats supported');
       }
-    } catch(e){ dbg('BarcodeDetector error: '+e); detectorBar = null; }
+    } catch (e) { dbg('BarcodeDetector err: ' + e); }
   } else {
-    dbg('BarcodeDetector NOT in window');
+    dbg('BarcodeDetector: not available');
   }
 
   await startCamera();
 }
 
-function loadJsQR(){
-  return new Promise((resolve) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
-    s.onload  = () => { console.log('jsQR loaded'); resolve(); };
-    s.onerror = () => {
-      const s2 = document.createElement('script');
-      s2.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
-      s2.onload  = () => resolve();
-      s2.onerror = () => resolve();
-      document.head.appendChild(s2);
-    };
-    document.head.appendChild(s);
-  });
-}
-
-function loadZXing(){
-  return new Promise((resolve) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.4/umd/index.min.js';
-    s.onload  = () => { console.log('ZXing loaded'); resolve(); };
-    s.onerror = () => { console.warn('ZXing failed'); resolve(); };
-    document.head.appendChild(s);
-  });
-}
-
-async function startCamera(){
+// ── CAMERA ────────────────────────────────────────────────────────────────────
+async function startCamera() {
   const video = document.getElementById('video');
   try {
-    // Request rear camera
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
     });
     video.srcObject = stream;
-    await new Promise(r => { video.onloadedmetadata = r; });
+    await new Promise(resolve => { video.onloadedmetadata = resolve; });
     await video.play();
-    setDot('Ready — point at QR', 'ready');
+    dbg('camera: ' + video.videoWidth + 'x' + video.videoHeight);
+    setDot('Ready', 'ready');
     scanning = true;
-    tick();
-  } catch(err){
-    console.error('Camera error:', err);
+    requestAnimationFrame(tick);
+  } catch (err) {
+    dbg('camera ERROR: ' + err.name + ' — ' + err.message);
     document.getElementById('camErrScreen').style.display = 'flex';
+    if (err.name === 'NotAllowedError') {
+      document.getElementById('camErrMsg').innerHTML =
+        '📵 <strong>Camera permission denied</strong><br><br>' +
+        'Browser blocks camera on <code>file://</code> links.<br><br>' +
+        'Fix: upload to <strong>netlify.com/drop</strong> → open https link on phone.';
+    }
     setDot('Camera error', '');
   }
 }
 
-// ─── SCAN LOOP ─────────────────────────────────────────────────────────────────
-async function tick(){
-  if(!scanning){ rafId = requestAnimationFrame(tick); return; }
+// ── SCAN LOOP ─────────────────────────────────────────────────────────────────
+async function tick() {
+  if (!scanning) { requestAnimationFrame(tick); return; }
 
   const video = document.getElementById('video');
-  if(video.readyState < 2 || video.videoWidth === 0){
-    rafId = requestAnimationFrame(tick); return;
+  if (video.readyState < 2 || video.videoWidth === 0) {
+    requestAnimationFrame(tick); return;
   }
 
   let result = null;
 
-  if(scanMode === 'qr'){
-    // ── QR MODE — always use jsQR (canvas-based, proven reliable) ──
-    if(typeof jsQR !== 'undefined'){
+  if (scanMode === 'qr') {
+    // ── QR: always jsQR, canvas pixel scan ──
+    if (typeof jsQR === 'function') {
       try {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
-        const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(id.data, id.width, id.height, { inversionAttempts: 'attemptBoth' });
-        if(code){ dbg('QR found: '+code.data.substring(0,40)); result = code.data; }
-      } catch(e){ dbg('jsQR error: '+e); }
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height, {
+          inversionAttempts: 'attemptBoth'
+        });
+        if (code) {
+          dbg('QR detected: ' + code.data.substring(0, 60));
+          result = code.data;
+        }
+      } catch (e) { dbg('jsQR error: ' + e); }
     } else {
-      // jsQR not loaded — show this in debug once
-      if(!window._jsqrWarn){ window._jsqrWarn=true; dbg('⚠ jsQR not loaded!'); }
+      if (!window._warnedNoJsQR) {
+        window._warnedNoJsQR = true;
+        dbg('⚠ jsQR not loaded! Check internet.');
+        setDot('jsQR missing — check internet', 'scanning');
+      }
     }
 
   } else {
-    // ── BARCODE MODE ──
-    if(detectorBar){
+    // ── BARCODE: BarcodeDetector (native) ──
+    if (detectorBar) {
       try {
         const codes = await detectorBar.detect(video);
-        if(codes.length > 0) result = codes[0].rawValue;
-      } catch(_){}
-    }
-    // ZXing canvas fallback
-    if(!result && typeof ZXingBrowser !== 'undefined'){
-      try {
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
-        const reader = new ZXingBrowser.BrowserMultiFormatReader();
-        const decoded = await reader.decodeFromImageUrl(canvas.toDataURL('image/png')).catch(()=>null);
-        if(decoded) result = decoded.getText();
-      } catch(_){}
+        if (codes.length > 0) {
+          dbg('Barcode: ' + codes[0].rawValue);
+          result = codes[0].rawValue;
+        }
+      } catch (e) { dbg('barcode err: ' + e); }
+    } else {
+      if (!window._warnedNoBar) {
+        window._warnedNoBar = true;
+        dbg('⚠ no barcode detector — use Manual');
+        setDot('Use Manual for barcodes', 'scanning');
+      }
     }
   }
 
-  if(result){
+  if (result) {
     const now = Date.now();
-    if(result !== lastScanned || now - lastScannedAt > 4000){
+    if (result !== lastScanned || now - lastScannedAt > 4000) {
       lastScanned   = result;
       lastScannedAt = now;
-      scanning      = false; // pause scanning while processing
+      scanning = false;
       setDot('Processing…', 'scanning');
       await handleScan(result);
     }
   }
 
-  rafId = requestAnimationFrame(tick);
+  requestAnimationFrame(tick);
 }
 
-// ─── HANDLE QR DATA ────────────────────────────────────────────────────────────
-async function handleScan(raw){
-  dbg('handleScan raw: '+raw.substring(0,50));
+// ── HANDLE SCAN ───────────────────────────────────────────────────────────────
+async function handleScan(raw) {
+  dbg('raw: ' + raw.substring(0, 80));
   let rollno = '';
   try {
     const parsed = JSON.parse(raw);
-    rollno = (parsed.roll || parsed.rollno || '').toUpperCase().trim();
-    dbg('parsed JSON, rollno: '+rollno);
-  } catch(_){
+    rollno = (parsed.roll || parsed.rollno || parsed.r || '').toUpperCase().trim();
+    dbg('JSON → rollno: ' + rollno);
+  } catch (_) {
     rollno = raw.toUpperCase().trim();
-    dbg('plain text rollno: '+rollno);
+    dbg('plain → rollno: ' + rollno);
   }
-
-  if(!rollno){
-    showResult('notfound', null, 'QR not recognized');
+  if (!rollno) {
+    showResult('notfound', null, 'Unreadable code');
     return;
   }
   await processCheckin(rollno);
 }
 
-// ─── CHECK-IN LOGIC ────────────────────────────────────────────────────────────
-async function processCheckin(rollno){
+// ── CHECKIN ───────────────────────────────────────────────────────────────────
+async function processCheckin(rollno) {
   try {
-    const res  = await sb('/rest/v1/registrations?rollno=eq.' + encodeURIComponent(rollno) + '&select=*');
+    dbg('lookup: ' + rollno);
+    const res  = await sbFetch('/rest/v1/registrations?rollno=eq.' + encodeURIComponent(rollno) + '&select=*');
     const data = await res.json();
 
-    if(!data || data.length === 0){
+    if (!data || !data.length) {
       doFlash('orange'); vib([300]);
-      showResult('notfound', null, 'Not registered:\n' + rollno + '\n\nStudent not found in ARTIX database.');
+      showResult('notfound', null, rollno + '\n\nNot registered in ARTIX.');
       return;
     }
 
     const rec = data[0];
 
-    if(rec.status !== 'Approved'){
-      doFlash('orange'); vib([200,100,200]);
+    if (rec.status !== 'Approved') {
+      doFlash('orange'); vib([200, 100, 200]);
       showResult('unapproved', rec, 'Status: ' + (rec.status || 'Pending'));
       return;
     }
 
-    if(rec.checked_in){
-      doFlash('red'); vib([200,80,200,80,200]);
+    if (rec.checked_in) {
+      doFlash('red'); vib([200, 80, 200, 80, 200]);
       showResult('duplicate', rec, null);
       return;
     }
 
-    // ✓ First-time check-in — write to Supabase
-    await sb('/rest/v1/registrations?id=eq.' + rec.id, {
-      method: 'PATCH', prefer: 'return=minimal',
+    await sbFetch('/rest/v1/registrations?id=eq.' + rec.id, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
       body: JSON.stringify({ checked_in: true, checked_in_at: new Date().toISOString() })
     });
 
@@ -468,121 +450,113 @@ async function processCheckin(rollno){
     showResult('success', rec, null);
     loadStats();
 
-  } catch(err){
-    showResult('notfound', null, 'Network error — try again');
+  } catch (err) {
+    dbg('network err: ' + err);
+    showResult('notfound', null, 'Network error — check connection');
   }
 }
 
-// ─── RESULT DISPLAY ────────────────────────────────────────────────────────────
+// ── RESULT UI ─────────────────────────────────────────────────────────────────
 const CFG = {
-  success:   { icon:'✅', title:'CHECKED IN ✓' },
-  duplicate: { icon:'🚫', title:'ALREADY CHECKED IN' },
-  notfound:  { icon:'❓', title:'NOT FOUND' },
-  unapproved:{ icon:'⚠️', title:'NOT APPROVED' }
+  success:    { icon: '✅', title: 'CHECKED IN ✓'   },
+  duplicate:  { icon: '🚫', title: 'ALREADY IN'      },
+  notfound:   { icon: '❓', title: 'NOT FOUND'        },
+  unapproved: { icon: '⚠️', title: 'NOT APPROVED'    }
 };
 
-function showResult(type, rec, msg){
+function showResult(type, rec, msg) {
   const o = document.getElementById('resultOverlay');
   o.className = 'show ' + type;
   document.getElementById('resIcon').textContent  = CFG[type].icon;
   document.getElementById('resTitle').textContent = CFG[type].title;
-
   let html = '';
-  if(rec){
-    html += rr('Name',   rec.name);
-    html += rr('Roll No',rec.rollno);
-    html += rr('Event',  rec.event);
-    if(type === 'duplicate' && rec.checked_in_at){
-      const t = new Date(rec.checked_in_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  if (rec) {
+    html += rr('Name',    rec.name);
+    html += rr('Roll No', rec.rollno);
+    if (rec.branch) html += rr('Branch', rec.branch);
+    html += rr('Event',   rec.event);
+    if (type === 'duplicate' && rec.checked_in_at) {
+      const t = new Date(rec.checked_in_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
       html += rr('Entered At', t, 'red');
     }
-    if(type === 'unapproved') html += rr('Status', rec.status || 'Pending', 'orange');
-    if(rec.m2name) html += rr('Team', [rec.m2name, rec.m3name].filter(Boolean).join(', '));
+    if (type === 'unapproved') html += rr('Status', rec.status || 'Pending', 'orange');
+    if (rec.m2name) html += rr('Team', [rec.m2name, rec.m3name].filter(Boolean).join(', '));
   } else {
     html += rr('Info', msg);
   }
   document.getElementById('resCard').innerHTML = html;
 }
 
-function rr(k, v, cls=''){
-  return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${cls}">${v||'—'}</span></div>`;
+function rr(k, v, cls = '') {
+  return `<div class="rrow"><span class="rk">${k}</span><span class="rv ${cls}">${v || '—'}</span></div>`;
 }
 
-function dismissResult(){
+function dismissResult() {
   document.getElementById('resultOverlay').className = '';
-  const hint = scanMode === 'qr' ? 'Point at QR code' : 'Point at ID card barcode';
-  setDot('Ready — ' + hint, 'ready');
-  setTimeout(()=>{ scanning = true; }, 400);
+  setDot('Ready', 'ready');
+  setTimeout(() => { scanning = true; }, 400);
 }
 
-// ─── MODE SWITCH ───────────────────────────────────────────────────────────────
-function setMode(mode){
+// ── MODE SWITCH ───────────────────────────────────────────────────────────────
+function setMode(mode) {
   scanMode = mode;
-  const isQR = mode === 'qr';
-  document.getElementById('btnQR').classList.toggle('active', isQR);
-  document.getElementById('btnBar').classList.toggle('active', !isQR);
-  const frame = document.getElementById('frameBox');
-  frame.className = 'frame-box ' + (isQR ? 'qr-mode' : 'bar-mode');
-  const hint = isQR ? 'Point at QR code' : 'Point at ID card barcode';
-  document.getElementById('scanHint').textContent = hint;
-  setDot('Ready — ' + hint, 'ready');
-  // Reset last scan so same code can be re-scanned after switch
+  document.getElementById('btnQR').classList.toggle('active',  mode === 'qr');
+  document.getElementById('btnBar').classList.toggle('active', mode === 'bar');
+  document.getElementById('frameBox').className  = 'frame-box ' + (mode === 'qr' ? 'qr-mode' : 'bar-mode');
+  document.getElementById('scanHint').textContent = mode === 'qr' ? 'Point at QR code' : 'Point at ID card barcode';
   lastScanned = '';
+  setDot('Ready', 'ready');
+  dbg('mode → ' + mode);
 }
 
-// ─── STATS ─────────────────────────────────────────────────────────────────────
-async function loadStats(){
+// ── STATS ─────────────────────────────────────────────────────────────────────
+async function loadStats() {
   try {
-    const res  = await sb('/rest/v1/registrations?select=checked_in&status=eq.Approved');
+    const res  = await sbFetch('/rest/v1/registrations?select=checked_in&status=eq.Approved');
     const data = await res.json();
-    if(!Array.isArray(data)) return;
+    if (!Array.isArray(data)) return;
     const tot = data.length;
     const cin = data.filter(r => r.checked_in).length;
-    document.getElementById('statIn').textContent    = cin;
-    document.getElementById('statRem').textContent   = tot - cin;
-    document.getElementById('statTotal').textContent = tot;
-    document.getElementById('cntIn').textContent     = cin;
-    document.getElementById('cntTotal').textContent  = tot;
-  } catch(_){}
+    ['statIn','statRem','statTotal','cntIn','cntTotal'].forEach((id, i) => {
+      document.getElementById(id).textContent = [cin, tot - cin, tot, cin, tot][i];
+    });
+  } catch (_) {}
 }
 
-// ─── MANUAL ENTRY ──────────────────────────────────────────────────────────────
-function openManual(){
+// ── MANUAL ────────────────────────────────────────────────────────────────────
+function openManual() {
   document.getElementById('manualModal').classList.add('on');
-  setTimeout(()=> document.getElementById('manualRoll').focus(), 250);
+  setTimeout(() => document.getElementById('manualRoll').focus(), 250);
 }
-function closeManual(){
+function closeManual() {
   document.getElementById('manualModal').classList.remove('on');
   document.getElementById('manualRoll').value = '';
 }
-async function manualCheckin(){
+async function manualCheckin() {
   const roll = document.getElementById('manualRoll').value.trim().toUpperCase();
-  if(!roll) return;
+  if (!roll) return;
   closeManual();
   scanning = false;
   await processCheckin(roll);
 }
 document.getElementById('manualModal').addEventListener('click', e => {
-  if(e.target === document.getElementById('manualModal')) closeManual();
+  if (e.target === document.getElementById('manualModal')) closeManual();
 });
 
-// ─── HELPERS ───────────────────────────────────────────────────────────────────
-function setDot(text, cls){
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function setDot(text, cls) {
   const d = document.getElementById('statusDot');
   d.textContent = text;
   d.className   = 'status-dot ' + cls;
 }
-
-function doFlash(c){
+function doFlash(c) {
   const el = document.getElementById('flash');
-  el.style.background = c==='green'?'rgba(34,197,94,.28)':c==='red'?'rgba(217,4,41,.32)':'rgba(249,115,22,.28)';
+  el.style.background = c === 'green' ? 'rgba(34,197,94,.28)' : c === 'red' ? 'rgba(217,4,41,.32)' : 'rgba(249,115,22,.28)';
   el.classList.add('go');
-  setTimeout(()=> el.classList.remove('go'), 220);
+  setTimeout(() => el.classList.remove('go'), 220);
 }
+function vib(p) { try { navigator.vibrate(p); } catch (_) {} }
 
-function vib(p){ try{ navigator.vibrate(p); }catch(_){} }
-
-// Sync stats every 20s across all scanning phones
 setInterval(loadStats, 20000);
 </script>
 </body>
