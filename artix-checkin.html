@@ -282,10 +282,17 @@ function loop() {
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       const scale  = Math.min(1, 400 / v.videoWidth);
-      canvas.width  = Math.round(v.videoWidth  * scale);
-      canvas.height = Math.round(v.videoHeight * scale);
-      ctx.filter = 'contrast(1.4) brightness(1.1)';
-      ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+      const sw = Math.round(v.videoWidth  * scale);
+      const sh = Math.round(v.videoHeight * scale);
+      const pad = 24; // white border so QR finder patterns aren't clipped by dark bg
+      canvas.width  = sw + pad * 2;
+      canvas.height = sh + pad * 2;
+      // Fill white first — this creates the margin around the video frame
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Draw video into centre with contrast boost
+      ctx.filter = 'contrast(1.5) brightness(1.15)';
+      ctx.drawImage(v, 0, 0, v.videoWidth, v.videoHeight, pad, pad, sw, sh);
       ctx.filter = 'none';
       const img  = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(img.data, canvas.width, canvas.height, { inversionAttempts: 'attemptBoth' });
