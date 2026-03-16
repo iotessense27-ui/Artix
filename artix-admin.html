@@ -3,739 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARTIX 2026 – Admin</title>
+<title>ARTIX 2026 – Register</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--red:#D90429;--red-dark:#a80220;--black:#090909;--black2:#111;--black3:#181818;--white:#fff;--soft:#ececec;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.07);--green:#22c55e;--orange:#f97316;--blue:#3b82f6}
+:root{--red:#D90429;--red-dark:#a80220;--black:#090909;--black2:#111;--white:#fff;--soft:#ececec;--gray:#6b6b6b;--lgray:#bbb;--border:rgba(255,255,255,0.07);--green:#22c55e;--orange:#f97316}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh}
-#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse 65% 55% at 50% 0%,rgba(217,4,41,.2) 0%,transparent 70%)}
-.lcard{background:var(--black2);border:1px solid var(--border);border-radius:10px;padding:42px 38px;width:100%;max-width:390px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.65)}
-.ltitle{font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:4px;margin-bottom:3px}
-.ltitle span{color:var(--red)}
-.lsub{color:var(--gray);font-size:13px;margin-bottom:30px}
-.lf{display:flex;flex-direction:column;gap:6px;margin-bottom:13px;text-align:left}
-.lf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:600}
-.lf input{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:12px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .2s}
-.lf input:focus{border-color:var(--red)}
-.lerr{color:var(--red);font-size:13px;margin-bottom:9px;min-height:17px}
-.lbtn{width:100%;background:var(--red);border:none;border-radius:5px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:14px;cursor:pointer;margin-top:6px}
-.lbtn:hover{background:var(--red-dark)}
-#panel{display:none}
-.topbar{background:var(--black2);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50}
-.brand{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px}
-.brand span{color:var(--red)}
-.tright{display:flex;align-items:center;gap:14px}
-.tuser{font-size:13px;color:var(--gray)}
-.logoutbtn{background:rgba(217,4,41,.1);border:1px solid rgba(217,4,41,.2);color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 13px;border-radius:4px;cursor:pointer}
-.main{max-width:1180px;margin:0 auto;padding:26px 20px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:24px}
-.sc{background:var(--black2);border:1px solid var(--border);border-radius:7px;padding:17px 19px}
-.sn{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;line-height:1}
-.sk{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:2px}
-.sc.total .sn{color:var(--white)}.sc.pend .sn{color:var(--orange)}.sc.appr .sn{color:var(--green)}.sc.expo .sn{color:var(--blue)}
-.filters{display:flex;align-items:center;gap:9px;margin-bottom:18px;flex-wrap:wrap}
-.fb{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;padding:6px 14px;border-radius:4px;cursor:pointer;transition:all .2s}
-.fb:hover{border-color:rgba(255,255,255,.18);color:var(--white)}
-.fb.on{background:rgba(217,4,41,.1);border-color:var(--red);color:var(--white)}
-.fsearch{flex:1;min-width:160px;max-width:260px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:7px 11px;color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;outline:none}
-.fsearch:focus{border-color:var(--red)}
-.fsearch::placeholder{color:rgba(255,255,255,.18)}
-.rfbtn{background:transparent;border:1px solid var(--border);color:var(--gray);font-size:16px;width:33px;height:33px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.rfbtn:hover{border-color:var(--red);color:var(--red)}
-.twrap{background:var(--black2);border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:700px}
-thead{background:rgba(255,255,255,.03)}
-th{padding:11px 13px;text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;border-bottom:1px solid var(--border)}
-td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.035);font-size:14px;vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.018)}
-.ss-thumb{width:44px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer;display:block;transition:transform .15s}
-.ss-thumb:hover{transform:scale(1.12);border-color:var(--red)}
-.ss-none{color:var(--gray);font-size:12px}
-.bdg{display:inline-block;padding:3px 9px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
-.b-pend{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.22)}
-.b-appr{background:rgba(34,197,94,.09);color:var(--green);border:1px solid rgba(34,197,94,.18)}
-.b-rej{background:rgba(217,4,41,.09);color:var(--red);border:1px solid rgba(217,4,41,.18)}
-.b-reg{background:rgba(255,255,255,.05);color:var(--lgray)}
-.b-expo{background:rgba(59,130,246,.09);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
-.acts{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-.bappr{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.22);color:var(--green);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
-.bappr:hover{background:rgba(34,197,94,.18)}
-.brej{background:rgba(217,4,41,.07);border:1px solid rgba(217,4,41,.18);color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
-.brej:hover{background:rgba(217,4,41,.15)}
-.bview{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
-.bview:hover{border-color:rgba(255,255,255,.2);color:#fff}
-.bqr{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.14);color:var(--green);font-size:14px;width:29px;height:29px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.bqr:hover{background:rgba(34,197,94,.16)}
-.bmail{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--blue);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 11px;border-radius:4px;cursor:pointer;white-space:nowrap}
-.bmail:hover{background:rgba(59,130,246,.18)}
-.bmail.sent{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.2);color:var(--green);cursor:default}
-.bmail.sending{opacity:.5;cursor:not-allowed}
-.bulk-bar{display:flex;align-items:center;gap:10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:6px;padding:10px 15px;margin-bottom:16px}
-.bulk-bar span{font-size:13px;color:var(--lgray);flex:1}
-.bbulk{background:var(--blue);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;padding:7px 16px;border-radius:4px;cursor:pointer;white-space:nowrap}
-.bbulk:hover{background:#2563eb}.bbulk:disabled{opacity:.45;cursor:not-allowed}
-.empty .ico{font-size:38px;margin-bottom:10px}
-.mback{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px)}
-.mback.on{display:flex}
-.modal{background:var(--black2);border:1px solid var(--border);border-radius:10px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
-.mhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--black2);z-index:1}
-.mtitle{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:3px}
-.mclose{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--gray);width:30px;height:30px;border-radius:4px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
-.mclose:hover{color:#fff}
-.mbody{padding:22px}
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px}
-.mgrid .full{grid-column:1/-1}
-.mf{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;padding:10px 12px}
-.mk{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:2px}
-.mv{font-size:14px;color:var(--soft)}
-.macts{display:flex;gap:9px;margin-top:6px}
-.macts .bappr,.macts .brej{flex:1;padding:11px;font-size:13px;letter-spacing:1.5px}
-.ss-section{margin-bottom:18px}
-.ss-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:8px}
-.ss-img{width:100%;max-height:320px;object-fit:contain;border-radius:6px;border:1px solid var(--border);display:block;cursor:zoom-in}
-.ss-img:hover{border-color:var(--red)}
-.ss-actions{display:flex;gap:12px;margin-top:8px;font-size:12px}
-.ss-dl{color:var(--red);text-decoration:none}.ss-dl:hover{color:var(--soft)}
-.ss-hint{color:var(--gray)}
-.ss-missing{padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;color:var(--gray);font-size:13px}
-#qrModal .modal{max-width:360px}
-.qrmb{text-align:center;padding:26px}
-#adminQRbox{display:inline-block;background:#fff;padding:13px;border-radius:6px;margin-bottom:14px}
-.qrpname{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:2px;margin-bottom:3px}
-.qrproll{font-size:13px;color:var(--gray);margin-bottom:14px}
-.dlqr{background:var(--green);color:#0a0a0a;border:none;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;padding:10px 22px;cursor:pointer}
-#ssOverlay{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
-#ssOverlay.on{display:flex}
-#ssOverlay img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
-#ssOverlay .ss-close{position:absolute;top:18px;right:22px;color:#fff;font-size:26px;cursor:pointer;background:rgba(255,255,255,.1);border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
-.loader{text-align:center;padding:44px;color:var(--gray)}
-.spin{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--red);border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
-@keyframes sp{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:22px;right:22px;background:var(--black3);border:1px solid var(--border);border-radius:6px;padding:11px 18px;font-size:14px;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
-.toast.on{opacity:1;transform:translateY(0)}
-.toast.ok{border-color:rgba(34,197,94,.3);color:var(--green)}
-.toast.err{border-color:rgba(217,4,41,.3);color:var(--red)}
-@media(max-width:680px){.stats{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 14px}.main{padding:18px 13px}.mgrid{grid-template-columns:1fr}.mgrid .full{grid-column:1}}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 90% 55% at 50% -8%,rgba(217,4,41,.22) 0%,transparent 68%),radial-gradient(ellipse 35% 35% at 95% 85%,rgba(217,4,41,.08) 0%,transparent 60%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:58px 58px}
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 80px}
+header{text-align:center;padding:52px 0 32px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:4px;padding:5px 15px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--lgray);margin-bottom:22px}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.title{font-family:'Bebas Neue',sans-serif;font-size:clamp(88px,21vw,155px);line-height:.85;letter-spacing:4px;display:inline-block;position:relative}
+.title-line{position:absolute;bottom:-4px;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.year{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(17px,4vw,30px);letter-spacing:12px;color:var(--red);margin-top:5px}
+.meta{display:flex;justify-content:center;flex-wrap:wrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:13px 0;margin-top:26px}
+.mi{display:flex;flex-direction:column;align-items:center;padding:0 22px;gap:2px;position:relative}
+.mi:not(:last-child)::after{content:'';position:absolute;right:0;top:8%;height:84%;width:1px;background:var(--border)}
+.mk{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700}
+.mv{font-size:13px;color:var(--soft);font-weight:500;text-align:center}
+.steps{display:flex;align-items:center;margin:28px 0 6px}
+.st{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+.sn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--gray);transition:all .3s}
+.st.active .sn{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 18px rgba(217,4,41,.45)}
+.st.done .sn{background:rgba(217,4,41,.18);border-color:var(--red);color:var(--red)}
+.sl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);text-align:center}
+.st.active .sl{color:var(--soft)}
+.sline{flex:1;height:1px;background:rgba(255,255,255,.07);margin-bottom:17px}
+.sline.done{background:var(--red)}
+.card{background:var(--black2);border:1px solid var(--border);border-radius:8px;padding:34px;margin-top:6px;box-shadow:0 22px 65px rgba(0,0,0,.55)}
+.slabel{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px;font-weight:700}
+.eopts{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px}
+.eopt{position:relative;cursor:pointer;user-select:none}
+.eopt input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.oc{display:flex;flex-direction:column;gap:5px;padding:17px 19px 17px 50px;border:1.5px solid rgba(255,255,255,.09);border-radius:6px;background:rgba(255,255,255,.02);transition:all .25s;cursor:pointer;position:relative}
+.oc:hover{border-color:rgba(217,4,41,.4);background:rgba(217,4,41,.04)}
+.eopt input:checked+.oc{border-color:var(--red);background:rgba(217,4,41,.09)}
+.oc::before{content:'';position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;border:1.5px solid rgba(255,255,255,.2);border-radius:4px;background:rgba(255,255,255,.04);transition:all .2s}
+.eopt input:checked+.oc::before{background:var(--red);border-color:var(--red)}
+.oc::after{content:'';position:absolute;left:22px;top:50%;transform:translateY(-60%) rotate(45deg);width:6px;height:10px;border-right:2px solid #fff;border-bottom:2px solid #fff;opacity:0;transition:opacity .15s}
+.eopt input:checked+.oc::after{opacity:1}
+.on{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--white)}
+.op{font-family:'Bebas Neue',sans-serif;font-size:27px;color:var(--red);line-height:1}
+.od{font-size:11px;color:var(--gray)}
+.sel-summary{background:rgba(217,4,41,.06);border:1px solid rgba(217,4,41,.18);border-radius:5px;padding:11px 15px;font-size:13px;margin-bottom:16px;display:none}
+.sel-summary.show{display:block}
+.sel-summary .total{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);float:right}
+.notice{background:rgba(217,4,41,.07);border:1px solid rgba(217,4,41,.22);border-radius:5px;padding:11px 15px;font-size:13px;color:var(--lgray);line-height:1.65;margin-bottom:22px}
+.notice strong{color:var(--red)}
+.div{height:1px;background:var(--border);margin:22px 0}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.fg .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600}
+select{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:11px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;width:100%;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+select:focus{border-color:var(--red);background-color:rgba(217,4,41,.04)}
+select option{background:#1a1a1a;color:#fff}
+select.inv{border-color:var(--red)!important}
+input[type=text],input[type=email],input[type=tel]{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:5px;padding:11px 13px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;width:100%;outline:none;transition:border-color .2s}
+input::placeholder{color:rgba(255,255,255,.16)}
+input:focus{border-color:var(--red);background:rgba(217,4,41,.04)}
+input.inv{border-color:var(--red)!important}
+.team{overflow:hidden;max-height:0;opacity:0;transition:max-height .45s,opacity .35s}
+.team.open{max-height:380px;opacity:1}
+.thdiv{display:flex;align-items:center;gap:10px;margin:18px 0 13px}
+.thline{flex:1;height:1px;background:var(--border)}
+.thlabel{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--gray);white-space:nowrap;text-transform:uppercase}
+.phase{display:none}.phase.active{display:block}
+.upibox{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;padding:26px 22px;text-align:center;margin-bottom:18px}
+.upi-amt{display:inline-block;background:var(--red);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;padding:5px 20px;border-radius:4px;margin-bottom:18px}
+.qrwrap{display:flex;flex-direction:column;align-items:center;gap:11px;margin:4px 0 18px}
+.qrbox{background:#fff;padding:13px;border-radius:7px;display:inline-block}
+.qr-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray)}
+.upi-or{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2)}
+.openbtn{display:inline-flex;align-items:center;gap:7px;background:var(--red);color:#fff;border:none;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;padding:9px 22px;cursor:pointer;text-decoration:none}
+.upiid{font-family:'Barlow Condensed',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin:4px 0}
+.copybtn{background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--lgray);font-family:'Barlow Condensed',sans-serif;font-size:12px;padding:5px 13px;border-radius:4px;cursor:pointer;margin-left:8px}
+.usteps{text-align:left;font-size:13px;color:var(--gray);line-height:2.1;border-top:1px solid var(--border);padding-top:13px;margin-top:6px}
+.usteps span{color:var(--soft)}
+.uparea{border:2px dashed rgba(255,255,255,.1);border-radius:6px;padding:30px 18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:18px}
+.uparea:hover,.uparea.drag{border-color:var(--red);background:rgba(217,4,41,.04)}
+.uparea input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upicon{font-size:30px;margin-bottom:7px;opacity:.45}
+.uptxt{font-size:14px;color:var(--gray)}
+.uptxt strong{color:var(--soft)}
+.upprev{display:none;margin-top:11px}
+.upprev img{max-width:100%;max-height:190px;border-radius:5px;border:1px solid var(--border)}
+.upname{font-size:12px;color:var(--red);margin-top:5px}
+.compressing{font-size:12px;color:var(--orange);margin-top:6px;display:none}
+.amtbar{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:rgba(217,4,41,.06);border:1px solid rgba(217,4,41,.18);border-radius:5px;margin-bottom:14px}
+.amtlbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray)}
+.amtval{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);letter-spacing:2px}
+.amtval em{color:var(--red);font-style:normal}
+.btn{width:100%;padding:15px;border:none;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;transition:all .2s}
+.btnp{background:var(--red);color:#fff}.btnp:hover{background:var(--red-dark)}.btnp:disabled{opacity:.42;cursor:not-allowed}
+.btno{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,.13);margin-top:9px;font-size:14px;letter-spacing:1px;padding:11px}
+.progress-wrap{display:none;margin-bottom:14px}.progress-wrap.show{display:block}
+.progress-bar-bg{background:rgba(255,255,255,.07);border-radius:4px;height:6px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--red);border-radius:4px;width:0%;transition:width .3s}
+.progress-label{font-size:11px;color:var(--gray);margin-top:5px;text-align:center}
+.done-wrap{text-align:center;padding:18px 0}
+.done-icon{font-size:52px;margin-bottom:14px}
+.done-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:4px;margin-bottom:7px}
+.done-sub{color:var(--gray);font-size:14px;line-height:1.8;margin-bottom:22px}
+.roll-box{background:rgba(217,4,41,.07);border:1px solid rgba(217,4,41,.18);border-radius:6px;padding:14px;margin-bottom:22px;display:inline-block;min-width:200px}
+.roll-lbl{font-size:10px;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.roll-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px}
+.status-link{text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.status-link a{color:var(--gray);font-size:13px;text-decoration:none}
+.status-link a span{color:var(--red)}
+footer{text-align:center;padding:36px 0 0;color:var(--gray);font-size:12px;line-height:1.9}
+footer strong{color:var(--soft)}
+@media(max-width:560px){.card{padding:20px 15px}.fg{grid-template-columns:1fr}.fg .full{grid-column:1}.eopts{grid-template-columns:1fr}.meta{flex-direction:column;gap:8px}.mi::after{display:none}.mi{padding:0}}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="login">
-  <div class="lcard">
-    <div class="ltitle">ARTIX <span>Admin</span></div>
-    <div class="lsub">ARTIX 2026 · Department of CSE–IoT</div>
-    <div class="lf"><label>Username</label><input type="text" id="luser" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lerr" id="lerr"></div>
-    <button class="lbtn" onclick="doLogin()">Login →</button>
-  </div>
-</div>
-
-<!-- PANEL -->
-<div id="panel">
-  <div class="topbar">
-    <div class="brand">ARTIX <span>2026</span> Admin</div>
-    <div class="tright">
-      <span class="tuser">iot@123</span>
-      <button class="logoutbtn" onclick="logout()">Logout</button>
+<div class="wrap">
+  <header>
+    <div class="badge">Malla Reddy Deemed to be University</div>
+    <div class="title">ARTIX<span class="year">2026</span><div class="title-line"></div></div>
+    <div class="meta">
+      <div class="mi"><span class="mk">Dept</span><span class="mv">CSE – IoT</span></div>
+      <div class="mi"><span class="mk">Date</span><span class="mv">16–17 Mar 2026</span></div>
+      <div class="mi"><span class="mk">Venue</span><span class="mv">Sports Complex Auditorium</span></div>
     </div>
+  </header>
+  <div class="steps">
+    <div class="st active" id="s1"><div class="sn">1</div><div class="sl">Details</div></div>
+    <div class="sline" id="l1"></div>
+    <div class="st" id="s2"><div class="sn">2</div><div class="sl">Pay</div></div>
+    <div class="sline" id="l2"></div>
+    <div class="st" id="s3"><div class="sn">3</div><div class="sl">Upload</div></div>
+    <div class="sline" id="l3"></div>
+    <div class="st" id="s4"><div class="sn">4</div><div class="sl">Done</div></div>
   </div>
-  <div class="main">
-    <div class="stats">
-      <div class="sc total"><div class="sn" id="stTotal">—</div><div class="sk">Total</div></div>
-      <div class="sc pend"><div class="sn" id="stPend">—</div><div class="sk">Pending</div></div>
-      <div class="sc appr"><div class="sn" id="stAppr">—</div><div class="sk">Approved</div></div>
-      <div class="sc expo"><div class="sn" id="stExpo">—</div><div class="sk">Project Expo</div></div>
+  <div class="card">
+    <!-- PHASE 1 -->
+    <div class="phase active" id="ph1">
+      <div class="slabel">— Select Event(s)</div>
+      <div class="eopts">
+        <label class="eopt"><input type="checkbox" id="chkReg" onchange="onEvt()">
+          <div class="oc"><div class="on">Registration</div><div class="op">₹70</div><div class="od">Individual participation</div></div>
+        </label>
+        <label class="eopt"><input type="checkbox" id="chkExpo" onchange="onEvt()">
+          <div class="oc"><div class="on">Project Expo</div><div class="op">₹150</div><div class="od">Team of max 3 members</div></div>
+        </label>
+      </div>
+      <div class="sel-summary" id="selSum"><span id="selTxt"></span><span class="total" id="selTot"></span></div>
+      <div class="notice" id="expoNote" style="display:none"><strong>Project Expo selected:</strong> Register for Expo only (₹150), or both Registration + Expo (₹220).</div>
+      <div class="div"></div>
+      <div class="slabel">— Your Details</div>
+      <div class="fg">
+        <div class="field full"><label>Full Name</label><input type="text" id="fname" placeholder="e.g. Priya Sharma"></div>
+        <div class="field full">
+          <label>Roll No</label>
+          <input type="text" id="roll" placeholder="e.g. 24J41A6667  or  25EU08R0093" oninput="detectFromRoll()" style="text-transform:uppercase">
+          <div id="autoDetectBadge" style="display:none;margin-top:6px;padding:5px 10px;background:rgba(40,200,100,.1);border:1px solid rgba(40,200,100,.25);border-radius:6px;font-size:11px;color:#3ecf6e;letter-spacing:.5px"></div>
+        </div>
+        <div class="field"><label>Branch</label>
+          <select id="branch">
+            <option value="" disabled selected>Select Branch</option>
+            <option value="CSE">CSE</option>
+            <option value="CSM">CSM</option>
+            <option value="IT">IT</option>
+            <option value="ECE">ECE</option>
+            <option value="EEE">EEE</option>
+            <option value="DS">DS</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Civil">Civil</option>
+          </select>
+        </div>
+        <div class="field"><label>Year</label>
+          <select id="year">
+            <option value="" disabled selected>Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+          </select>
+        </div>
+        <div class="field"><label>Phone</label><input type="tel" id="phone" placeholder="10-digit number" maxlength="10"></div>
+        <div class="field full"><label>Email</label><input type="email" id="email" placeholder="you@example.com"></div>
+      </div>
+      <div class="team" id="teamSec">
+        <div class="thdiv"><div class="thline"></div><div class="thlabel">Team Members (Optional)</div><div class="thline"></div></div>
+        <div class="fg">
+          <div class="field"><label>Member 2 Name</label><input type="text" id="m2n" placeholder="Full name"></div>
+          <div class="field"><label>Member 2 Roll No</label><input type="text" id="m2r" placeholder="Roll number"></div>
+          <div class="field"><label>Member 3 Name</label><input type="text" id="m3n" placeholder="Full name"></div>
+          <div class="field"><label>Member 3 Roll No</label><input type="text" id="m3r" placeholder="Roll number"></div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="amtbar"><span class="amtlbl">Total Amount</span><span class="amtval"><em>₹</em><span id="amtDisp">0</span></span></div>
+      <button class="btn btnp" onclick="goPhase2()">Continue to Payment →</button>
     </div>
-    <div class="filters">
-      <button class="fb on" data-f="All" onclick="setF(this)">All</button>
-      <button class="fb" data-f="Pending" onclick="setF(this)">Pending</button>
-      <button class="fb" data-f="Approved" onclick="setF(this)">Approved</button>
-      <button class="fb" data-f="Rejected" onclick="setF(this)">Rejected</button>
-      <button class="fb" data-f="expo" onclick="setF(this)">Project Expo</button>
-      <button class="fb" data-f="CSE" onclick="setF(this)">CSE</button>
-      <button class="fb" data-f="CSM" onclick="setF(this)">CSM</button>
-      <button class="fb" data-f="IT" onclick="setF(this)">IT</button>
-      <button class="fb" data-f="ECE" onclick="setF(this)">ECE</button>
-      <button class="fb" data-f="EEE" onclick="setF(this)">EEE</button>
-      <button class="fb" data-f="DS" onclick="setF(this)">DS</button>
-      <button class="fb" data-f="1st Year" onclick="setF(this)">1st Yr</button>
-      <button class="fb" data-f="2nd Year" onclick="setF(this)">2nd Yr</button>
-      <button class="fb" data-f="3rd Year" onclick="setF(this)">3rd Yr</button>
-      <input class="fsearch" type="text" placeholder="Search name / roll…" oninput="renderTable()" id="fq">
-      <button class="rfbtn" onclick="loadData()" title="Refresh">↻</button>
+    <!-- PHASE 2 -->
+    <div class="phase" id="ph2">
+      <div class="slabel">— Pay Now</div>
+      <div class="upibox">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px">Send exactly</div>
+        <div class="upi-amt" id="payBadge">₹0</div>
+        <div class="qrwrap">
+          <div class="qr-lbl">Scan with PhonePe / GPay / Paytm</div>
+          <div class="qrbox" id="payQR"></div>
+          <div class="upi-or">— or —</div>
+          <a class="openbtn" id="upiBtn" href="#">📱 Open UPI App</a>
+        </div>
+        <div style="height:1px;background:var(--border);margin-bottom:13px"></div>
+        <div class="upiid">6305696184-2@ybl <button class="copybtn" onclick="copyUPI()">Copy</button></div>
+        <div class="usteps">1. Scan QR or tap "Open UPI App"<br>2. Amount pre-filled: <span id="stepAmt">₹0</span><br>3. Add your <span>Roll No</span> in remarks<br>4. Pay and take a <span>screenshot</span></div>
+      </div>
+      <button class="btn btnp" onclick="setPhase(3)">I've Paid — Upload Screenshot →</button>
+      <button class="btn btno" onclick="setPhase(1)">← Back</button>
     </div>
-    <div class="bulk-bar">
-      <span id="bulkInfo">📧 Send approval emails to all approved students who haven't received one yet.</span>
-      <button class="bbulk" id="bulkBtn" onclick="bulkSendMails()">✉ Bulk Send Emails</button>
-      <button class="bbulk" id="resendBtn" onclick="resendAll()" style="background:#f97316">🔄 Resend All — QR Update</button>
+    <!-- PHASE 3 -->
+    <div class="phase" id="ph3">
+      <div class="slabel">— Upload Payment Screenshot</div>
+      <div class="notice">Upload a clear screenshot of payment. It will be <strong>compressed automatically</strong>.</div>
+      <div class="uparea" id="upArea" onclick="document.getElementById('ssFile').click()">
+        <input type="file" id="ssFile" accept="image/*" onchange="onFile(event)" style="display:none">
+        <div class="upicon">📸</div>
+        <div class="uptxt"><strong>Tap anywhere here to upload</strong><br>or drag &amp; drop</div>
+        <div class="compressing" id="compMsg">⚙️ Compressing...</div>
+        <div class="upprev" id="upPrev"><img id="upImg" src="" alt=""><div class="upname" id="upName"></div></div>
+      </div>
+      <div class="progress-wrap" id="progWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progFill"></div></div>
+        <div class="progress-label" id="progLabel">Uploading...</div>
+      </div>
+      <button class="btn btnp" id="subBtn" onclick="submitReg()">Submit Registration</button>
+      <button class="btn btno" onclick="setPhase(2)">← Back</button>
     </div>
-    <div class="twrap" id="tw"><div class="loader"><div class="spin"></div></div></div>
-  </div>
-</div>
-
-<!-- DETAIL MODAL -->
-<div class="mback" id="detModal">
-  <div class="modal">
-    <div class="mhead"><div class="mtitle">Registration Details</div><button class="mclose" onclick="closeM('detModal')">✕</button></div>
-    <div class="mbody" id="detBody"></div>
-  </div>
-</div>
-
-<!-- QR MODAL -->
-<div class="mback" id="qrModal">
-  <div class="modal">
-    <div class="mhead"><div class="mtitle">Confirmation QR</div><button class="mclose" onclick="closeM('qrModal')">✕</button></div>
-    <div class="qrmb">
-      <div id="adminQRbox"></div>
-      <div class="qrpname" id="qrName"></div>
-      <div class="qrproll" id="qrRoll"></div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="dlqr" id="dlQRbtn">⬇ Download</button>
-        <button class="dlqr" id="waQRbtn" style="background:#25D366;color:#fff">📲 WhatsApp</button>
+    <!-- PHASE 4 -->
+    <div class="phase" id="ph4">
+      <div class="done-wrap">
+        <div class="done-icon">🎉</div>
+        <div class="done-title">Registration Submitted!</div>
+        <div class="done-sub">Your screenshot is being reviewed.<br>Check status once approved.</div>
+        <div class="roll-box"><div class="roll-lbl">Your Roll No</div><div class="roll-val" id="doneRoll">—</div></div>
+        <a href="artix-status.html" style="color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;text-decoration:none">Check Status →</a>
       </div>
     </div>
+    <div class="status-link"><a href="artix-status.html">Already registered? <span>Check your status →</span></a></div>
   </div>
+  <footer><strong>ARTIX 2026</strong> &nbsp;·&nbsp; Department of CSE – IoT<br>Malla Reddy Deemed to be University &nbsp;·&nbsp; 16–17 March 2026</footer>
 </div>
-
-<!-- FULLSCREEN SCREENSHOT -->
-<div id="ssOverlay" onclick="closeSS()">
-  <button class="ss-close" onclick="closeSS()">✕</button>
-  <img id="ssOverlayImg" src="" alt="Screenshot">
-</div>
-
-<div class="toast" id="toast"></div>
-
 <script>
-const ADMIN_USER = 'iot@123';
-const ADMIN_HASH = 'b1028bf44a65c1cb37ee8adb2509c960be9fb7d185714f4942502cef92c6e7b9';
 const SB  = 'https://ofidwodbhfchymlacukz.supabase.co';
 const KEY = 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U';
-
-let recs = [], curF = 'All';
+const UPI = '6305696184-2@ybl';
 
 function sb(path, opts={}) {
   return fetch(SB + path, {
     ...opts,
-    headers: { apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer:opts.prefer||'', ...(opts.headers||{}) }
+    headers: { apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json', Prefer: opts.prefer||'', ...(opts.headers||{}) }
   });
 }
 
-// ── LOGIN ─────────────────────────────────────────────
-async function doLogin(){
-  const u = document.getElementById('luser').value.trim();
-  const p = document.getElementById('lpass').value;
-  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
-  const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  if(u === ADMIN_USER && hash === ADMIN_HASH){
-    document.getElementById('login').style.display='none';
-    document.getElementById('panel').style.display='block';
-    loadData();
-  } else {
-    document.getElementById('lerr').textContent='Invalid credentials.';
-    setTimeout(()=>document.getElementById('lerr').textContent='',3000);
+let fd={}, ss64='';
+
+function g(id){ return document.getElementById(id).value.trim(); }
+function inv(id){ const el=document.getElementById(id); el.classList.add('inv'); el.addEventListener('input',()=>el.classList.remove('inv'),{once:true}); el.addEventListener('change',()=>el.classList.remove('inv'),{once:true}); }
+
+function detectFromRoll(){
+  const roll = document.getElementById('roll').value.toUpperCase().trim();
+  const brEl = document.getElementById('branch');
+  const yrEl = document.getElementById('year');
+  const badge = document.getElementById('autoDetectBadge');
+  let detectedBr = '', detectedYr = '';
+
+  // ── YEAR ──
+  // 25EUxxRxxxx = 1st year (e.g. 25EU02R0003, 25EU08R0093, 25EU04R0036, 25EU10R0118)
+  if(/^25EU[0-9]{2}R/.test(roll))       detectedYr = '1st Year';
+  // 24J41Axxxx  = 2nd year (e.g. 24J41A6667, 24J41A12F1, 24J41A05BK, 24J41A05AQ)
+  else if(/^24J41A/.test(roll))         detectedYr = '2nd Year';
+  // 23J41Axxxx  = 3rd year
+  else if(/^23J41A/.test(roll))         detectedYr = '3rd Year';
+
+  // ── BRANCH — 1st years (25EUxxR) ──
+  // Code after 25EU and before R is branch code (2 digits)
+  // 02=EEE, 04=ECE, 05=CSE, 06=CSM, 07=Mech, 08=DS, 09=Civil, 10=IT
+  if(/^25EU02R/.test(roll))             detectedBr = 'EEE';
+  else if(/^25EU04R/.test(roll))        detectedBr = 'ECE';
+  else if(/^25EU05R/.test(roll))        detectedBr = 'CSE';
+  else if(/^25EU06R/.test(roll))        detectedBr = 'CSM';
+  else if(/^25EU07R/.test(roll))        detectedBr = 'Mechanical';
+  else if(/^25EU08R/.test(roll))        detectedBr = 'DS';
+  else if(/^25EU09R/.test(roll))        detectedBr = 'Civil';
+  else if(/^25EU10R/.test(roll))        detectedBr = 'IT';
+
+  // ── BRANCH — 2nd years (24J41A) ──
+  // After 24J41A: 05xx=CSE, 12xx=IT, 6xxx=CSM (special range)
+  // Examples: 24J41A6667=CSM, 24J41A12F1=IT, 24J41A05BK=CSE, 24J41A05AQ=CSE
+  else if(/^24J41A6[0-9A-F]/.test(roll))  detectedBr = 'CSM';
+  else if(/^24J41A12/.test(roll))          detectedBr = 'IT';
+  else if(/^24J41A10/.test(roll))          detectedBr = 'IT';
+  else if(/^24J41A05/.test(roll))          detectedBr = 'CSE';
+  else if(/^24J41A06/.test(roll))          detectedBr = 'CSM';
+  else if(/^24J41A04/.test(roll))          detectedBr = 'ECE';
+  else if(/^24J41A02/.test(roll))          detectedBr = 'EEE';
+  else if(/^24J41A08/.test(roll))          detectedBr = 'DS';
+  else if(/^24J41A07/.test(roll))          detectedBr = 'Mechanical';
+  else if(/^24J41A09/.test(roll))          detectedBr = 'Civil';
+
+  // ── BRANCH — 3rd years (23J41A) ──
+  else if(/^23J41A6[0-9A-F]/.test(roll))  detectedBr = 'CSM';
+  else if(/^23J41A12/.test(roll))          detectedBr = 'IT';
+  else if(/^23J41A10/.test(roll))          detectedBr = 'IT';
+  else if(/^23J41A05/.test(roll))          detectedBr = 'CSE';
+  else if(/^23J41A06/.test(roll))          detectedBr = 'CSM';
+  else if(/^23J41A04/.test(roll))          detectedBr = 'ECE';
+  else if(/^23J41A02/.test(roll))          detectedBr = 'EEE';
+  else if(/^23J41A08/.test(roll))          detectedBr = 'DS';
+  else if(/^23J41A07/.test(roll))          detectedBr = 'Mechanical';
+  else if(/^23J41A09/.test(roll))          detectedBr = 'Civil';
+
+  // Apply detected values
+  if(detectedYr){ yrEl.value = detectedYr; yrEl.classList.remove('inv'); }
+  if(detectedBr){ brEl.value = detectedBr; brEl.classList.remove('inv'); }
+
+  // Show auto-detect badge
+  if(detectedBr && detectedYr && badge){
+    badge.textContent = '✓ Auto-detected: ' + detectedBr + ' · ' + detectedYr;
+    badge.style.display = 'block';
+  } else if(badge){
+    badge.style.display = 'none';
   }
 }
-function logout(){
-  document.getElementById('panel').style.display='none';
-  document.getElementById('login').style.display='flex';
-  document.getElementById('luser').value='';
-  document.getElementById('lpass').value='';
-  recs=[];
+
+function onEvt(){
+  const reg=document.getElementById('chkReg').checked, expo=document.getElementById('chkExpo').checked;
+  document.getElementById('teamSec').classList.toggle('open',expo);
+  document.getElementById('expoNote').style.display=expo?'block':'none';
+  let tot=0,parts=[];
+  if(reg){tot+=70;parts.push('Registration ₹70');}
+  if(expo){tot+=150;parts.push('Project Expo ₹150');}
+  document.getElementById('amtDisp').textContent=tot;
+  const s=document.getElementById('selSum');
+  if(tot>0){document.getElementById('selTxt').textContent=parts.join(' + ');document.getElementById('selTot').textContent='₹'+tot;s.classList.add('show');}
+  else s.classList.remove('show');
 }
 
-// ── LOAD DATA — direct Supabase REST, zero CORS issues ──
-async function loadData(){
-  document.getElementById('tw').innerHTML='<div class="loader"><div class="spin"></div></div>';
+function validate(){
+  const reg=document.getElementById('chkReg').checked,expo=document.getElementById('chkExpo').checked;
+  if(!reg&&!expo){alert('Please select at least one event.');return false;}
+  let ok=true;
+  [{id:'fname',t:v=>v.length>=2},{id:'roll',t:v=>v.length>=4},{id:'phone',t:v=>/^[6-9]\d{9}$/.test(v)},{id:'email',t:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},{id:'branch',t:v=>v.length>0},{id:'year',t:v=>v.length>0}]
+  .forEach(({id,t})=>{if(!t(g(id))){inv(id);ok=false;}});
+  return ok;
+}
+
+function setPhase(n){
+  document.querySelectorAll('.phase').forEach(p=>p.classList.remove('active'));
+  document.getElementById('ph'+n).classList.add('active');
+  for(let i=1;i<=4;i++) document.getElementById('s'+i).className='st'+(i<n?' done':i===n?' active':'');
+  for(let i=1;i<=3;i++) document.getElementById('l'+i).className='sline'+(i<n?' done':'');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goPhase2(){
+  if(!validate()) return;
+  const reg=document.getElementById('chkReg').checked,expo=document.getElementById('chkExpo').checked;
+  const amt=(reg?70:0)+(expo?150:0);
+  fd={name:g('fname'),rollno:g('roll').toUpperCase(),email:g('email'),phone:g('phone'),branch:g('branch'),year:g('year'),
+      event:reg&&expo?'Registration + Project Expo':reg?'Registration':'Project Expo',
+      amount:amt,m2name:g('m2n'),m2roll:g('m2r'),m3name:g('m3n'),m3roll:g('m3r')};
+  setPhase(2);
+  const link=`upi://pay?pa=${UPI}&pn=ARTIX&am=${amt}&cu=INR&tn=ARTIX_${fd.rollno}`;
+  document.getElementById('upiBtn').href=link;
+  document.getElementById('payBadge').textContent='₹'+amt;
+  document.getElementById('stepAmt').textContent='₹'+amt;
+  const box=document.getElementById('payQR'); box.innerHTML='';
+  new QRCode(box,{text:link,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+}
+
+function copyUPI(){ navigator.clipboard.writeText(UPI).then(()=>{const b=document.querySelector('.copybtn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);}); }
+
+function compress(file,maxW,q,cb){
+  const r=new FileReader(); r.onload=ev=>{
+    const img=new Image(); img.onload=()=>{
+      const ratio=Math.min(maxW/img.width,maxW/img.height,1);
+      const w=Math.round(img.width*ratio),h=Math.round(img.height*ratio);
+      const c=document.createElement('canvas'); c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',q));
+    }; img.src=ev.target.result;
+  }; r.readAsDataURL(file);
+}
+
+function onFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  document.querySelector('.uptxt').style.display='none';
+  document.querySelector('.upicon').style.display='none';
+  document.getElementById('compMsg').style.display='block';
+  // Max 700px wide, quality 0.65 — keeps screenshots ~80-120KB, uploads in 1-2s
+  compress(file,700,0.65,compressed=>{
+    ss64=compressed;
+    document.getElementById('upImg').src=ss64;
+    document.getElementById('upName').textContent=file.name+' ('+Math.round((ss64.length*3/4)/1024)+' KB compressed)';
+    document.getElementById('upPrev').style.display='block';
+    document.getElementById('compMsg').style.display='none';
+  });
+}
+
+const ua=document.getElementById('upArea');
+ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('drag');});
+ua.addEventListener('dragleave',()=>ua.classList.remove('drag'));
+ua.addEventListener('drop',e=>{
+  e.preventDefault();ua.classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f){ onFile({target:{files:[f]}}); }
+});
+
+async function submitReg(){
+  if(!ss64){alert('Please upload your payment screenshot first.');return;}
+  const btn=document.getElementById('subBtn'),fill=document.getElementById('progFill'),label=document.getElementById('progLabel');
+  btn.disabled=true; btn.textContent='Submitting...';
+  document.getElementById('progWrap').classList.add('show');
+  let p=0; const iv=setInterval(()=>{p=Math.min(p+Math.random()*12,88);fill.style.width=p+'%';label.textContent='Uploading... '+Math.round(p)+'%';},180);
   try {
-    const res = await sb('/rest/v1/registrations?select=*&order=created_at.desc');
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    recs = await res.json();
-    updateStats();
-    renderTable();
-  } catch(err) {
-    document.getElementById('tw').innerHTML=
-      `<div class="empty"><div class="ico">⚠️</div>Could not load data: ${err.message}</div>`;
-  }
-}
-
-function updateStats(){
-  // branch breakdown for console/future use
-  const branchStats = {};
-  ['CSE','CSM','IT','ECE','EEE','DS','Mechanical','Civil'].forEach(b=>{
-    branchStats[b] = recs.filter(r=>r.branch===b).length;
-  });
-  document.getElementById('stTotal').textContent=recs.length;
-  document.getElementById('stPend').textContent=recs.filter(r=>!r.status||r.status==='Pending').length;
-  document.getElementById('stAppr').textContent=recs.filter(r=>r.status==='Approved').length;
-  document.getElementById('stExpo').textContent=recs.filter(r=>(r.event||'').includes('Expo')).length;
-  // Update bulk bar info
-  const unsent=recs.filter(r=>r.status==='Approved'&&!r.mail_sent&&r.email).length;
-  document.getElementById('bulkInfo').textContent = unsent > 0
-    ? `📧 ${unsent} approved student${unsent>1?'s':''} haven't received an email yet.`
-    : `✓ All approved students have been emailed.`;
-}
-
-function setF(btn){
-  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); curF=btn.dataset.f; renderTable();
-}
-
-// ── TABLE ─────────────────────────────────────────────
-function renderTable(){
-  const q=(document.getElementById('fq').value||'').toLowerCase();
-  const rows=recs.filter(r=>{
-    const branches=['CSE','CSM','IT','ECE','EEE','DS','Mechanical','Civil'];
-    const years=['1st Year','2nd Year','3rd Year'];
-    const fok=curF==='All'
-      ||(curF==='expo'?(r.event||'').includes('Expo')
-      :branches.includes(curF)?(r.branch===curF)
-      :years.includes(curF)?(r.year===curF)
-      :r.status===curF);
-    const qok=!q||(r.name||'').toLowerCase().includes(q)||(r.rollno||'').toLowerCase().includes(q);
-    return fok&&qok;
-  });
-  if(!rows.length){
-    document.getElementById('tw').innerHTML='<div class="empty"><div class="ico">📋</div>No registrations found.</div>';
-    return;
-  }
-  const tbody=rows.map((r,i)=>{
-    const st=r.status||'Pending';
-    const sc=st==='Approved'?'b-appr':st==='Rejected'?'b-rej':'b-pend';
-    const ec=(r.event||'').includes('Expo')?'b-expo':'b-reg';
-    const ssThumb=r.screenshot&&r.screenshot.length>100
-      ? `<img class="ss-thumb" src="${r.screenshot}" onclick="openSS('${r.id}')" title="Click to enlarge">`
-      : `<span class="ss-none">—</span>`;
-    return `<tr>
-      <td style="color:var(--gray);font-size:12px">${i+1}</td>
-      <td style="font-weight:500;color:var(--soft)">${r.name||'—'}</td>
-      <td style="font-family:'Barlow Condensed',sans-serif;color:var(--lgray)">${r.rollno||'—'}</td>
-      <td style="font-size:12px;color:var(--lgray)">${r.branch||'—'}</td>
-      <td style="font-size:12px;color:var(--lgray)">${r.year||'—'}</td>
-      <td><span class="bdg ${ec}">${r.event||'Reg'}</span></td>
-      <td>${ssThumb}</td>
-      <td><span class="bdg ${sc}">${st}</span></td>
-      <td><div class="acts">
-        <button class="bview" onclick="viewRec('${r.id}')">View</button>
-        ${st!=='Approved'?`<button class="bappr" onclick="updStatus('${r.id}','Approved')">✓</button>`:''}
-        ${st!=='Rejected'?`<button class="brej"  onclick="updStatus('${r.id}','Rejected')">✕</button>`:''}
-        ${st==='Approved'?`<button class="bqr" onclick="showQR('${r.id}')" title="QR">⊞</button><button class="bqr" onclick="shareWhatsApp(recs.find(x=>x.id==='${r.id}'))" title="WhatsApp" style="background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.25);color:#25D366">📲</button>`:''}
-        ${st==='Approved'?`<button class="bmail ${r.mail_sent?'sent':''}" ${r.mail_sent?'disabled title="Email sent"':'onclick="sendMail(this,\''+r.id+'\')"'}>${r.mail_sent?'✓ Sent':'✉ Mail'}</button>`:''}
-      </div></td>
-    </tr>`;
-  }).join('');
-  document.getElementById('tw').innerHTML=`<table>
-    <thead><tr><th>#</th><th>Name</th><th>Roll No</th><th>Branch</th><th>Year</th><th>Event</th><th>Screenshot</th><th>Status</th><th>Actions</th></tr></thead>
-    <tbody>${tbody}</tbody>
-  </table>`;
-}
-
-// ── SCREENSHOT FULLSCREEN ─────────────────────────────
-function openSS(id){
-  const r=recs.find(x=>x.id===id); if(!r||!r.screenshot) return;
-  document.getElementById('ssOverlayImg').src=r.screenshot;
-  document.getElementById('ssOverlay').classList.add('on');
-}
-function closeSS(){
-  document.getElementById('ssOverlay').classList.remove('on');
-  document.getElementById('ssOverlayImg').src='';
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSS();});
-
-// ── VIEW RECORD ───────────────────────────────────────
-function viewRec(id){
-  const r=recs.find(x=>x.id===id); if(!r) return;
-  const st=r.status||'Pending';
-  const sc=st==='Approved'?'b-appr':st==='Rejected'?'b-rej':'b-pend';
-  let ssHtml='';
-  if(r.screenshot&&r.screenshot.length>100){
-    ssHtml+=`<div class="ss-section">
-      <div class="ss-label">Payment Screenshot</div>
-      <img class="ss-img" src="${r.screenshot}" alt="Screenshot" onclick="openSS('${r.id}')">
-      <div class="ss-actions">
-        <span class="ss-hint">Click to fullscreen</span>
-        <a class="ss-dl" href="${r.screenshot}" download="ss_${r.rollno}.jpg">⬇ Download</a>
-      </div>
-    </div>`;
-  } else {
-    ssHtml+=`<div class="ss-section"><div class="ss-label">Payment Screenshot</div><div class="ss-missing">No screenshot uploaded.</div></div>`;
-  }
-  document.getElementById('detBody').innerHTML=`
-    <div class="mgrid">
-      <div class="mf full"><div class="mk">Full Name</div><div class="mv">${r.name||'—'}</div></div>
-      <div class="mf"><div class="mk">Roll No</div><div class="mv">${r.rollno||'—'}</div></div>
-      <div class="mf"><div class="mk">Event</div><div class="mv">${r.event||'—'}</div></div>
-      <div class="mf"><div class="mk">Phone</div><div class="mv">${r.phone||'—'}</div></div>
-      <div class="mf"><div class="mk">Email</div><div class="mv">${r.email||'—'}</div></div>
-      <div class="mf"><div class="mk">Branch</div><div class="mv">${r.branch||'—'}</div></div>
-      <div class="mf"><div class="mk">Year</div><div class="mv">${r.year||'—'}</div></div>
-      <div class="mf"><div class="mk">Amount Paid</div><div class="mv">₹${r.amount||70}</div></div>
-      ${r.m2name?`<div class="mf"><div class="mk">Member 2</div><div class="mv">${r.m2name} · ${r.m2roll||''}</div></div>`:''}
-      ${r.m3name?`<div class="mf"><div class="mk">Member 3</div><div class="mv">${r.m3name} · ${r.m3roll||''}</div></div>`:''}
-      <div class="mf"><div class="mk">Status</div><div class="mv"><span class="bdg ${sc}">${st}</span></div></div>
-      <div class="mf"><div class="mk">Submitted</div><div class="mv">${r.created_at?new Date(r.created_at).toLocaleString('en-IN'):'—'}</div></div>
-    </div>
-    ${ssHtml}
-    <div class="macts">
-      ${st!=='Approved'?`<button class="bappr" onclick="updStatus('${r.id}','Approved');closeM('detModal')">✓ Approve</button>`:''}
-      ${st!=='Rejected'?`<button class="brej"  onclick="updStatus('${r.id}','Rejected');closeM('detModal')">✕ Reject</button>`:''}
-      ${st==='Approved'?`<button class="bview" onclick="closeM('detModal');showQR('${r.id}')">View QR →</button>`:''}
-      ${st==='Approved'?`<button class="bmail ${r.mail_sent?'sent':''}" ${r.mail_sent?'disabled':'onclick="closeM(\'detModal\');sendMail(this,\''+r.id+'\')"'}>${r.mail_sent?'✓ Email Sent':'✉ Send Email'}</button>`:''}
-    </div>`;
-  openM('detModal');
-}
-
-// ── UPDATE STATUS ─────────────────────────────────────
-async function updStatus(id, status){
-  try {
-    await sb('/rest/v1/registrations?id=eq.'+id, {method:'PATCH', prefer:'return=minimal', body:JSON.stringify({status})});
-    const r=recs.find(x=>x.id===id); if(r) r.status=status;
-    updateStats(); renderTable();
-    toast((r?r.rollno:id)+' → '+status, status==='Approved'?'ok':'err');
-    if(status==='Approved'){
-      setTimeout(()=>showQR(id),400);
-      // Auto-send email on approval
-      setTimeout(()=>sendMail(null, id, true), 1200);
+    const res=await sb('/rest/v1/registrations',{
+      method:'POST', prefer:'return=minimal',
+      body:JSON.stringify({name:fd.name,rollno:fd.rollno,email:fd.email,phone:fd.phone,
+        branch:fd.branch,year:fd.year,
+        event:fd.event,amount:fd.amount,m2name:fd.m2name||null,m2roll:fd.m2roll||null,
+        m3name:fd.m3name||null,m3roll:fd.m3roll||null,screenshot:ss64,status:'Approved'})
+    });
+    clearInterval(iv);
+    if(res.status===409){
+      document.getElementById('progWrap').classList.remove('show');
+      btn.disabled=false; btn.textContent='Submit Registration';
+      alert('This Roll No is already registered. Check status at artix-status.html'); return;
     }
-  } catch(e){ toast('Update failed','err'); }
-}
-
-// ── EMAIL SYSTEM (BREVO) ───────────────────────────────
-const RESEND_KEY  = 're_eaUATX2C_DCLgRNLSWVZSjoCcgmt2uSM5';
-const MAIL_FROM   = 'ARTIX 2026 <onboarding@resend.dev>';
-
-// Build QR card as base64 PNG using canvas — WHITE background for easy scanning
-function buildQRCard(r){
-  return new Promise(resolve => {
-    const tmp = document.createElement('div');
-    tmp.style.cssText = 'position:fixed;left:-9999px;top:-9999px;background:#fff;padding:13px;';
-    document.body.appendChild(tmp);
-    const qr = new QRCode(tmp, {
-      text: JSON.stringify({name:r.name,roll:r.rollno,event:r.event,college:'MRDU',artix:'2026',status:'APPROVED'}),
-      width:220, height:220, colorDark:'#000000', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.H
-    });
-    setTimeout(()=>{
-      const qrCanvas = tmp.querySelector('canvas');
-      const W=440, H=580;
-      const c = document.createElement('canvas'); c.width=W; c.height=H;
-      const x = c.getContext('2d');
-
-      // ── WHITE background ──
-      x.fillStyle='#ffffff'; x.fillRect(0,0,W,H);
-
-      // ── Top red bar ──
-      x.fillStyle='#D90429'; x.fillRect(0,0,W,10);
-
-      // ── Red header band ──
-      x.fillStyle='#D90429'; x.fillRect(0,10,W,80);
-
-      // ── Title ──
-      x.fillStyle='#ffffff'; x.font='bold 52px Georgia'; x.textAlign='center';
-      x.fillText('ARTIX 2026', W/2, 68);
-
-      // ── Subtitle ──
-      x.fillStyle='rgba(255,255,255,0.85)'; x.font='bold 10.5px Arial';
-      x.fillText('DEPARTMENT OF CSE – IoT  ·  MALLA REDDY DEEMED UNIVERSITY', W/2, 86);
-
-      // ── QR code — centred, on white ──
-      if(qrCanvas){
-        // White padding box behind QR
-        x.fillStyle='#ffffff';
-        x.strokeStyle='#eeeeee'; x.lineWidth=1;
-        const qx=110, qy=108, qs=220;
-        x.fillRect(qx-10, qy-10, qs+20, qs+20);
-        x.strokeRect(qx-10, qy-10, qs+20, qs+20);
-        x.drawImage(qrCanvas, qx, qy, qs, qs);
-      }
-
-      // ── Light divider ──
-      x.strokeStyle='#eeeeee'; x.lineWidth=1;
-      x.beginPath(); x.moveTo(40,348); x.lineTo(400,348); x.stroke();
-
-      // ── Name ──
-      x.fillStyle='#111111'; x.font='bold 24px Arial'; x.textAlign='center';
-      x.fillText(r.name, W/2, 382);
-
-      // ── Roll No ──
-      x.fillStyle='#666666'; x.font='15px Arial';
-      x.fillText(r.rollno, W/2, 406);
-
-      // ── Approved badge ──
-      const badgeW=200, badgeH=30, badgeX=(W-badgeW)/2, badgeY=420;
-      x.fillStyle='#dcfce7'; x.beginPath();
-      x.roundRect(badgeX, badgeY, badgeW, badgeH, 15);
-      x.fill();
-      x.fillStyle='#16a34a'; x.font='bold 12px Arial';
-      x.fillText('✓ APPROVED  ·  '+(r.event||'REGISTRATION').toUpperCase(), W/2, 440);
-
-      // ── Date/Venue ──
-      x.fillStyle='#999999'; x.font='12px Arial';
-      x.fillText('16–17 March 2026  ·  Sports Complex Auditorium', W/2, 472);
-
-      // ── Bottom red bar ──
-      x.fillStyle='#D90429'; x.fillRect(0,H-10,W,10);
-
-      document.body.removeChild(tmp);
-      resolve(c.toDataURL('image/png')); // full data URL
-    },400);
-  });
-}
-
-// Get base64 only (for email)
-async function buildQRCardBase64(r){
-  const dataUrl = await buildQRCard(r);
-  return dataUrl.split(',')[1];
-}
-
-function buildEmailHTML(r, forceResend=false){
-  const isExpo = (r.event||'').includes('Expo');
-  const teamSection = r.m2name
-    ? `<tr><td style="padding:6px 0;color:#888;font-size:13px">Team</td><td style="padding:6px 0;font-weight:600">${[r.m2name,r.m3name].filter(Boolean).join(', ')}</td></tr>`
-    : '';
-  const expoSection = isExpo ? `
-    <div style="margin-top:22px;background:#0d1520;border:1px solid #1a3a5c;border-radius:8px;padding:24px">
-      <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:10px">Welcome to Project Expo 🔬</div>
-      <p style="color:#bbb;font-size:14px;line-height:1.9;margin-bottom:0">
-        We're thrilled to have you and your team at <strong style="color:#fff">ARTIX 2026 Project Expo</strong> — 
-        a stage built for innovators like you to showcase what you've built and inspire everyone around you. 
-        Get your project ready, bring your energy, and let's make it an incredible experience together. 
-        Further details on schedule and setup will be shared with you soon — stay tuned! 🚀
-      </p>
-      ${r.m2name || r.m3name ? `
-      <div style="margin-top:18px;background:rgba(255,255,255,.04);border-radius:6px;padding:14px 16px">
-        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#3b82f6;font-weight:700;margin-bottom:12px">Your Team</div>
-        <table style="width:100%;border-collapse:collapse">
-          <tr><td style="padding:5px 0;color:#666;font-size:12px;width:80px">Lead</td><td style="padding:5px 0;font-size:13px;font-weight:600;color:#fff">${r.name} <span style="color:#666;font-weight:400">(${r.rollno})</span></td></tr>
-          ${r.m2name ? `<tr><td style="padding:5px 0;color:#666;font-size:12px">Member 2</td><td style="padding:5px 0;font-size:13px;font-weight:600;color:#fff">${r.m2name}${r.m2roll ? ' <span style="color:#666;font-weight:400">('+r.m2roll+')</span>' : ''}</td></tr>` : ''}
-          ${r.m3name ? `<tr><td style="padding:5px 0;color:#666;font-size:12px">Member 3</td><td style="padding:5px 0;font-size:13px;font-weight:600;color:#fff">${r.m3name}${r.m3roll ? ' <span style="color:#666;font-weight:400">('+r.m3roll+')</span>' : ''}</td></tr>` : ''}
-        </table>
-      </div>` : ''}
-    </div>` : '';
-  return `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f4f4f4;font-family:'Segoe UI',Arial,sans-serif">
-<div style="max-width:560px;margin:32px auto;background:#0a0a0a;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)">
-  <!-- Header -->
-  <div style="background:#D90429;padding:28px 32px;text-align:center">
-    <div style="font-size:42px;font-weight:900;color:#fff;letter-spacing:4px;font-family:Georgia,serif">ARTIX 2026</div>
-    <div style="color:rgba(255,255,255,.75);font-size:12px;letter-spacing:2px;margin-top:4px;text-transform:uppercase">Department of CSE – IoT · MRDU</div>
-  </div>
-  <!-- Body -->
-  <div style="padding:30px 32px;color:#fff">
-    <div style="font-size:22px;font-weight:700;margin-bottom:6px">You're In, ${r.name}! 🎉</div>
-    <div style="color:#aaa;font-size:14px;line-height:1.7;margin-bottom:24px">
-      Your registration has been <span style="color:#22c55e;font-weight:700">approved</span>. Show your QR code at the entry gate on the event day.
-    </div>
-    <!-- Details table -->
-    <div style="background:#161616;border-radius:8px;padding:18px 20px;margin-bottom:22px">
-      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#D90429;font-weight:700;margin-bottom:12px">Your Details</div>
-      <table style="width:100%;border-collapse:collapse">
-        <tr><td style="padding:6px 0;color:#888;font-size:13px">Name</td><td style="padding:6px 0;font-weight:600">${r.name}</td></tr>
-        <tr><td style="padding:6px 0;color:#888;font-size:13px">Roll No</td><td style="padding:6px 0;font-weight:600;font-family:monospace">${r.rollno}</td></tr>
-        <tr><td style="padding:6px 0;color:#888;font-size:13px">Event</td><td style="padding:6px 0;font-weight:600">${r.event}</td></tr>
-        <tr><td style="padding:6px 0;color:#888;font-size:13px">Amount</td><td style="padding:6px 0;font-weight:600">₹${r.amount}</td></tr>
-        ${teamSection}
-      </table>
-    </div>
-    <!-- Event info -->
-    <div style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap">
-      <div style="flex:1;min-width:130px;background:#161616;border-radius:6px;padding:13px 15px;text-align:center">
-        <div style="font-size:20px;margin-bottom:4px">📅</div>
-        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px">Date</div>
-        <div style="font-size:13px;font-weight:600;margin-top:2px">16–17 Mar 2026</div>
-      </div>
-      <div style="flex:1;min-width:130px;background:#161616;border-radius:6px;padding:13px 15px;text-align:center">
-        <div style="font-size:20px;margin-bottom:4px">📍</div>
-        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px">Venue</div>
-        <div style="font-size:13px;font-weight:600;margin-top:2px">Sports Complex Auditorium</div>
-      </div>
-    </div>
-    <!-- QR note -->
-    <div style="background:#0d1a0d;border:1px solid #1a4d1a;border-radius:8px;padding:16px 18px;margin-bottom:22px;text-align:center">
-      ${forceResend ? `
-      <div style="color:#f97316;font-weight:700;font-size:14px;margin-bottom:6px">🔄 Updated Entry Pass</div>
-      <div style="color:#aaa;font-size:13px">We've sent you a fresh QR card with improvements.<br>Please use <strong style="color:#fff">this new QR</strong> at the entry gate on 16–17 March.<br><span style="color:#888;font-size:12px">(You can ignore your previous pass)</span></div>
-      ` : `
-      <div style="color:#22c55e;font-weight:700;font-size:14px;margin-bottom:4px">🎫 Your Entry QR Code</div>
-      <div style="color:#aaa;font-size:13px">Your QR card is attached to this email as an image.<br>Download it and show at the entry gate.</div>
-      `}
-    </div>
-    ${expoSection}
-  </div>
-  <!-- Footer -->
-  <div style="background:#111;border-top:1px solid #222;padding:18px 32px;text-align:center">
-    <div style="color:#555;font-size:12px;line-height:1.8">
-      <strong style="color:#888">ARTIX 2026</strong> · Department of CSE – IoT<br>
-      Malla Reddy Deemed to be University · 16–17 March 2026
-    </div>
-  </div>
-</div>
-</body></html>`;
-}
-
-async function sendMail(btnEl, id, silent=false, forceResend=false){
-  const r = recs.find(x=>x.id===id);
-  if(!r || !r.email){ if(!silent) toast('No email on record','err'); return; }
-  if(r.mail_sent && !silent && !forceResend){ toast('Already sent to '+r.email,'ok'); return; }
-
-  if(btnEl && !silent){ btnEl.disabled=true; btnEl.textContent='Sending…'; }
-  if(!silent) toast('Sending to '+r.email+'…','ok');
-
-  try {
-    const qrBase64 = await buildQRCardBase64(r);
-    const isExpo   = (r.event||'').includes('Expo');
-
-    // Use update subject when force resending
-    const subject = forceResend
-      ? '🔄 ARTIX 2026 – Updated Entry Pass (Action Required)'
-      : isExpo
-        ? 'ARTIX 2026 – You are in for Project Expo! 🔬'
-        : "You're Approved! ARTIX 2026 Entry Pass 🎉";
-
-    const payload = {
-      from: MAIL_FROM,
-      to: [r.email],
-      subject,
-      html: buildEmailHTML(r, forceResend),
-      attachments: [{
-        filename: 'ARTIX2026_QR_'+r.rollno+'.png',
-        content: qrBase64
-      }]
-    };
-
-    const res = await fetch('https://ofidwodbhfchymlacukz.supabase.co/functions/v1/send-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U',
-        'Authorization': 'Bearer sb_publishable_hGhBZDOK8dPGZpE9uKLQhw_4QkBgo6U'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const resText = await res.text();
-    console.log('Resend status:', res.status, resText);
-    if(!res.ok){
-      let msg = 'Resend error ' + res.status;
-      try{ msg = JSON.parse(resText).message || msg; }catch(_){}
-      throw new Error(msg);
-    }
-
-    // Mark mail_sent in Supabase
-    await sb('/rest/v1/registrations?id=eq.'+id, {
-      method:'PATCH', prefer:'return=minimal',
-      body: JSON.stringify({ mail_sent: true })
-    });
-    r.mail_sent = true;
-    renderTable();
-    if(!silent) toast('✓ Email sent to '+r.email,'ok');
-
+    if(!res.ok){ const e=await res.json(); throw new Error(e.message||'Server error'); }
+    fill.style.width='100%'; label.textContent='Submitted ✓';
+    setTimeout(()=>{document.getElementById('doneRoll').textContent=fd.rollno;setPhase(4);},600);
   } catch(err){
-    console.error('Email error:', err);
-    if(btnEl && !silent){ btnEl.disabled=false; btnEl.textContent='✉ Mail'; }
-    if(!silent) toast('Failed: '+err.message,'err');
-    else toast('Auto-email failed for '+r.rollno+': '+err.message,'err');
+    clearInterval(iv);
+    document.getElementById('progWrap').classList.remove('show');
+    btn.disabled=false; btn.textContent='Submit Registration';
+    alert('Error: '+err.message);
   }
 }
-
-async function bulkSendMails(){
-  const unsent = recs.filter(r => r.status==='Approved' && !r.mail_sent && r.email);
-  if(unsent.length === 0){ toast('All approved students already emailed ✓','ok'); return; }
-  const btn = document.getElementById('bulkBtn');
-  btn.disabled = true;
-  btn.textContent = `Sending 0 / ${unsent.length}…`;
-  let sent = 0;
-  for(const r of unsent){
-    await sendMail(null, r.id, true);
-    sent++;
-    btn.textContent = `Sending ${sent} / ${unsent.length}…`;
-    await new Promise(res=>setTimeout(res, 300));
-  }
-  btn.disabled = false;
-  btn.textContent = '✉ Bulk Send Emails';
-  toast(`✓ Sent ${sent} emails!`, 'ok');
-  document.getElementById('bulkInfo').textContent = `📧 Send approval emails to all approved students who haven't received one yet.`;
-}
-
-async function resendAll(){
-  const all = recs.filter(r => r.status==='Approved' && r.email);
-  if(!all.length){ toast('No approved students with email','err'); return; }
-  const ok = confirm(`Resend updated QR cards to ALL ${all.length} approved students?\n\nSubject: "Updated Entry Pass (Action Required)"\n\nThis will resend to everyone including those already emailed.`);
-  if(!ok) return;
-  const btn = document.getElementById('resendBtn');
-  btn.disabled = true;
-  btn.textContent = `Resending 0 / ${all.length}…`;
-  let sent = 0;
-  for(const r of all){
-    await sendMail(null, r.id, true, true); // forceResend=true
-    sent++;
-    btn.textContent = `Resending ${sent} / ${all.length}…`;
-    await new Promise(res=>setTimeout(res, 400)); // slightly longer delay
-  }
-  btn.disabled = false;
-  btn.textContent = '🔄 Resend All — QR Update';
-  toast(`✓ Resent to ${sent} students!`, 'ok');
-}
-
-// ── QR ────────────────────────────────────────────────
-function showQR(id){
-  const r=recs.find(x=>x.id===id); if(!r) return;
-  document.getElementById('adminQRbox').innerHTML='';
-  document.getElementById('qrName').textContent=r.name;
-  document.getElementById('qrRoll').textContent=r.rollno+' · '+r.event;
-  new QRCode(document.getElementById('adminQRbox'),{
-    text:JSON.stringify({name:r.name,roll:r.rollno,event:r.event,college:'MRDU',artix:'2026',status:'APPROVED'}),
-    width:180,height:180,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
-  });
-  document.getElementById('dlQRbtn').onclick = () => dlQRCard(r);
-  document.getElementById('waQRbtn').onclick = () => shareWhatsApp(r);
-  openM('qrModal');
-}
-
-async function dlQRCard(r){
-  const dataUrl = await buildQRCard(r);
-  const a = document.createElement('a');
-  a.download = `ARTIX2026_QR_${r.rollno}.png`;
-  a.href = dataUrl;
-  a.click();
-}
-
-async function shareWhatsApp(r){
-  const dataUrl = await buildQRCard(r);
-  // Convert dataURL to blob and share via Web Share API if available
-  const res  = await fetch(dataUrl);
-  const blob = await res.blob();
-  const file = new File([blob], `ARTIX2026_QR_${r.rollno}.png`, { type:'image/png' });
-
-  if (navigator.canShare && navigator.canShare({ files:[file] })) {
-    await navigator.share({
-      title: 'ARTIX 2026 – Entry Pass',
-      text: `Hi ${r.name}! Your ARTIX 2026 entry pass is attached. Show this QR at the gate. See you on 16-17 March! 🎉`,
-      files: [file]
-    });
-  } else {
-    // Fallback — open WhatsApp web with pre-filled message, user saves image manually
-    const msg = encodeURIComponent(`Hi ${r.name}! 🎉 Your ARTIX 2026 entry pass is ready. Roll No: ${r.rollno}. Show your QR card at the gate on 16-17 March 2026, Sports Complex Auditorium.`);
-    const phone = (r.phone||'').replace(/\D/g,'');
-    const url = phone
-      ? `https://wa.me/91${phone}?text=${msg}`
-      : `https://wa.me/?text=${msg}`;
-    // Also download the image so they can attach it
-    const a = document.createElement('a');
-    a.download = `ARTIX2026_QR_${r.rollno}.png`;
-    a.href = dataUrl; a.click();
-    setTimeout(()=> window.open(url,'_blank'), 500);
-  }
-}
-
-function openM(id){document.getElementById(id).classList.add('on');}
-function closeM(id){document.getElementById(id).classList.remove('on');}
-document.querySelectorAll('.mback').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');}));
-function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} on`;setTimeout(()=>t.classList.remove('on'),2800);}
 </script>
 </body>
 </html>
